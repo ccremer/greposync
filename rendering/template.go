@@ -5,12 +5,10 @@ import (
 	"os"
 	"path"
 	"text/template"
-
-	"github.com/Masterminds/sprig/v3"
 )
 
 func RenderTemplate(repoDir string, data map[string]interface{}) error {
-	funcs := sprig.TxtFuncMap()
+	funcs := funcMap()
 
 	fileName := "README.tpl.md"
 	targetFilePath := path.Join("repos", repoDir, "README.md")
@@ -25,3 +23,4 @@ func RenderTemplate(repoDir string, data map[string]interface{}) error {
 	_ = w.Flush()
 	return err
 }
+
