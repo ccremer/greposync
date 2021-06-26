@@ -9,7 +9,7 @@ import (
 
 func main() {
 	dir := "git-repo-sync"
-	err := repository.CloneGitRepository("git@github.com:ccremer/git-repo-sync.git", dir)
+	repo, err := repository.CloneGitRepository("git@github.com:ccremer/git-repo-sync.git", dir)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -25,4 +25,8 @@ func main() {
 		log.Fatal(err)
 	}
 
+	err = repository.MakeCommit(repo)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
