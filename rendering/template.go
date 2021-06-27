@@ -2,6 +2,7 @@ package rendering
 
 import (
 	"bufio"
+	"log"
 	"os"
 	"path"
 	"text/template"
@@ -24,3 +25,9 @@ func RenderTemplate(repoDir string, data map[string]interface{}) error {
 	return err
 }
 
+
+func CheckIfError(err error) {
+	if err != nil {
+		log.Fatal(err)
+	}
+}
