@@ -1,27 +1,29 @@
 package rendering
 
 import (
-	"github.com/ccremer/git-repo-sync/printer"
-	"github.com/knadh/koanf"
 	"github.com/knadh/koanf/parsers/yaml"
 	"github.com/knadh/koanf/providers/file"
 )
 
-// Global koanf instance. Use "." as the key path delimiter. This can be "/" or any character.
-var k = koanf.New(".")
-
-func LoadConfigFile(path string) {
-	// Load YAML config and merge into the previously loaded config (because we can).
-	err := k.Load(file.Provider(path), yaml.Parser())
-	printer.CheckIfError(err)
+func (s *Service) loadVariables(syncFile string) {
+	// Load the config from config_defaults.yml
+	err := s.k.Merge(s.cfg.ConfigDefaults)
+	s.p.CheckIfError(err)
+	s.p.DebugF("Loading sync config %s", syncFile)
+	// Load the config from .sync.yml
+	err = s.k.Load(file.Provider(syncFile), yaml.Parser())
+	if err != nil {
+		s.p.WarnF("file %s not loaded: %s", syncFile, err)
+	}
 }
 
-func Unmarshal(file string) map[string]interface{} {
-
-	m := make(map[string]interface{})
-
-	err := k.Unmarshal(":globals", &m)
-	err = k.Unmarshal(file, &m)
-	printer.CheckIfError(err)
-	return m
+func (s *Service) loadDataForFile(fileName string) Data {
+	// Load the global variables into exposed values
+	data := make(Data)
+	err := s.k.Unmarshal(":globals", &data)
+	s.p.CheckIfError(err)
+	// Load the file-specific variables into values
+	err = s.k.Unmarshal(fileName, &data)
+	s.p.CheckIfError(err)
+	return data
 }

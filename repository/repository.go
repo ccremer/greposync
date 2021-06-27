@@ -6,6 +6,7 @@ import (
 	"path"
 	"strings"
 
+	"github.com/ccremer/git-repo-sync/cfg"
 	"github.com/ccremer/git-repo-sync/printer"
 	"github.com/go-git/go-git/v5"
 	"github.com/knadh/koanf"
@@ -30,14 +31,15 @@ type (
 		SkipPush   bool
 		ForcePush  bool
 		CreatePR   bool
+		Amend      bool
 	}
 	ManagedGitRepo struct {
 		Name string
 	}
 )
 
-func NewServicesFromFile(managedRepoPath string, repoRootDir string, defaultNs string) []*Service {
-	err := k.Load(file.Provider(managedRepoPath), yaml.Parser())
+func NewServicesFromFile(cfg *cfg.Configuration) []*Service {
+	err := k.Load(file.Provider("managed_repos.yml"), yaml.Parser())
 	printer.CheckIfError(err)
 
 	var s []*Service
@@ -46,17 +48,19 @@ func NewServicesFromFile(managedRepoPath string, repoRootDir string, defaultNs s
 	printer.CheckIfError(err)
 	gitBase := "git@github.com:"
 	for _, repo := range m {
-		u := parseUrl(repo, gitBase, defaultNs)
+		u := parseUrl(repo, gitBase, cfg.Namespace)
+		repoName := path.Base(u.Path)
 		s = append(s, &Service{
-			p: printer.New().MapColorToLevel(printer.Blue, printer.LevelInfo).SetLevel(printer.LevelDebug),
+			p: printer.New().MapColorToLevel(printer.Blue, printer.LevelInfo).SetLevel(printer.LevelDebug).SetName(repoName),
 			Config: Config{
-				GitDir:     path.Clean(path.Join(repoRootDir, strings.ReplaceAll(u.Hostname(), ":", "-"), u.Path)),
+				GitDir:     path.Clean(path.Join(cfg.ProjectRoot, strings.ReplaceAll(u.Hostname(), ":", "-"), u.Path)),
 				GitUrl:     u.String(),
 				ForcePush:  true,
-				SkipReset:  true,
-				SkipPush:   true,
-				SkipCommit: true,
-				CreatePR:   false,
+				SkipReset:  cfg.SkipReset,
+				SkipPush:   cfg.SkipPush,
+				SkipCommit: cfg.SkipCommit,
+				CreatePR:   cfg.PullRequest.Create,
+				Amend:      cfg.Amend,
 			},
 		})
 	}

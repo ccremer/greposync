@@ -7,7 +7,7 @@ import (
 
 func (s *Service) Pull() {
 	if s.Config.SkipReset {
-		s.p.WarnF("Skipped: pull")
+		s.p.WarnF("Skipped: git pull")
 		return
 	}
 	w, err := s.r.Worktree()

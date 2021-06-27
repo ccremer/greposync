@@ -62,19 +62,19 @@ func (p *colorPrinter) setColorForWriter(color Color, writer io.Writer) Printer 
 
 func (p colorPrinter) DebugF(format string, args ...interface{}) {
 	if p.level >= LevelDebug {
-		p.printWithColor(os.Stdout, p.colorMap[LevelDebug], format, args...)
+		p.printWithColorAndPrefix(os.Stdout, p.colorMap[LevelDebug], format, args...)
 	}
 }
 
 func (p *colorPrinter) InfoF(format string, args ...interface{}) {
 	if p.level >= LevelInfo {
-		p.printWithColor(os.Stdout, p.colorMap[LevelInfo], format, args...)
+		p.printWithColorAndPrefix(os.Stdout, p.colorMap[LevelInfo], format, args...)
 	}
 }
 
 func (p *colorPrinter) WarnF(format string, args ...interface{}) {
 	if p.level >= LevelWarn {
-		p.printWithColor(os.Stdout, p.colorMap[LevelWarn], format, args...)
+		p.printWithColorAndPrefix(os.Stdout, p.colorMap[LevelWarn], format, args...)
 	}
 }
 
@@ -94,8 +94,12 @@ func (p *colorPrinter) getPrefix() string {
 	return prefix
 }
 
-func (p *colorPrinter) printWithColor(writer io.Writer, color Color, format string, args ...interface{}) {
+func (p *colorPrinter) printWithColorAndPrefix(writer io.Writer, color Color, format string, args ...interface{}) {
 	_, _ = fmt.Fprintf(writer, "%s%s%s%s\n", color, p.getPrefix(), fmt.Sprintf(format, args...), Reset)
+}
+
+func (p *colorPrinter) printWithColor(writer io.Writer, color Color, format string, args ...interface{}) {
+	_, _ = fmt.Fprintf(writer, "%s%s%s\n", color, fmt.Sprintf(format, args...), Reset)
 }
 
 func (p *colorPrinter) SetLevel(level LogLevel) Printer {
@@ -103,9 +107,14 @@ func (p *colorPrinter) SetLevel(level LogLevel) Printer {
 	return p
 }
 
+func (p *colorPrinter) SetName(name string) Printer {
+	p.name = name
+	return p
+}
+
 func (p *colorPrinter) CheckIfError(err error) {
 	if err != nil {
-		p.printWithColor(os.Stderr, p.colorMap[LevelError], err.Error())
+		p.printWithColorAndPrefix(os.Stderr, p.colorMap[LevelError], err.Error())
 		os.Exit(1)
 	}
 }

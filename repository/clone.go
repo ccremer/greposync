@@ -25,7 +25,7 @@ func (s *Service) PrepareWorkspace() {
 
 func (s *Service) ResetRepository() {
 	if s.Config.SkipReset {
-		s.p.WarnF("Skipped: reset")
+		s.p.WarnF("Skipped: git reset")
 		return
 	}
 	s.p.InfoF("git fetch")

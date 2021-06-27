@@ -3,13 +3,16 @@ package cli
 import (
 	"encoding/json"
 	"fmt"
-	"log"
+	"os"
 	"path"
 
 	"github.com/ccremer/git-repo-sync/cfg"
 	"github.com/ccremer/git-repo-sync/printer"
 	"github.com/ccremer/git-repo-sync/rendering"
 	"github.com/ccremer/git-repo-sync/repository"
+	"github.com/knadh/koanf"
+	"github.com/knadh/koanf/parsers/yaml"
+	"github.com/knadh/koanf/providers/file"
 	"github.com/urfave/cli/v2"
 )
 
@@ -52,6 +55,7 @@ func validateUpdateCommand(ctx *cli.Context) error {
 		dryRunMode := ctx.String(dryRunFlagName)
 		switch dryRunMode {
 		case "offline":
+			config.SkipReset = true
 			config.SkipCommit = true
 			config.SkipPush = true
 			config.PullRequest.Create = false
@@ -72,29 +76,35 @@ func validateUpdateCommand(ctx *cli.Context) error {
 }
 
 func runUpdateCommand(*cli.Context) error {
+	globalK := koanf.New(".")
+	configDefaultName := "config_defaults.yml"
 
-	services := repository.NewServicesFromFile("managed_repos.yml", config.ProjectRoot, config.Namespace)
-
-	for _, repoService := range services {
-		repoService.PrepareWorkspace()
-
-		rendering.LoadConfigFile("config_defaults.yml")
-		syncFile := path.Join(repoService.Config.GitDir, ".sync.yml")
-		rendering.LoadConfigFile(syncFile)
-
-		data := map[string]interface{}{
-			"Values": rendering.Unmarshal("README.md/test"),
-		}
-
-		err := rendering.RenderTemplate(repoService.Config.GitDir, data)
+	if info, err := os.Stat(configDefaultName); err != nil || info.IsDir() {
+		printer.WarnF("File %s does not exist, ignoring template defaults")
+	} else {
+		printer.DebugF("Loading config %s", configDefaultName)
+		err = globalK.Load(file.Provider(configDefaultName), yaml.Parser())
 		if err != nil {
-			log.Fatal(err)
+			return nil
 		}
+	}
+	services := repository.NewServicesFromFile(config)
 
-		repoService.MakeCommit()
-		repoService.ShowDiff()
-		repoService.PushToRemote()
-		repoService.CreatePR()
+	for _, repo := range services {
+		repo.PrepareWorkspace()
+
+		renderer := rendering.NewService(rendering.Config{
+			TemplateDir:    config.TemplateRoot,
+			TargetRootDir:  repo.Config.GitDir,
+			ConfigDefaults: globalK,
+			RepoName:       path.Base(repo.Config.GitDir),
+		})
+
+		renderer.ProcessTemplates()
+		repo.MakeCommit()
+		repo.ShowDiff()
+		repo.PushToRemote()
+		repo.CreatePR()
 	}
 	return nil
 }
