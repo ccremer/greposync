@@ -9,10 +9,7 @@ import (
 
 func main() {
 	dir := "git-repo-sync"
-	repo, err := repository.CloneGitRepository("git@github.com:ccremer/git-repo-sync.git", dir)
-	if err != nil {
-		log.Fatal(err)
-	}
+	repo := repository.PrepareWorkspace("git@github.com:ccremer/git-repo-sync.git", dir)
 
 	data := map[string]interface{} {
 		"Values": map[string]string {
@@ -20,13 +17,11 @@ func main() {
 		},
 	}
 
-	err = rendering.RenderTemplate(dir, data)
+	err := rendering.RenderTemplate(dir, data)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	err = repository.MakeCommit(repo)
-	if err != nil {
-		log.Fatal(err)
-	}
+	repository.MakeCommit(repo)
+	repository.ShowDiff(repo)
 }
