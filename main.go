@@ -9,24 +9,27 @@ import (
 )
 
 func main() {
-	dir := "git-repo-sync"
-	repo := repository.PrepareWorkspace("git@github.com:ccremer/git-repo-sync.git", dir)
+	services := repository.NewServicesFromFile("managed_repos.yml", "repos", "ccremer")
 
-	rendering.LoadConfigFile("config_defaults.yml")
-	syncFile := path.Join("repos",dir, ".sync.yml")
-	rendering.LoadConfigFile(syncFile)
+	for _, repoService := range services {
+		repoService.PrepareWorkspace()
 
-	data := map[string]interface{}{
-		"Values": rendering.Unmarshal("README.md/test"),
+		rendering.LoadConfigFile("config_defaults.yml")
+		syncFile := path.Join(repoService.Config.GitDir, ".sync.yml")
+		rendering.LoadConfigFile(syncFile)
+
+		data := map[string]interface{}{
+			"Values": rendering.Unmarshal("README.md/test"),
+		}
+
+		err := rendering.RenderTemplate(repoService.Config.GitDir, data)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		repoService.MakeCommit()
+		repoService.ShowDiff()
+		repoService.PushToRemote()
+		repoService.CreatePR()
 	}
-
-	err := rendering.RenderTemplate(dir, data)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	//repository.MakeCommit(repo)
-	repository.ShowDiff(repo)
-	//repository.PushToRemote(repo)
-	//repository.CreatePR(repo)
 }

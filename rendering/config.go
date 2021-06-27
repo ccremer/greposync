@@ -6,7 +6,6 @@ import (
 	"github.com/knadh/koanf/providers/file"
 )
 
-
 // Global koanf instance. Use "." as the key path delimiter. This can be "/" or any character.
 var k = koanf.New(".")
 

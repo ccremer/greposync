@@ -4,26 +4,23 @@ import (
 	"fmt"
 	"os"
 	"strings"
-
-	"github.com/go-git/go-git/v5"
 )
 
-func ShowDiff(r *git.Repository) {
+func (s *Service) ShowDiff() {
 
 	// Getting the latest commit on the current branch
 	Info("git log -1")
 
 	// ... retrieving the branch being pointed by HEAD
-	ref, err := r.Head()
+	ref, err := s.r.Head()
 	CheckIfError(err)
 
 	// ... retrieving the commit object
-	commit, err := r.CommitObject(ref.Hash())
+	commit, err := s.r.CommitObject(ref.Hash())
 	CheckIfError(err)
 
 	Info("retrieve parent commit")
 	parent, err := commit.Parent(0)
-
 
 	Info("getting previous commit %s", parent)
 	patch, err := parent.Patch(commit)

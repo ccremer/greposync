@@ -2,12 +2,15 @@ package repository
 
 import "github.com/go-git/go-git/v5"
 
-func PushToRemote(r *git.Repository) {
+func (s *Service) PushToRemote() {
 
+	if s.Config.SkipPush || s.Config.SkipCommit {
+		Info("Skipping push")
+		return
+	}
 	Info("git push")
-	// push using default options
-	err := r.Push(&git.PushOptions{
-		Force: true,
+	err := s.r.Push(&git.PushOptions{
+		Force: s.Config.ForcePush,
 	})
 	CheckIfError(err)
 }
