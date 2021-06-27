@@ -3,13 +3,16 @@ package cfg
 type (
 	// Configuration holds a strongly-typed tree of the configuration
 	Configuration struct {
-		Log         LogConfig
-		Namespace   string
-		Message     string
-		PullRequest PullRequestConfig
-		SkipCommit  bool
-		SkipPush    bool
-		ProjectRoot string
+		Log          LogConfig
+		Namespace    string
+		Message      string
+		PullRequest  PullRequestConfig
+		SkipCommit   bool
+		SkipPush     bool
+		ProjectRoot  string
+		TemplateRoot string
+		SkipReset    bool
+		Amend        bool
 	}
 	// LogConfig configures the logging options
 	LogConfig struct {
@@ -29,7 +32,8 @@ func NewDefaultConfig() *Configuration {
 		Log: LogConfig{
 			Level: "info",
 		},
-		Message:     "Update from git-repo-sync",
-		ProjectRoot: "repos",
+		Message:      "Update from git-repo-sync",
+		ProjectRoot:  "repos",
+		TemplateRoot: "template",
 	}
 }

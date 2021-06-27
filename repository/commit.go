@@ -7,6 +7,7 @@ import (
 
 func (s *Service) MakeCommit() {
 	if s.Config.SkipCommit {
+		s.p.WarnF("Skipped: git commit")
 		return
 	}
 	w, err := s.r.Worktree()
@@ -21,10 +22,6 @@ func (s *Service) MakeCommit() {
 	s.p.CheckIfError(err)
 	s.p.LogF(status.String())
 
-	if s.Config.SkipCommit {
-		s.p.WarnF("Skipped: commit")
-		return
-	}
 	s.p.InfoF("git commit -m \"New update from template\"")
 	commit, err := w.Commit("New update from template", &git.CommitOptions{})
 

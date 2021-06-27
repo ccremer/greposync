@@ -56,7 +56,7 @@ func New() Printer {
 	return &colorPrinter{
 		level: DefaultLevel,
 		color: InfoColor,
-		name: "",
+		name:  "",
 		colorMap: map[LogLevel]Color{
 			LevelError: ErrorColor,
 			LevelWarn:  WarnColor,

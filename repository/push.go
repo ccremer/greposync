@@ -7,7 +7,7 @@ import (
 func (s *Service) PushToRemote() {
 
 	if s.Config.SkipPush {
-		s.p.WarnF("Skipped: push")
+		s.p.WarnF("Skipped: git push")
 		return
 	}
 	s.p.InfoF("git push")
