@@ -16,7 +16,7 @@ help: ## Show this help
 .PHONY: build
 build: export GOOS = linux
 build: fmt vet ## Build the Go binary
-	@go build . -o gsync
+	@go build -o gsync .
 
 .PHONY: fmt
 fmt: ## Run 'go fmt' against code
