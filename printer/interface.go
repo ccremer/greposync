@@ -1,5 +1,10 @@
 package printer
 
+import (
+	"errors"
+	"strings"
+)
+
 type (
 	Printer interface {
 		// DebugF sets the color to DebugColor, prints the string as given and resets the color, provided the LogLevel is LevelDebug or higher.
@@ -71,4 +76,19 @@ func WarnF(format string, args ...interface{}) {
 }
 func CheckIfError(err error) {
 	DefaultPrinter.CheckIfError(err)
+}
+
+func ParseLogLevel(level string) (LogLevel, error) {
+	levelMap := map[string]LogLevel{
+		"error": LevelError,
+		"warn":  LevelWarn,
+		"info":  LevelInfo,
+		"debug": LevelDebug,
+	}
+	lvl, found := levelMap[strings.ToLower(level)]
+	if found {
+		return lvl, nil
+	} else {
+		return LevelInfo, errors.New("log level invalid: " + level)
+	}
 }
