@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/ccremer/git-repo-sync/printer"
 	"github.com/google/go-github/v36/github"
 	"golang.org/x/oauth2"
 )
@@ -33,7 +34,7 @@ func CreatePR(c Config) {
 	client := github.NewClient(tc)
 
 	err := createPR(context.Background(), client, c)
-	CheckIfError(err)
+	printer.CheckIfError(err)
 }
 
 // createPR creates a pull request. Based on: https://godoc.org/github.com/google/go-github/github#example-PullRequestsService-Create
@@ -63,11 +64,5 @@ func addLabels(ctx context.Context, client *github.Client, c Config, issueNumber
 	_, _, err := client.Issues.AddLabelsToIssue(ctx, c.RepoOwner, c.Repo, issueNumber, c.Labels)
 	if err != nil {
 		log.Println("could not add label, ignoring error: " + err.Error())
-	}
-}
-
-func CheckIfError(err error) {
-	if err != nil {
-		log.Fatal(err)
 	}
 }

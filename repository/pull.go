@@ -1,29 +1,22 @@
 package repository
 
 import (
-	"fmt"
-
+	"github.com/ccremer/git-repo-sync/printer"
 	"github.com/go-git/go-git/v5"
 )
 
 func (s *Service) Pull() {
-
-	// Get the working directory for the repository
+	if s.Config.SkipReset {
+		s.p.WarnF("Skipped: pull")
+		return
+	}
 	w, err := s.r.Worktree()
-	CheckIfError(err)
+	s.p.CheckIfError(err)
 
-	Info("git pull origin")
+	s.p.InfoF("git pull origin")
 	// Pull the latest changes from the origin remote and merge into the current branch
 	err = w.Pull(&git.PullOptions{})
 	if err != git.NoErrAlreadyUpToDate {
-		CheckIfError(err)
+		printer.CheckIfError(err)
 	}
-
-	// Print the latest commit that was just pulled
-	ref, err := s.r.Head()
-	CheckIfError(err)
-	commit, err := s.r.CommitObject(ref.Hash())
-	CheckIfError(err)
-
-	fmt.Println(commit)
 }

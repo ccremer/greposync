@@ -3,6 +3,7 @@ package repository
 import (
 	"os"
 
+	"github.com/ccremer/git-repo-sync/printer"
 	"github.com/go-git/go-git/v5"
 )
 
@@ -10,42 +11,46 @@ func (s *Service) PrepareWorkspace() {
 	gitDir := s.Config.GitDir
 	if _, err := os.Stat(gitDir); os.IsNotExist(err) {
 		s.CloneGitRepository()
-		s.SwitchBranch()
+		s.CheckoutBranch()
 		return
 	}
 	repo, err := git.PlainOpen(gitDir)
-	CheckIfError(err)
-
-	//ResetRepository(repo)
-	//SwitchBranch(repo)
-	//Pull(repo)
-
+	s.p.CheckIfError(err)
 	s.r = repo
+
+	s.ResetRepository()
+	s.CheckoutBranch()
+	s.Pull()
 }
 
 func (s *Service) ResetRepository() {
-	Info("git fetch")
+	if s.Config.SkipReset {
+		s.p.WarnF("Skipped: reset")
+		return
+	}
+	s.p.InfoF("git fetch")
 	err := s.r.Fetch(&git.FetchOptions{})
 	if err != git.NoErrAlreadyUpToDate {
-		CheckIfError(err)
+		printer.CheckIfError(err)
 	}
 
 	w, err := s.r.Worktree()
-	CheckIfError(err)
+	s.p.CheckIfError(err)
 
-	Info("git reset --hard")
+	s.p.InfoF("git reset --hard")
 	err = w.Reset(&git.ResetOptions{
 		Mode: git.HardReset,
 	})
-	CheckIfError(err)
+	s.p.CheckIfError(err)
 }
 
 func (s *Service) CloneGitRepository() {
+	s.p.InfoF("git clone")
 	gitDir := s.Config.GitDir
 	repo, err := git.PlainClone(gitDir, false, &git.CloneOptions{
 		URL:      s.Config.GitUrl,
 		Progress: os.Stdout,
 	})
-	CheckIfError(err)
+	s.p.CheckIfError(err)
 	s.r = repo
 }

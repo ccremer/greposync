@@ -1,45 +1,45 @@
 package repository
 
 import (
-	"fmt"
-	"os"
 	"strings"
+
+	"github.com/ccremer/git-repo-sync/printer"
 )
 
 func (s *Service) ShowDiff() {
-
-	// Getting the latest commit on the current branch
-	Info("git log -1")
-
-	// ... retrieving the branch being pointed by HEAD
+	if s.Config.SkipCommit {
+		return
+	}
+	s.p.DebugF("Getting the latest commit on the current branch")
 	ref, err := s.r.Head()
-	CheckIfError(err)
+	s.p.CheckIfError(err)
 
-	// ... retrieving the commit object
+	s.p.DebugF("Retrieving the commit object")
 	commit, err := s.r.CommitObject(ref.Hash())
-	CheckIfError(err)
+	s.p.CheckIfError(err)
 
-	Info("retrieve parent commit")
+	s.p.DebugF("Retrieving the parent commit")
 	parent, err := commit.Parent(0)
+	s.p.CheckIfError(err)
 
-	Info("getting previous commit %s", parent)
+	s.p.DebugF("Retrieving the patch between")
 	patch, err := parent.Patch(commit)
-	CheckIfError(err)
+	s.p.CheckIfError(err)
 
-	prettyPrint(patch.String())
+	s.prettyPrint(patch.String())
 }
 
-func prettyPrint(diff string) {
+func (s *Service) prettyPrint(diff string) {
 	lines := strings.Split(diff, "\n")
 	for _, line := range lines {
 		if strings.HasPrefix(line, "-") {
-			fmt.Fprintf(os.Stdout, "\x1b[31;1m%s\x1b[0m\n", line)
+			s.p.UseColor(printer.Red).LogF(line)
 			continue
 		}
 		if strings.HasPrefix(line, "+") {
-			fmt.Fprintf(os.Stdout, "\x1b[32;1m%s\x1b[0m\n", line)
+			s.p.UseColor(printer.Green).LogF(line)
 			continue
 		}
-		fmt.Println(line)
+		s.p.UseColor(printer.White).LogF(line)
 	}
 }
