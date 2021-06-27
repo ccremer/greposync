@@ -24,4 +24,6 @@ func main() {
 
 	repository.MakeCommit(repo)
 	repository.ShowDiff(repo)
+	repository.PushToRemote(repo)
+	repository.CreatePR(repo)
 }

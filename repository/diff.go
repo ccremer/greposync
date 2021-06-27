@@ -20,7 +20,6 @@ func ShowDiff(r *git.Repository) {
 	// ... retrieving the commit object
 	commit, err := r.CommitObject(ref.Hash())
 	CheckIfError(err)
-	fmt.Println(commit)
 
 	Info("retrieve parent commit")
 	parent, err := commit.Parent(0)

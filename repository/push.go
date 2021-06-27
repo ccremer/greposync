@@ -2,6 +2,12 @@ package repository
 
 import "github.com/go-git/go-git/v5"
 
-func PushToRemote(repo *git.Repository) error {
-return nil
+func PushToRemote(r *git.Repository) {
+
+	Info("git push")
+	// push using default options
+	err := r.Push(&git.PushOptions{
+		Force: true,
+	})
+	CheckIfError(err)
 }

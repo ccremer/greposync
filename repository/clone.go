@@ -9,6 +9,7 @@ import (
 
 func PrepareWorkspace(url, dir string) *git.Repository {
 	gitDir := path.Join("repos", dir)
+	gitDir = path.Clean(gitDir)
 	if _, err := os.Stat(gitDir); os.IsNotExist(err) {
 		repo := CloneGitRepository(url, dir)
 		SwitchBranch(repo)
@@ -43,6 +44,7 @@ func ResetRepository(repo *git.Repository) {
 
 func CloneGitRepository(url, dir string) *git.Repository {
 	gitDir := path.Join("repos", dir)
+	gitDir = path.Clean(gitDir)
 	repo, err := git.PlainClone(gitDir, false, &git.CloneOptions{
 		URL:      url,
 		Progress: os.Stdout,
