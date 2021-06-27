@@ -2,37 +2,35 @@ package repository
 
 import (
 	"os"
-	"path"
 
 	"github.com/go-git/go-git/v5"
 )
 
-func PrepareWorkspace(url, dir string) *git.Repository {
-	gitDir := path.Join("repos", dir)
-	gitDir = path.Clean(gitDir)
+func (s *Service) PrepareWorkspace() {
+	gitDir := s.Config.GitDir
 	if _, err := os.Stat(gitDir); os.IsNotExist(err) {
-		repo := CloneGitRepository(url, dir)
-		SwitchBranch(repo)
-		return repo
+		s.CloneGitRepository()
+		s.SwitchBranch()
+		return
 	}
 	repo, err := git.PlainOpen(gitDir)
 	CheckIfError(err)
 
-	ResetRepository(repo)
-	SwitchBranch(repo)
-	Pull(repo)
+	//ResetRepository(repo)
+	//SwitchBranch(repo)
+	//Pull(repo)
 
-	return repo
+	s.r = repo
 }
 
-func ResetRepository(repo *git.Repository) {
+func (s *Service) ResetRepository() {
 	Info("git fetch")
-	err := repo.Fetch(&git.FetchOptions{})
+	err := s.r.Fetch(&git.FetchOptions{})
 	if err != git.NoErrAlreadyUpToDate {
 		CheckIfError(err)
 	}
 
-	w, err := repo.Worktree()
+	w, err := s.r.Worktree()
 	CheckIfError(err)
 
 	Info("git reset --hard")
@@ -42,13 +40,12 @@ func ResetRepository(repo *git.Repository) {
 	CheckIfError(err)
 }
 
-func CloneGitRepository(url, dir string) *git.Repository {
-	gitDir := path.Join("repos", dir)
-	gitDir = path.Clean(gitDir)
+func (s *Service) CloneGitRepository() {
+	gitDir := s.Config.GitDir
 	repo, err := git.PlainClone(gitDir, false, &git.CloneOptions{
-		URL:      url,
+		URL:      s.Config.GitUrl,
 		Progress: os.Stdout,
 	})
 	CheckIfError(err)
-	return repo
+	s.r = repo
 }

@@ -4,55 +4,67 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"os"
 
-	"github.com/go-git/go-git/v5"
 	"github.com/google/go-github/v36/github"
 	"golang.org/x/oauth2"
 )
 
-func CreatePR(r *git.Repository) {
+type (
+	Config struct {
+		Token        string
+		Subject      string
+		Repo         string
+		RepoOwner    string
+		CommitBranch string
+		TargetBranch string
+		Body         string
+		Labels       []string
+	}
+)
+
+func CreatePR(c Config) {
 
 	ctx := context.Background()
 	ts := oauth2.StaticTokenSource(
-		&oauth2.Token{AccessToken: os.Getenv("GITHUB_TOKEN")},
+		&oauth2.Token{AccessToken: c.Token},
 	)
 	tc := oauth2.NewClient(ctx, ts)
 
 	client := github.NewClient(tc)
 
-	err := createPR(context.Background(), client)
+	err := createPR(context.Background(), client, c)
 	CheckIfError(err)
 }
 
 // createPR creates a pull request. Based on: https://godoc.org/github.com/google/go-github/github#example-PullRequestsService-Create
-func createPR(ctx context.Context, client *github.Client) (err error) {
-	prSubject := "Update from gsync"
-	prRepo := "git-repo-sync"
-	prRepoOwner := "ccremer"
-
-	commitBranch := "my-branch"
-
-	prBranch := "master"
-	prDescription := "long text for PR desc"
-
+func createPR(ctx context.Context, client *github.Client, c Config) (err error) {
 	newPR := &github.NewPullRequest{
-		Title:               &prSubject,
-		Head:                &commitBranch,
-		Base:                &prBranch,
-		Body:                &prDescription,
+		Title:               &c.Subject,
+		Head:                &c.CommitBranch,
+		Base:                &c.TargetBranch,
+		Body:                &c.Body,
 		MaintainerCanModify: github.Bool(true),
 	}
 
-	pr, _, err := client.PullRequests.Create(ctx, prRepoOwner, prRepo, newPR)
+	pr, _, err := client.PullRequests.Create(ctx, c.RepoOwner, c.Repo, newPR)
 	if err != nil {
 		return err
+	}
+
+	if len(c.Labels) > 0 {
+		addLabels(ctx, client, c, *pr.Number)
 	}
 
 	fmt.Printf("PR created: %s\n", pr.GetHTMLURL())
 	return nil
 }
 
+func addLabels(ctx context.Context, client *github.Client, c Config, issueNumber int) {
+	_, _, err := client.Issues.AddLabelsToIssue(ctx, c.RepoOwner, c.Repo, issueNumber, c.Labels)
+	if err != nil {
+		log.Println("could not add label, ignoring error: " + err.Error())
+	}
+}
 
 func CheckIfError(err error) {
 	if err != nil {

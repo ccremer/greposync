@@ -2,14 +2,12 @@ package repository
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/go-git/go-git/v5"
-	"github.com/go-git/go-git/v5/plumbing/object"
 )
 
-func MakeCommit(repo *git.Repository) {
-	w, err := repo.Worktree()
+func (s *Service) MakeCommit() {
+	w, err := s.r.Worktree()
 	CheckIfError(err)
 
 	Info("git add *")
@@ -19,16 +17,14 @@ func MakeCommit(repo *git.Repository) {
 	Info("git status --porcelain")
 	fmt.Println(w.Status())
 
+	if s.Config.SkipCommit {
+		Info("Skipping commit")
+		return
+	}
 	Info("git commit -m \"New update from template\"")
-	commit, err := w.Commit("New update from template", &git.CommitOptions{
-		Author: &object.Signature{
-			Name: "just me",
-			Email: "john@doe.org",
-			When: time.Now(),
-		},
-	})
+	commit, err := w.Commit("New update from template", &git.CommitOptions{})
 
-	obj, err := repo.CommitObject(commit)
+	obj, err := s.r.CommitObject(commit)
 	fmt.Println(obj)
 	CheckIfError(err)
 }

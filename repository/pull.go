@@ -6,10 +6,10 @@ import (
 	"github.com/go-git/go-git/v5"
 )
 
-func Pull(repo *git.Repository) {
+func (s *Service) Pull() {
 
 	// Get the working directory for the repository
-	w, err := repo.Worktree()
+	w, err := s.r.Worktree()
 	CheckIfError(err)
 
 	Info("git pull origin")
@@ -20,9 +20,9 @@ func Pull(repo *git.Repository) {
 	}
 
 	// Print the latest commit that was just pulled
-	ref, err := repo.Head()
+	ref, err := s.r.Head()
 	CheckIfError(err)
-	commit, err := repo.CommitObject(ref.Hash())
+	commit, err := s.r.CommitObject(ref.Hash())
 	CheckIfError(err)
 
 	fmt.Println(commit)
