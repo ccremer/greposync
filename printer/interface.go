@@ -31,6 +31,8 @@ type (
 		ResetColor()
 		// SetLevel sets the logging level.
 		SetLevel(level LogLevel) Printer
+		// SetName sets a prefix for DebugF, InfoF, WarnF
+		SetName(name string) Printer
 		// CheckIfError will print the error in ErrorColor to stderr if it is non-nil and exit with exit code 1.
 		CheckIfError(err error)
 	}
@@ -54,6 +56,7 @@ func New() Printer {
 	return &colorPrinter{
 		level: DefaultLevel,
 		color: InfoColor,
+		name: "",
 		colorMap: map[LogLevel]Color{
 			LevelError: ErrorColor,
 			LevelWarn:  WarnColor,
