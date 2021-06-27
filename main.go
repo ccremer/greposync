@@ -4,11 +4,14 @@ import (
 	"log"
 	"path"
 
+	"github.com/ccremer/git-repo-sync/printer"
 	"github.com/ccremer/git-repo-sync/rendering"
 	"github.com/ccremer/git-repo-sync/repository"
 )
 
 func main() {
+	printer.DefaultPrinter.SetLevel(printer.LevelDebug)
+
 	services := repository.NewServicesFromFile("managed_repos.yml", "repos", "ccremer")
 
 	for _, repoService := range services {

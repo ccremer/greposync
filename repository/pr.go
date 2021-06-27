@@ -8,7 +8,7 @@ import (
 
 func (s *Service) CreatePR() {
 	if !s.Config.CreatePR {
-		Info("Skip creating PR")
+		s.p.WarnF("Skipped: Create PR")
 		return
 	}
 	c := github.Config{
