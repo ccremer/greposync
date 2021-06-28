@@ -32,6 +32,7 @@ type (
 		ForcePush  bool
 		CreatePR   bool
 		Amend      bool
+		CommitMessage string
 	}
 	ManagedGitRepo struct {
 		Name string
@@ -61,6 +62,7 @@ func NewServicesFromFile(cfg *cfg.Configuration) []*Service {
 				SkipCommit: cfg.SkipCommit,
 				CreatePR:   cfg.PullRequest.Create,
 				Amend:      cfg.Amend,
+				CommitMessage: cfg.Message,
 			},
 		})
 	}
