@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	"path"
 
 	"github.com/ccremer/git-repo-sync/cfg"
 	"github.com/ccremer/git-repo-sync/printer"
@@ -19,6 +18,7 @@ import (
 const (
 	dryRunFlagName   = "dry-run"
 	createPrFlagName = "pr"
+	prBodyFlagName   = "pr-body"
 )
 
 func createUpdateCommand(c *cfg.Configuration) *cli.Command {
@@ -38,6 +38,11 @@ func createUpdateCommand(c *cfg.Configuration) *cli.Command {
 				Destination: &c.PullRequest.Create,
 				Usage:       "Create a PullRequest on a supported git hoster after pushing to remote.",
 			},
+			&cli.StringFlag{
+				Name:        prBodyFlagName,
+				Destination: &c.PullRequest.BodyTemplate,
+				Usage:       "Markdown-enabled body of the PullRequest. It will load from an existing file if this is a path. Content can be templated. Defaults to commit message.",
+			},
 		),
 	}
 }
@@ -55,12 +60,12 @@ func validateUpdateCommand(ctx *cli.Context) error {
 		dryRunMode := ctx.String(dryRunFlagName)
 		switch dryRunMode {
 		case "offline":
-			config.SkipReset = true
-			config.SkipCommit = true
-			config.SkipPush = true
+			config.Git.SkipReset = true
+			config.Git.SkipCommit = true
+			config.Git.SkipPush = true
 			config.PullRequest.Create = false
 		case "commit":
-			config.SkipPush = true
+			config.Git.SkipPush = true
 			config.PullRequest.Create = false
 		case "push":
 			config.PullRequest.Create = false
@@ -91,20 +96,39 @@ func runUpdateCommand(*cli.Context) error {
 	services := repository.NewServicesFromFile(config)
 
 	for _, repo := range services {
+		log := printer.New().SetName(repo.Config.GetName())
+
+		sc := &cfg.SyncConfig{
+			Git:         repo.Config,
+			PullRequest: config.PullRequest,
+			Template: cfg.TemplateConfig{
+				RootDir: config.Template.RootDir,
+			},
+		}
+
 		repo.PrepareWorkspace()
 
-		renderer := rendering.NewService(rendering.Config{
-			TemplateDir:    config.TemplateRoot,
-			TargetRootDir:  repo.Config.GitDir,
-			ConfigDefaults: globalK,
-			RepoName:       path.Base(repo.Config.GitDir),
-		})
+		renderer := rendering.NewRenderer(sc, globalK)
 
 		renderer.ProcessTemplates()
 		repo.MakeCommit()
 		repo.ShowDiff()
 		repo.PushToRemote()
-		repo.CreatePR()
+
+		if config.PullRequest.Create {
+			template := config.PullRequest.BodyTemplate
+			if template == "" {
+				log.InfoF("No PullRequest template defined")
+				config.PullRequest.BodyTemplate = config.Git.CommitMessage
+			}
+
+			if renderer.FileExists(template) {
+				renderer.RenderTemplateFile(renderer.ConstructMetadata(), template)
+			} else {
+				renderer.RenderString(renderer.ConstructMetadata(), template)
+			}
+			repo.CreatePR(config.PullRequest)
+		}
 	}
 	return nil
 }

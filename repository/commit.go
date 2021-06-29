@@ -22,8 +22,8 @@ func (s *Service) MakeCommit() {
 	s.p.CheckIfError(err)
 	s.p.LogF(status.String())
 
-	s.p.InfoF("git commit -m \"New update from template\"")
-	commit, err := w.Commit("New update from template", &git.CommitOptions{})
+	s.p.InfoF("git commit -m \"%s\"", s.Config.CommitMessage)
+	commit, err := w.Commit(s.Config.CommitMessage, &git.CommitOptions{})
 
 	obj, err := s.r.CommitObject(commit)
 	s.p.CheckIfError(err)
