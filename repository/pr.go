@@ -7,12 +7,12 @@ import (
 	"github.com/ccremer/git-repo-sync/repository/github"
 )
 
-func (s *Service) CreatePR(config cfg.PullRequestConfig) {
+func (s *Service) CreateOrUpdatePR(config cfg.PullRequestConfig) {
 	if !s.Config.CreatePR {
 		s.p.WarnF("Skipped: Create PR")
 		return
 	}
-	c := github.Config{
+	c := &github.Config{
 		Token:        os.Getenv("GITHUB_TOKEN"),
 		Subject:      config.Subject,
 		Repo:         s.Config.GetName(),
@@ -21,5 +21,6 @@ func (s *Service) CreatePR(config cfg.PullRequestConfig) {
 		TargetBranch: config.TargetBranch,
 		Body:         config.BodyTemplate,
 	}
-	github.CreatePR(c)
+	gh := github.NewProvider(c)
+	gh.CreateOrUpdatePR()
 }

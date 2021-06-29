@@ -14,5 +14,7 @@ func (s *Service) PushToRemote() {
 	err := s.r.Push(&git.PushOptions{
 		Force: s.Config.ForcePush,
 	})
-	s.p.CheckIfError(err)
+	if err != git.NoErrAlreadyUpToDate {
+		s.p.CheckIfError(err)
+	}
 }

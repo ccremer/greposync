@@ -127,7 +127,7 @@ func runUpdateCommand(*cli.Context) error {
 			} else {
 				renderer.RenderString(renderer.ConstructMetadata(), template)
 			}
-			repo.CreatePR(config.PullRequest)
+			repo.CreateOrUpdatePR(config.PullRequest)
 		}
 	}
 	return nil

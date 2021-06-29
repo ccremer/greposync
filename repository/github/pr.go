@@ -3,7 +3,6 @@ package github
 import (
 	"context"
 	"fmt"
-	"log"
 
 	"github.com/ccremer/git-repo-sync/printer"
 	"github.com/google/go-github/v36/github"
@@ -21,48 +20,95 @@ type (
 		Body         string
 		Labels       []string
 	}
+	PrProvider struct {
+		cfg    *Config
+		client *github.Client
+		ctx    context.Context
+		log    printer.Printer
+	}
 )
 
-func CreatePR(c Config) {
-
-	ctx := context.Background()
+func (p *PrProvider) createClient() {
+	p.ctx = context.Background()
 	ts := oauth2.StaticTokenSource(
-		&oauth2.Token{AccessToken: c.Token},
+		&oauth2.Token{AccessToken: p.cfg.Token},
 	)
-	tc := oauth2.NewClient(ctx, ts)
+	tc := oauth2.NewClient(p.ctx, ts)
 
-	client := github.NewClient(tc)
+	p.client = github.NewClient(tc)
+}
 
-	err := createPR(context.Background(), client, c)
-	printer.CheckIfError(err)
+func NewProvider(config *Config) *PrProvider {
+	provider := &PrProvider{
+		cfg: config,
+	}
+	provider.createClient()
+	return provider
+}
+
+func (p *PrProvider) CreateOrUpdatePR() {
+
+	if pr := p.findExistingPr(); pr == nil {
+		err := p.createPR()
+		p.log.CheckIfError(err)
+	} else {
+		if *pr.Body != p.cfg.Body || *pr.Title != p.cfg.Subject {
+			p.log.InfoF("Updating PR#%s", pr.Number)
+			err := p.updatePr(pr)
+			p.log.CheckIfError(err)
+		} else {
+			p.log.InfoF("PR#%s is up-to-date.", pr.Number)
+		}
+	}
+
+}
+
+func (p *PrProvider) findExistingPr() *github.PullRequest {
+	p.log.DebugF("Searching existing PRs with same branch %s...", p.cfg.CommitBranch)
+	list, _, err := p.client.PullRequests.List(p.ctx, p.cfg.RepoOwner, p.cfg.Repo, &github.PullRequestListOptions{
+		Head: fmt.Sprintf("%s:%s", p.cfg.RepoOwner, p.cfg.CommitBranch),
+	})
+	p.log.CheckIfError(err)
+	if len(list) > 0 {
+		return list[0]
+	}
+	return nil
 }
 
 // createPR creates a pull request. Based on: https://godoc.org/github.com/google/go-github/github#example-PullRequestsService-Create
-func createPR(ctx context.Context, client *github.Client, c Config) (err error) {
+func (p *PrProvider) createPR() (err error) {
+	p.log.DebugF("Creating new PR")
 	newPR := &github.NewPullRequest{
-		Title:               &c.Subject,
-		Head:                &c.CommitBranch,
-		Base:                &c.TargetBranch,
-		Body:                &c.Body,
+		Title:               &p.cfg.Subject,
+		Head:                &p.cfg.CommitBranch,
+		Base:                &p.cfg.TargetBranch,
+		Body:                &p.cfg.Body,
 		MaintainerCanModify: github.Bool(true),
 	}
 
-	pr, _, err := client.PullRequests.Create(ctx, c.RepoOwner, c.Repo, newPR)
+	pr, _, err := p.client.PullRequests.Create(p.ctx, p.cfg.RepoOwner, p.cfg.Repo, newPR)
 	if err != nil {
 		return err
 	}
 
-	if len(c.Labels) > 0 {
-		addLabels(ctx, client, c, *pr.Number)
+	if len(p.cfg.Labels) > 0 {
+		p.addLabels(*pr.Number)
 	}
 
-	fmt.Printf("PR created: %s\n", pr.GetHTMLURL())
+	p.log.InfoF("PR created: %s", pr.GetHTMLURL())
 	return nil
 }
 
-func addLabels(ctx context.Context, client *github.Client, c Config, issueNumber int) {
-	_, _, err := client.Issues.AddLabelsToIssue(ctx, c.RepoOwner, c.Repo, issueNumber, c.Labels)
+func (p *PrProvider) addLabels(issueNumber int) {
+	_, _, err := p.client.Issues.AddLabelsToIssue(p.ctx, p.cfg.RepoOwner, p.cfg.Repo, issueNumber, p.cfg.Labels)
 	if err != nil {
-		log.Println("could not add label, ignoring error: " + err.Error())
+		p.log.WarnF("could not add label, ignoring error: " + err.Error())
 	}
+}
+
+func (p *PrProvider) updatePr(pr *github.PullRequest) error {
+	pr.Body = &p.cfg.Body
+	pr.Title = &p.cfg.Subject
+	_, _, err := p.client.PullRequests.Edit(p.ctx, p.cfg.RepoOwner, p.cfg.Repo, *pr.Number, pr)
+	return err
 }
