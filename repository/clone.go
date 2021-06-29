@@ -7,13 +7,12 @@ import (
 )
 
 func (s *Service) PrepareWorkspace() {
-	gitDir := s.Config.GitDir
-	if _, err := os.Stat(gitDir); os.IsNotExist(err) {
+	if _, err := os.Stat(s.Config.Dir); os.IsNotExist(err) {
 		s.CloneGitRepository()
 		s.CheckoutBranch()
 		return
 	}
-	repo, err := git.PlainOpen(gitDir)
+	repo, err := git.PlainOpen(s.Config.Dir)
 	s.p.CheckIfError(err)
 	s.r = repo
 
@@ -24,9 +23,9 @@ func (s *Service) PrepareWorkspace() {
 
 func (s *Service) CloneGitRepository() {
 	s.p.InfoF("git clone")
-	gitDir := s.Config.GitDir
+	gitDir := s.Config.Dir
 	repo, err := git.PlainClone(gitDir, false, &git.CloneOptions{
-		URL:      s.Config.GitUrl,
+		URL:      s.Config.Url,
 		Progress: os.Stdout,
 	})
 	s.p.CheckIfError(err)

@@ -15,32 +15,24 @@ import (
 	giturls "github.com/whilp/git-urls"
 )
 
-var k = koanf.New(".")
-
 type (
 	Service struct {
 		r      *git.Repository
 		p      printer.Printer
-		Config Config
-	}
-	Config struct {
-		GitDir     string
-		GitUrl     string
-		SkipReset  bool
-		SkipCommit bool
-		SkipPush   bool
-		ForcePush  bool
-		CreatePR   bool
-		Amend      bool
-		CommitMessage string
+		Config cfg.GitConfig
 	}
 	ManagedGitRepo struct {
 		Name string
 	}
 )
 
-func NewServicesFromFile(cfg *cfg.Configuration) []*Service {
-	err := k.Load(file.Provider("managed_repos.yml"), yaml.Parser())
+var (
+	k                    = koanf.New(".")
+	ManagedReposFileName = "managed_repos.yml"
+)
+
+func NewServicesFromFile(config *cfg.Configuration) []*Service {
+	err := k.Load(file.Provider(ManagedReposFileName), yaml.Parser())
 	printer.CheckIfError(err)
 
 	var s []*Service
@@ -49,20 +41,19 @@ func NewServicesFromFile(cfg *cfg.Configuration) []*Service {
 	printer.CheckIfError(err)
 	gitBase := "git@github.com:"
 	for _, repo := range m {
-		u := parseUrl(repo, gitBase, cfg.Namespace)
+		u := parseUrl(repo, gitBase, config.Git.Namespace)
 		repoName := path.Base(u.Path)
 		s = append(s, &Service{
 			p: printer.New().MapColorToLevel(printer.Blue, printer.LevelInfo).SetLevel(printer.LevelDebug).SetName(repoName),
-			Config: Config{
-				GitDir:     path.Clean(path.Join(cfg.ProjectRoot, strings.ReplaceAll(u.Hostname(), ":", "-"), u.Path)),
-				GitUrl:     u.String(),
-				ForcePush:  true,
-				SkipReset:  cfg.SkipReset,
-				SkipPush:   cfg.SkipPush,
-				SkipCommit: cfg.SkipCommit,
-				CreatePR:   cfg.PullRequest.Create,
-				Amend:      cfg.Amend,
-				CommitMessage: cfg.Message,
+			Config: cfg.GitConfig{
+				Dir:           path.Clean(path.Join(config.ProjectRoot, strings.ReplaceAll(u.Hostname(), ":", "-"), u.Path)),
+				Url:           u.String(),
+				ForcePush:     true,
+				SkipReset:     config.Git.SkipReset,
+				SkipPush:      config.Git.SkipPush,
+				SkipCommit:    config.Git.SkipCommit,
+				Amend:         config.Git.Amend,
+				CommitMessage: config.Git.CommitMessage,
 			},
 		})
 	}
@@ -70,7 +61,6 @@ func NewServicesFromFile(cfg *cfg.Configuration) []*Service {
 }
 
 func parseUrl(m ManagedGitRepo, gitBase, defaultNs string) *url.URL {
-
 	if strings.Contains(m.Name, "/") {
 		u, err := giturls.Parse(fmt.Sprintf("%s/%s", gitBase, m.Name))
 		printer.CheckIfError(err)

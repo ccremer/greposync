@@ -3,22 +3,23 @@ package repository
 import (
 	"os"
 
+	"github.com/ccremer/git-repo-sync/cfg"
 	"github.com/ccremer/git-repo-sync/repository/github"
 )
 
-func (s *Service) CreatePR() {
+func (s *Service) CreatePR(config cfg.PullRequestConfig) {
 	if !s.Config.CreatePR {
 		s.p.WarnF("Skipped: Create PR")
 		return
 	}
 	c := github.Config{
 		Token:        os.Getenv("GITHUB_TOKEN"),
-		Subject:      "Update from gsync",
-		Repo:         "git-repo-sync",
-		RepoOwner:    "ccremer",
-		CommitBranch: "my-branch",
-		TargetBranch: "master",
-		Body:         "long text for PR desc",
+		Subject:      config.Subject,
+		Repo:         s.Config.GetName(),
+		RepoOwner:    s.Config.Namespace,
+		CommitBranch: s.Config.CommitBranch,
+		TargetBranch: config.TargetBranch,
+		Body:         config.BodyTemplate,
 	}
 	github.CreatePR(c)
 }

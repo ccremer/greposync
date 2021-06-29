@@ -1,18 +1,15 @@
 package cfg
 
+import "path"
+
 type (
-	// Configuration holds a strongly-typed tree of the configuration
+	// Configuration holds a strongly-typed tree of the main configuration
 	Configuration struct {
-		Log          LogConfig
-		Namespace    string
-		Message      string
-		PullRequest  PullRequestConfig
-		SkipCommit   bool
-		SkipPush     bool
-		ProjectRoot  string
-		TemplateRoot string
-		SkipReset    bool
-		Amend        bool
+		ProjectRoot string
+		Log         LogConfig
+		PullRequest PullRequestConfig
+		Template    TemplateConfig
+		Git         GitConfig
 	}
 	// LogConfig configures the logging options
 	LogConfig struct {
@@ -23,17 +20,56 @@ type (
 		Create       bool
 		TargetBranch string
 		Labels       []string
+		BodyTemplate string
+		Subject      string
+	}
+
+	// SyncConfig configures a single repository sync
+	SyncConfig struct {
+		PullRequest PullRequestConfig
+		Git         GitConfig
+		Template    TemplateConfig
+		Name        string
+	}
+	GitConfig struct {
+		Url           string
+		Dir           string
+		SkipReset     bool `json:"-"`
+		SkipCommit    bool `json:"-"`
+		SkipPush      bool `json:"-"`
+		ForcePush     bool
+		CreatePR      bool
+		Amend         bool
+		CommitMessage string
+		CommitBranch  string
+		DefaultBranch string
+		Namespace     string
+	}
+	TemplateConfig struct {
+		RootDir string
 	}
 )
 
 // NewDefaultConfig retrieves the hardcoded configs with sane defaults
 func NewDefaultConfig() *Configuration {
 	return &Configuration{
+		ProjectRoot: "repos",
 		Log: LogConfig{
 			Level: "info",
 		},
-		Message:      "Update from git-repo-sync",
-		ProjectRoot:  "repos",
-		TemplateRoot: "template",
+		Git: GitConfig{
+			CommitMessage: "Update from git-repo-sync",
+		},
+		PullRequest: PullRequestConfig{
+			BodyTemplate: `This Pull request updates this repository with changes from a git-repo-sync template repository.`,
+			Subject: "Update from git-repo-sync",
+		},
+		Template: TemplateConfig{
+			RootDir: "template",
+		},
 	}
+}
+
+func (c GitConfig) GetName() string {
+	return path.Base(c.Dir)
 }
