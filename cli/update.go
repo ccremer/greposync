@@ -123,9 +123,9 @@ func runUpdateCommand(*cli.Context) error {
 			}
 
 			if renderer.FileExists(template) {
-				renderer.RenderTemplateFile(sc, template)
+				renderer.RenderTemplateFile(renderer.ConstructMetadata(), template)
 			} else {
-				renderer.RenderString(sc, template)
+				renderer.RenderString(renderer.ConstructMetadata(), template)
 			}
 			repo.CreatePR(config.PullRequest)
 		}

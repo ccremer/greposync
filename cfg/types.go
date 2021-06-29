@@ -34,9 +34,9 @@ type (
 	GitConfig struct {
 		Url           string
 		Dir           string
-		SkipReset     bool `json:"-"`
-		SkipCommit    bool `json:"-"`
-		SkipPush      bool `json:"-"`
+		SkipReset     bool
+		SkipCommit    bool
+		SkipPush      bool
 		ForcePush     bool
 		CreatePR      bool
 		Amend         bool
@@ -62,7 +62,7 @@ func NewDefaultConfig() *Configuration {
 		},
 		PullRequest: PullRequestConfig{
 			BodyTemplate: `This Pull request updates this repository with changes from a git-repo-sync template repository.`,
-			Subject: "Update from git-repo-sync",
+			Subject:      "Update from git-repo-sync",
 		},
 		Template: TemplateConfig{
 			RootDir: "template",
