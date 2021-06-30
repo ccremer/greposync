@@ -15,12 +15,12 @@ Feature | modulesync | git-repo-sync
 ---     | ---        | ---
 Git Clone | ✔️ | ✔️
 Git Commit | ✔️ | ✔️
-Git Commit --amend | ✔️ |
+Git Commit --amend | ✔️ | ✔️
 Git Push | ✔️ | ✔️
 Git Push --force | ✔️ | ✔️
 Git Tags | ✔️ |
 GitHub create PR | ✔️ | ✔️
-GitHub update PR | ❌ |
+GitHub update PR | ❌ | ✔️
 GitLab create PR | ✔️ | ❌
 GitLab update PR | ❌ | ❌
 Pre-Commit script | ✔️ | ❌

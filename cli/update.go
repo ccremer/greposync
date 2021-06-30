@@ -19,6 +19,7 @@ const (
 	dryRunFlagName   = "dry-run"
 	createPrFlagName = "pr"
 	prBodyFlagName   = "pr-body"
+	amendFlagName    = "amend"
 )
 
 func createUpdateCommand(c *cfg.Configuration) *cli.Command {
@@ -37,6 +38,11 @@ func createUpdateCommand(c *cfg.Configuration) *cli.Command {
 				Name:        createPrFlagName,
 				Destination: &c.PullRequest.Create,
 				Usage:       "Create a PullRequest on a supported git hoster after pushing to remote.",
+			},
+			&cli.BoolFlag{
+				Name:        amendFlagName,
+				Destination: &c.Git.Amend,
+				Usage:       "Amend previous commit.",
 			},
 			&cli.StringFlag{
 				Name:        prBodyFlagName,

@@ -41,6 +41,7 @@ func (p *PrProvider) createClient() {
 func NewProvider(config *Config) *PrProvider {
 	provider := &PrProvider{
 		cfg: config,
+		log: printer.New().SetName(config.Repo).SetLevel(printer.LevelDebug),
 	}
 	provider.createClient()
 	return provider
@@ -53,11 +54,11 @@ func (p *PrProvider) CreateOrUpdatePR() {
 		p.log.CheckIfError(err)
 	} else {
 		if *pr.Body != p.cfg.Body || *pr.Title != p.cfg.Subject {
-			p.log.InfoF("Updating PR#%s", pr.Number)
+			p.log.InfoF("Updating PR#%s", *pr.Number)
 			err := p.updatePr(pr)
 			p.log.CheckIfError(err)
 		} else {
-			p.log.InfoF("PR#%s is up-to-date.", pr.Number)
+			p.log.InfoF("PR#%d is up-to-date.", *pr.Number)
 		}
 	}
 
