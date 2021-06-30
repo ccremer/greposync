@@ -1,6 +1,8 @@
 package rendering
 
-import "path"
+import (
+	"path"
+)
 
 func (r *Renderer) ConstructMetadata() Values {
 	d := Values{

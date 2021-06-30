@@ -1,18 +1,15 @@
 package repository
 
-import (
-	"github.com/go-git/go-git/v5"
-)
-
 func (s *Service) PushToRemote() {
-
 	if s.Config.SkipPush {
 		s.p.WarnF("Skipped: git push")
 		return
 	}
-	s.p.InfoF("git push")
-	err := s.r.Push(&git.PushOptions{
-		Force: s.Config.ForcePush,
-	})
+	args := []string{"push"}
+	if s.Config.ForcePush {
+		args = append(args, "--force")
+	}
+	out, _, err := s.execGitCommand(s.logArgs(args...)...)
+	s.p.DebugF(out)
 	s.p.CheckIfError(err)
 }

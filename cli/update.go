@@ -19,6 +19,7 @@ const (
 	dryRunFlagName   = "dry-run"
 	createPrFlagName = "pr"
 	prBodyFlagName   = "pr-body"
+	amendFlagName    = "amend"
 )
 
 func createUpdateCommand(c *cfg.Configuration) *cli.Command {
@@ -38,10 +39,14 @@ func createUpdateCommand(c *cfg.Configuration) *cli.Command {
 				Destination: &c.PullRequest.Create,
 				Usage:       "Create a PullRequest on a supported git hoster after pushing to remote.",
 			},
+			&cli.BoolFlag{
+				Name:        amendFlagName,
+				Destination: &c.Git.Amend,
+				Usage:       "Amend previous commit.",
+			},
 			&cli.StringFlag{
-				Name:        prBodyFlagName,
-				Destination: &c.PullRequest.BodyTemplate,
-				Usage:       "Markdown-enabled body of the PullRequest. It will load from an existing file if this is a path. Content can be templated. Defaults to commit message.",
+				Name:  prBodyFlagName,
+				Usage: "Markdown-enabled body of the PullRequest. It will load from an existing file if this is a path. Content can be templated. Defaults to commit message.",
 			},
 		),
 	}
@@ -54,6 +59,9 @@ func validateUpdateCommand(ctx *cli.Context) error {
 
 	if ctx.Bool(createPrFlagName) {
 		config.PullRequest.Create = true
+	}
+	if v := ctx.String(prBodyFlagName); v != "" {
+		config.PullRequest.BodyTemplate = v
 	}
 
 	if ctx.IsSet(dryRunFlagName) {
@@ -96,16 +104,15 @@ func runUpdateCommand(*cli.Context) error {
 	services := repository.NewServicesFromFile(config)
 
 	for _, repo := range services {
-		log := printer.New().SetName(repo.Config.GetName())
+		log := printer.New().SetName(repo.Config.Name)
 
 		sc := &cfg.SyncConfig{
 			Git:         repo.Config,
 			PullRequest: config.PullRequest,
-			Template: cfg.TemplateConfig{
+			Template: &cfg.TemplateConfig{
 				RootDir: config.Template.RootDir,
 			},
 		}
-
 		repo.PrepareWorkspace()
 
 		renderer := rendering.NewRenderer(sc, globalK)
@@ -122,12 +129,13 @@ func runUpdateCommand(*cli.Context) error {
 				config.PullRequest.BodyTemplate = config.Git.CommitMessage
 			}
 
+			data := rendering.Values{"Metadata": renderer.ConstructMetadata()}
 			if renderer.FileExists(template) {
-				renderer.RenderTemplateFile(renderer.ConstructMetadata(), template)
+				config.PullRequest.BodyTemplate = renderer.RenderTemplateFile(data, template)
 			} else {
-				renderer.RenderString(renderer.ConstructMetadata(), template)
+				config.PullRequest.BodyTemplate = renderer.RenderString(data, template)
 			}
-			repo.CreatePR(config.PullRequest)
+			repo.CreateOrUpdatePR(config.PullRequest)
 		}
 	}
 	return nil
