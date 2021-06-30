@@ -54,7 +54,7 @@ func (p *PrProvider) CreateOrUpdatePR() {
 		p.log.CheckIfError(err)
 	} else {
 		if *pr.Body != p.cfg.Body || *pr.Title != p.cfg.Subject {
-			p.log.InfoF("Updating PR#%s", *pr.Number)
+			p.log.InfoF("Updating PR#%d", *pr.Number)
 			err := p.updatePr(pr)
 			p.log.CheckIfError(err)
 		} else {

@@ -7,7 +7,7 @@ import (
 	"github.com/ccremer/git-repo-sync/repository/github"
 )
 
-func (s *Service) CreateOrUpdatePR(config cfg.PullRequestConfig) {
+func (s *Service) CreateOrUpdatePR(config *cfg.PullRequestConfig) {
 	if !config.Create {
 		s.p.WarnF("Skipped: Create PR")
 		return

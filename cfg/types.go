@@ -9,10 +9,10 @@ type (
 	// Configuration holds a strongly-typed tree of the main configuration
 	Configuration struct {
 		ProjectRoot string
-		Log         LogConfig
-		PullRequest PullRequestConfig
-		Template    TemplateConfig
-		Git         GitConfig
+		Log         *LogConfig
+		PullRequest *PullRequestConfig
+		Template    *TemplateConfig
+		Git         *GitConfig
 	}
 	// LogConfig configures the logging options
 	LogConfig struct {
@@ -57,17 +57,17 @@ type (
 func NewDefaultConfig() *Configuration {
 	return &Configuration{
 		ProjectRoot: "repos",
-		Log: LogConfig{
+		Log: &LogConfig{
 			Level: "info",
 		},
-		Git: GitConfig{
+		Git: &GitConfig{
 			CommitMessage: "Update from git-repo-sync",
 		},
-		PullRequest: PullRequestConfig{
+		PullRequest: &PullRequestConfig{
 			BodyTemplate: `This Pull request updates this repository with changes from a git-repo-sync template repository.`,
 			Subject:      "Update from git-repo-sync",
 		},
-		Template: TemplateConfig{
+		Template: &TemplateConfig{
 			RootDir: "template",
 		},
 	}
