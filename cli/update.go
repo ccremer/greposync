@@ -96,16 +96,15 @@ func runUpdateCommand(*cli.Context) error {
 	services := repository.NewServicesFromFile(config)
 
 	for _, repo := range services {
-		log := printer.New().SetName(repo.Config.GetName())
+		log := printer.New().SetName(repo.Config.Name)
 
 		sc := &cfg.SyncConfig{
 			Git:         repo.Config,
-			PullRequest: config.PullRequest,
-			Template: cfg.TemplateConfig{
+			PullRequest: &config.PullRequest,
+			Template: &cfg.TemplateConfig{
 				RootDir: config.Template.RootDir,
 			},
 		}
-
 		repo.PrepareWorkspace()
 
 		renderer := rendering.NewRenderer(sc, globalK)

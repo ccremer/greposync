@@ -8,9 +8,12 @@ import (
 )
 
 func (s *Service) CreateOrUpdatePR(config cfg.PullRequestConfig) {
-	if !s.Config.CreatePR {
+	if !config.Create {
 		s.p.WarnF("Skipped: Create PR")
 		return
+	}
+	if config.TargetBranch == "" {
+		config.TargetBranch = s.Config.DefaultBranch
 	}
 	c := &github.Config{
 		Token:        os.Getenv("GITHUB_TOKEN"),

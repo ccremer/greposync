@@ -1,8 +1,8 @@
 package repository
 
 import (
-	"github.com/ccremer/git-repo-sync/printer"
-	"github.com/go-git/go-git/v5"
+	"fmt"
+	"os"
 )
 
 func (s *Service) MakeCommit() {
@@ -10,22 +10,25 @@ func (s *Service) MakeCommit() {
 		s.p.WarnF("Skipped: git commit")
 		return
 	}
-	w, err := s.r.Worktree()
+	f, err := os.CreateTemp("", "COMMIT_MSG_")
 	s.p.CheckIfError(err)
+	defer s.deleteFile(f)
+	args := []string{"commit", "-a", "-F", f.Name()}
+	if s.Config.Amend {
+		args = append(args, "--amend")
+	}
 
-	s.p.InfoF("git add *")
-	err = w.AddWithOptions(&git.AddOptions{All: true})
+	_, err = fmt.Fprint(f, s.Config.CommitMessage)
 	s.p.CheckIfError(err)
-
-	s.p.InfoF("git status --porcelain")
-	status, err := w.Status()
+	out, _, err := s.execGitCommand(s.logArgs(args...)...)
+	s.p.DebugF(out)
 	s.p.CheckIfError(err)
-	s.p.LogF(status.String())
+}
 
-	s.p.InfoF("git commit -m \"%s\"", s.Config.CommitMessage)
-	commit, err := w.Commit(s.Config.CommitMessage, &git.CommitOptions{})
-
-	obj, err := s.r.CommitObject(commit)
-	s.p.CheckIfError(err)
-	s.p.UseColor(printer.White).LogF(obj.String())
+func (s *Service) deleteFile(file *os.File) {
+	_ = file.Close()
+	err := os.Remove(file.Name())
+	if err != nil {
+		s.p.WarnF(err.Error())
+	}
 }

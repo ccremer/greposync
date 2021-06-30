@@ -10,23 +10,9 @@ func (s *Service) ShowDiff() {
 	if s.Config.SkipCommit {
 		return
 	}
-	s.p.DebugF("Getting the latest commit on the current branch")
-	ref, err := s.r.Head()
+	out, _, err := s.execGitCommand(s.logArgs("diff", "HEAD~1")...)
 	s.p.CheckIfError(err)
-
-	s.p.DebugF("Retrieving the commit object")
-	commit, err := s.r.CommitObject(ref.Hash())
-	s.p.CheckIfError(err)
-
-	s.p.DebugF("Retrieving the parent commit")
-	parent, err := commit.Parent(0)
-	s.p.CheckIfError(err)
-
-	s.p.DebugF("Retrieving the patch between")
-	patch, err := parent.Patch(commit)
-	s.p.CheckIfError(err)
-
-	s.prettyPrint(patch.String())
+	s.prettyPrint(out)
 }
 
 func (s *Service) prettyPrint(diff string) {

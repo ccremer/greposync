@@ -3,12 +3,12 @@ package repository
 import (
 	"fmt"
 	"net/url"
+	"os"
 	"path"
 	"strings"
 
 	"github.com/ccremer/git-repo-sync/cfg"
 	"github.com/ccremer/git-repo-sync/printer"
-	"github.com/go-git/go-git/v5"
 	"github.com/knadh/koanf"
 	"github.com/knadh/koanf/parsers/yaml"
 	"github.com/knadh/koanf/providers/file"
@@ -17,9 +17,8 @@ import (
 
 type (
 	Service struct {
-		r      *git.Repository
 		p      printer.Printer
-		Config cfg.GitConfig
+		Config *cfg.GitConfig
 	}
 	ManagedGitRepo struct {
 		Name string
@@ -35,29 +34,36 @@ func NewServicesFromFile(config *cfg.Configuration) []*Service {
 	err := k.Load(file.Provider(ManagedReposFileName), yaml.Parser())
 	printer.CheckIfError(err)
 
-	var s []*Service
+	var list []*Service
 	var m []ManagedGitRepo
 	err = k.Unmarshal("repositories", &m)
 	printer.CheckIfError(err)
 	gitBase := "git@github.com:"
 	for _, repo := range m {
 		u := parseUrl(repo, gitBase, config.Git.Namespace)
+		u.User = nil
 		repoName := path.Base(u.Path)
-		s = append(s, &Service{
+		s := &Service{
 			p: printer.New().MapColorToLevel(printer.Blue, printer.LevelInfo).SetLevel(printer.LevelDebug).SetName(repoName),
-			Config: cfg.GitConfig{
+			Config: &cfg.GitConfig{
 				Dir:           path.Clean(path.Join(config.ProjectRoot, strings.ReplaceAll(u.Hostname(), ":", "-"), u.Path)),
-				Url:           u.String(),
+				Url:           u,
 				ForcePush:     true,
 				SkipReset:     config.Git.SkipReset,
 				SkipPush:      config.Git.SkipPush,
 				SkipCommit:    config.Git.SkipCommit,
 				Amend:         config.Git.Amend,
 				CommitMessage: config.Git.CommitMessage,
+				CommitBranch:  config.Git.CommitBranch,
+				Namespace:     config.Git.Namespace,
+				Name:          repoName,
+				CreatePR:      config.PullRequest.Create,
 			},
-		})
+		}
+		s.Config.DefaultBranch = s.GetDefaultBranch()
+		list = append(list, s)
 	}
-	return s
+	return list
 }
 
 func parseUrl(m ManagedGitRepo, gitBase, defaultNs string) *url.URL {
@@ -69,4 +75,18 @@ func parseUrl(m ManagedGitRepo, gitBase, defaultNs string) *url.URL {
 	u, err := giturls.Parse(fmt.Sprintf("%s/%s/%s", gitBase, defaultNs, m.Name))
 	printer.CheckIfError(err)
 	return u
+}
+
+func (s *Service) FileExists(path string) bool {
+	if info, err := os.Stat(path); err != nil || info.IsDir() {
+		return false
+	}
+	return true
+}
+
+func (s *Service) DirExists(path string) bool {
+	if info, err := os.Stat(path); err != nil || !info.IsDir() {
+		return false
+	}
+	return true
 }

@@ -1,6 +1,9 @@
 package cfg
 
-import "path"
+import (
+	"net/url"
+	"path"
+)
 
 type (
 	// Configuration holds a strongly-typed tree of the main configuration
@@ -26,23 +29,23 @@ type (
 
 	// SyncConfig configures a single repository sync
 	SyncConfig struct {
-		PullRequest PullRequestConfig
-		Git         GitConfig
-		Template    TemplateConfig
-		Name        string
+		PullRequest *PullRequestConfig
+		Git         *GitConfig
+		Template    *TemplateConfig
 	}
 	GitConfig struct {
-		Url           string
-		Dir           string
+		Url           *url.URL `json:"-"`
+		Dir           string   `json:"-"`
 		SkipReset     bool
 		SkipCommit    bool
 		SkipPush      bool
 		ForcePush     bool
 		CreatePR      bool
-		Amend         bool
+		Amend         bool `json:"-"`
 		CommitMessage string
 		CommitBranch  string
 		DefaultBranch string
+		Name          string
 		Namespace     string
 	}
 	TemplateConfig struct {

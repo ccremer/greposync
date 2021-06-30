@@ -1,27 +1,57 @@
 package repository
 
 import (
-	"fmt"
-
-	"github.com/go-git/go-git/v5"
-	"github.com/go-git/go-git/v5/plumbing"
+	"strings"
 )
 
-func (s *Service) CheckoutBranch() {
-	if s.Config.SkipReset {
+func (s *Service) SwitchBranch() {
+	if s.Config.SkipReset || s.Config.CommitBranch == "" {
 		return
 	}
-	branch := fmt.Sprintf("refs/heads/%s", "my-branch")
-	b := plumbing.ReferenceName(branch)
+	s.CheckoutBranch(s.Config.CommitBranch)
+}
 
-	w, err := s.r.Worktree()
+func (s *Service) CheckoutBranch(branch string) {
+	out, _, err := s.execGitCommand(s.logArgs("checkout", branch)...)
 	s.p.CheckIfError(err)
+	s.p.DebugF(out)
+}
 
-	// First try to checkout branch
-	err = w.Checkout(&git.CheckoutOptions{Create: false, Force: true, Branch: b})
-	if err != nil {
-		// got an error  - try to create it
-		err = w.Checkout(&git.CheckoutOptions{Create: true, Force: true, Branch: b})
-		s.p.CheckIfError(err)
+func (s *Service) GetDefaultBranch() string {
+	out, _, err := s.execGitCommand("remote", "show", "origin")
+	s.p.CheckIfError(err)
+	lines := strings.Split(out, "\n")
+	head := "HEAD branch: "
+	for _, line := range lines {
+		str := strings.TrimSpace(line)
+		if strings.Contains(str, head) {
+			return strings.TrimPrefix(str, head)
+		}
 	}
+	s.p.WarnF("No default branch detected. Fall back to master")
+	return "master"
+}
+
+func (s *Service) localBranchExists(branch string) bool {
+	out, _, err := s.execGitCommand("branch", "--list")
+	s.p.CheckIfError(err)
+	branches := strings.Split(out, "\n")
+	for _, line := range branches {
+		if strings.Contains(strings.TrimSpace(line), branch) {
+			return true
+		}
+	}
+	return false
+}
+
+func (s *Service) remoteBranchExists(branch string) bool {
+	out, _, err := s.execGitCommand("branch", "-r", "--list")
+	s.p.CheckIfError(err)
+	branches := strings.Split(out, "\n")
+	for _, line := range branches {
+		if strings.Contains(strings.TrimSpace(line), branch) {
+			return true
+		}
+	}
+	return false
 }
