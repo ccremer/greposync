@@ -114,6 +114,7 @@ func runUpdateCommand(*cli.Context) error {
 				RootDir: config.Template.RootDir,
 			},
 		}
+		renderer := rendering.NewRenderer(sc, globalK)
 		gitDirExists := r.DirExists(r.Config.Dir)
 		p := pipeline.NewPipelineWithLogger(printer.PipelineLogger{Logger: log})
 		p.WithSteps(
@@ -121,20 +122,12 @@ func runUpdateCommand(*cli.Context) error {
 			pipeline.NewStepWithPredicate("reset repository", r.ResetRepository(), pipeline.Not(r.SkipReset())),
 			pipeline.NewStep("checkout branch", r.CheckoutBranch()),
 			pipeline.NewStepWithPredicate("pull", r.Pull(), pipeline.Not(r.SkipReset())),
-		)
-		result := p.Run()
-		log.CheckIfError(result.Err)
-
-		renderer := rendering.NewRenderer(sc, globalK)
-		renderer.ProcessTemplates()
-
-		p = pipeline.NewPipeline()
-		p.WithSteps(
+			pipeline.NewStep("render templates", renderer.ProcessTemplates()),
 			pipeline.NewStepWithPredicate("commit", r.MakeCommit(), pipeline.Not(r.SkipCommit())),
 			pipeline.NewStepWithPredicate("show diff", r.ShowDiff(), pipeline.Not(r.SkipCommit())),
 			pipeline.NewStepWithPredicate("push", r.PushToRemote(), pipeline.Not(r.SkipPush())),
 		)
-		result = p.Run()
+		result := p.Run()
 		log.CheckIfError(result.Err)
 
 		if config.PullRequest.Create {
