@@ -5,6 +5,7 @@ go 1.16
 require (
 	github.com/BurntSushi/toml v0.3.1
 	github.com/Masterminds/sprig/v3 v3.2.1
+	github.com/ccremer/go-command-pipeline v0.1.0
 	github.com/google/go-github/v36 v36.0.0
 	github.com/knadh/koanf v1.1.1
 	github.com/stretchr/testify v1.7.0

@@ -9,6 +9,7 @@ import (
 	"github.com/ccremer/git-repo-sync/printer"
 	"github.com/ccremer/git-repo-sync/rendering"
 	"github.com/ccremer/git-repo-sync/repository"
+	pipeline "github.com/ccremer/go-command-pipeline"
 	"github.com/knadh/koanf"
 	"github.com/knadh/koanf/parsers/yaml"
 	"github.com/knadh/koanf/providers/file"
@@ -104,7 +105,7 @@ func runUpdateCommand(*cli.Context) error {
 	services := repository.NewServicesFromFile(config)
 
 	for _, repo := range services {
-		log := printer.New().SetName(repo.Config.Name)
+		log := printer.New().SetName(repo.Config.Name).SetLevel(printer.LevelDebug)
 
 		sc := &cfg.SyncConfig{
 			Git:         repo.Config,
@@ -113,14 +114,26 @@ func runUpdateCommand(*cli.Context) error {
 				RootDir: config.Template.RootDir,
 			},
 		}
-		repo.PrepareWorkspace()
+		gitDirExists := repo.DirExists(repo.Config.Dir)
+		p := pipeline.NewPipelineWithLogger(printer.PipelineLogger{Logger: log})
+		p.WithSteps(
+			pipeline.NewStepWithPredicate("clone repository", repo.CloneGitRepositoryAction(), pipeline.Bool(!gitDirExists)),
+			pipeline.NewStepWithPredicate("reset repository", repo.ResetRepository(), pipeline.Not(repo.SkipReset())),
+			pipeline.NewStep("checkout branch", repo.CheckoutBranch()),
+			pipeline.NewStepWithPredicate("pull", repo.Pull(), pipeline.Not(repo.SkipReset())),
+		)
+		result := p.Run()
+		log.CheckIfError(result.Err)
 
 		renderer := rendering.NewRenderer(sc, globalK)
-
 		renderer.ProcessTemplates()
-		repo.MakeCommit()
-		repo.ShowDiff()
-		repo.PushToRemote()
+
+		p = pipeline.NewPipeline()
+		p.WithSteps(
+			pipeline.NewStepWithPredicate("commit", repo.MakeCommit(), pipeline.Not(repo.SkipCommit())),
+			pipeline.NewStepWithPredicate("show diff", repo.ShowDiff(), pipeline.Not(repo.SkipCommit())),
+			pipeline.NewStepWithPredicate("push", repo.PushToRemote(), pipeline.Not(repo.SkipPush())),
+		)
 
 		if config.PullRequest.Create {
 			template := config.PullRequest.BodyTemplate
