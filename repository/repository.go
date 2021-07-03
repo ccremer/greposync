@@ -60,7 +60,6 @@ func NewServicesFromFile(config *cfg.Configuration) []*Service {
 				CreatePR:      config.PullRequest.Create,
 			},
 		}
-		s.Config.DefaultBranch = s.GetDefaultBranch()
 		list = append(list, s)
 	}
 	return list

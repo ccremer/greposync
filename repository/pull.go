@@ -6,7 +6,11 @@ import (
 
 func (s *Service) Pull() pipeline.ActionFunc {
 	return func() pipeline.Result {
-		if s.remoteBranchExists(s.Config.CommitBranch) {
+		exists, err := s.remoteBranchExists(s.Config.CommitBranch)
+		if err != nil {
+			return pipeline.Result{Err: err}
+		}
+		if exists {
 			out, stderr, err := s.execGitCommand(s.logArgs("pull")...)
 			if err != nil {
 				return s.toResult(err, stderr)

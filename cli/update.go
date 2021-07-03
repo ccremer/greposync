@@ -116,17 +116,21 @@ func runUpdateCommand(*cli.Context) error {
 		}
 		renderer := rendering.NewRenderer(sc, globalK)
 		gitDirExists := r.DirExists(r.Config.Dir)
-		p := pipeline.NewPipelineWithLogger(printer.PipelineLogger{Logger: log})
+		logger := printer.PipelineLogger{Logger: log}
+		p := pipeline.NewPipelineWithLogger(logger)
 		p.WithSteps(
-			pipeline.NewStepWithPredicate("clone repository", r.CloneGitRepositoryAction(), pipeline.Bool(!gitDirExists)),
-			pipeline.NewStepWithPredicate("reset repository", r.ResetRepository(), pipeline.Not(r.SkipReset())),
-			pipeline.NewStep("checkout branch", r.CheckoutBranch()),
-			pipeline.NewStepWithPredicate("pull", r.Pull(), pipeline.Not(r.SkipReset())),
+			pipeline.NewPipelineWithLogger(logger).WithSteps(
+				pipeline.NewStepWithPredicate("clone repository", r.CloneGitRepository(), pipeline.Bool(!gitDirExists)),
+				pipeline.NewStep("determine default branch", r.GetDefaultBranch()),
+				pipeline.NewStepWithPredicate("reset repository", r.ResetRepository(), pipeline.Not(r.SkipReset())),
+				pipeline.NewStep("checkout branch", r.CheckoutBranch()),
+				pipeline.NewStepWithPredicate("pull", r.Pull(), pipeline.Not(r.SkipReset())),
+			).AsNestedStep("prepare workspace", nil),
 			pipeline.NewStep("render templates", renderer.ProcessTemplates()),
 			pipeline.NewStepWithPredicate("commit", r.MakeCommit(), pipeline.Not(r.SkipCommit())),
 			pipeline.NewStepWithPredicate("show diff", r.ShowDiff(), pipeline.Not(r.SkipCommit())),
 			pipeline.NewStepWithPredicate("push", r.PushToRemote(), pipeline.Not(r.SkipPush())),
-			pipeline.NewPipeline().WithSteps(
+			pipeline.NewPipelineWithLogger(logger).WithSteps(
 				pipeline.NewStep("render pull request template", RenderPrTemplate(log, renderer)),
 				pipeline.NewStep("create or update pull request", r.CreateOrUpdatePR(config.PullRequest)),
 			).AsNestedStep("pull request", CreatePr()),
