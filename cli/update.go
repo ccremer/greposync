@@ -9,6 +9,7 @@ import (
 	"github.com/ccremer/git-repo-sync/printer"
 	"github.com/ccremer/git-repo-sync/rendering"
 	"github.com/ccremer/git-repo-sync/repository"
+	pipeline "github.com/ccremer/go-command-pipeline"
 	"github.com/knadh/koanf"
 	"github.com/knadh/koanf/parsers/yaml"
 	"github.com/knadh/koanf/providers/file"
@@ -103,40 +104,76 @@ func runUpdateCommand(*cli.Context) error {
 	}
 	services := repository.NewServicesFromFile(config)
 
-	for _, repo := range services {
-		log := printer.New().SetName(repo.Config.Name)
+	for _, r := range services {
+		log := printer.New().SetName(r.Config.Name).SetLevel(printer.LevelDebug)
 
 		sc := &cfg.SyncConfig{
-			Git:         repo.Config,
+			Git:         r.Config,
 			PullRequest: config.PullRequest,
 			Template: &cfg.TemplateConfig{
 				RootDir: config.Template.RootDir,
 			},
 		}
-		repo.PrepareWorkspace()
-
 		renderer := rendering.NewRenderer(sc, globalK)
-
-		renderer.ProcessTemplates()
-		repo.MakeCommit()
-		repo.ShowDiff()
-		repo.PushToRemote()
+		gitDirExists := r.DirExists(r.Config.Dir)
+		logger := printer.PipelineLogger{Logger: log}
+		p := pipeline.NewPipelineWithLogger(logger)
+		p.WithSteps(
+			pipeline.NewPipelineWithLogger(logger).WithSteps(
+				pipeline.NewStepWithPredicate("clone repository", r.CloneGitRepository(), pipeline.Bool(!gitDirExists)),
+				pipeline.NewStep("determine default branch", r.GetDefaultBranch()),
+				pipeline.NewStepWithPredicate("reset repository", r.ResetRepository(), pipeline.Not(r.SkipReset())),
+				pipeline.NewStep("checkout branch", r.CheckoutBranch()),
+				pipeline.NewStepWithPredicate("pull", r.Pull(), pipeline.Not(r.SkipReset())),
+			).AsNestedStep("prepare workspace", nil),
+			pipeline.NewStep("render templates", renderer.ProcessTemplates()),
+			pipeline.NewStepWithPredicate("commit", r.MakeCommit(), pipeline.Not(r.SkipCommit())),
+			pipeline.NewStepWithPredicate("show diff", r.ShowDiff(), pipeline.Not(r.SkipCommit())),
+			pipeline.NewStepWithPredicate("push", r.PushToRemote(), pipeline.Not(r.SkipPush())),
+			pipeline.NewPipelineWithLogger(logger).WithSteps(
+				pipeline.NewStep("render pull request template", RenderPrTemplate(log, renderer)),
+				pipeline.NewStep("create or update pull request", r.CreateOrUpdatePR(config.PullRequest)),
+			).AsNestedStep("pull request", CreatePr()),
+		)
+		result := p.Run()
+		log.CheckIfError(result.Err)
 
 		if config.PullRequest.Create {
-			template := config.PullRequest.BodyTemplate
-			if template == "" {
-				log.InfoF("No PullRequest template defined")
-				config.PullRequest.BodyTemplate = config.Git.CommitMessage
-			}
 
-			data := rendering.Values{"Metadata": renderer.ConstructMetadata()}
-			if renderer.FileExists(template) {
-				config.PullRequest.BodyTemplate = renderer.RenderTemplateFile(data, template)
-			} else {
-				config.PullRequest.BodyTemplate = renderer.RenderString(data, template)
-			}
-			repo.CreateOrUpdatePR(config.PullRequest)
+			r.CreateOrUpdatePR(config.PullRequest)
 		}
 	}
 	return nil
+}
+
+func RenderPrTemplate(log printer.Printer, renderer *rendering.Renderer) pipeline.ActionFunc {
+	return func() pipeline.Result {
+		template := config.PullRequest.BodyTemplate
+		if template == "" {
+			log.InfoF("No PullRequest template defined")
+			config.PullRequest.BodyTemplate = config.Git.CommitMessage
+		}
+
+		data := rendering.Values{"Metadata": renderer.ConstructMetadata()}
+		if renderer.FileExists(template) {
+			if str, err := renderer.RenderTemplateFile(data, template); err != nil {
+				return pipeline.Result{Err: err}
+			} else {
+				config.PullRequest.BodyTemplate = str
+			}
+		} else {
+			if str, err := renderer.RenderString(data, template); err != nil {
+				return pipeline.Result{Err: err}
+			} else {
+				config.PullRequest.BodyTemplate = str
+			}
+		}
+		return pipeline.Result{}
+	}
+}
+
+func CreatePr() pipeline.Predicate {
+	return func(step pipeline.Step) bool {
+		return config.PullRequest.Create
+	}
 }

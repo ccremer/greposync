@@ -2,8 +2,11 @@ package repository
 
 import (
 	"bytes"
+	"fmt"
 	"os/exec"
 	"strings"
+
+	pipeline "github.com/ccremer/go-command-pipeline"
 )
 
 var (
@@ -26,4 +29,10 @@ func (s *Service) execGitCommand(args ...string) (string, string, error) {
 func (s *Service) logArgs(args ...string) []string {
 	s.p.InfoF("%s %s", GitBin, strings.Join(args, " "))
 	return args
+}
+
+func (s *Service) toResult(err error, msg string) pipeline.Result {
+	return pipeline.Result{
+		Err: fmt.Errorf("%w: %s", err, msg),
+	}
 }

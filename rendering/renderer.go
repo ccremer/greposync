@@ -10,6 +10,7 @@ import (
 
 	"github.com/ccremer/git-repo-sync/cfg"
 	"github.com/ccremer/git-repo-sync/printer"
+	pipeline "github.com/ccremer/go-command-pipeline"
 	"github.com/knadh/koanf"
 )
 
@@ -41,24 +42,36 @@ func NewRenderer(c *cfg.SyncConfig, globalDefaults *koanf.Koanf) *Renderer {
 	}
 }
 
-func (r *Renderer) ProcessTemplates() {
-	r.loadVariables(path.Join(r.cfg.Git.Dir, ".sync.yml"))
-
-	files, err := filepath.Glob(path.Join(r.cfg.Template.RootDir, "*"))
-	r.p.CheckIfError(err)
-	for _, file := range files {
-		fileName := path.Base(file)
-		if fileName == helperFileName {
-			// File is a helper file
-			continue
+func (r *Renderer) ProcessTemplates() pipeline.ActionFunc {
+	return func() pipeline.Result {
+		err := r.loadVariables(path.Join(r.cfg.Git.Dir, ".sync.yml"))
+		if err != nil {
+			return pipeline.Result{Err: err}
 		}
-		r.processTemplate(file)
+
+		files, err := filepath.Glob(path.Join(r.cfg.Template.RootDir, "*"))
+		if err != nil {
+			return pipeline.Result{Err: err}
+		}
+		for _, file := range files {
+			fileName := path.Base(file)
+			if fileName == helperFileName {
+				// File is a helper file
+				continue
+			}
+			if err = r.processTemplate(file); err != nil {
+				return pipeline.Result{Err: err}
+			}
+		}
+		return pipeline.Result{}
 	}
 }
 
-func (r *Renderer) processTemplate(templateFullPath string) {
+func (r *Renderer) processTemplate(templateFullPath string) error {
 	relativePath, err := filepath.Rel(r.cfg.Template.RootDir, templateFullPath)
-	r.p.CheckIfError(err)
+	if err != nil {
+		return err
+	}
 	targetPath := path.Join(r.cfg.Git.Dir, relativePath)
 	targetPath = sanitizeTargetPath(targetPath)
 	fileName := path.Base(relativePath)
@@ -74,22 +87,36 @@ func (r *Renderer) processTemplate(templateFullPath string) {
 		Option(errorOnMissingKey).
 		Funcs(templateFunctions).
 		ParseFiles(templates...)
-	r.p.CheckIfError(err)
+	if err != nil {
+		return err
+	}
 
+	values, err := r.loadDataForFile(relativePath)
+	if err != nil {
+		return err
+	}
 	data := map[string]interface{}{
-		"Values":   r.loadDataForFile(relativePath),
+		"Values":   values,
 		"Metadata": r.ConstructMetadata(),
 	}
 
 	// Write target file
+	return r.writeFile(targetPath, tpl, data)
+}
+
+func (r *Renderer) writeFile(targetPath string, tpl *template.Template, data Values) error {
 	r.p.InfoF("Writing file: %s", path.Base(targetPath))
 	f, err := os.Create(targetPath)
-	printer.CheckIfError(err)
+	if err != nil {
+		return err
+	}
 	defer f.Close()
 	w := bufio.NewWriter(f)
 	err = tpl.Execute(w, data)
-	printer.CheckIfError(err)
-	_ = w.Flush()
+	if err != nil {
+		return err
+	}
+	return w.Flush()
 }
 
 func sanitizeTargetPath(targetPath string) string {

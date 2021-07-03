@@ -13,6 +13,8 @@ type (
 		InfoF(format string, args ...interface{})
 		// WarnF sets the color to WarnColor, prints the string as given and resets the color, provided the LogLevel is LevelWarn or higher.
 		WarnF(format string, args ...interface{})
+		// ErrorF sets the color to ErrorColor, prints the string as given and resets the color.
+		ErrorF(format string, args ...interface{})
 		// PrintF formats the given format string and prints it to stdout without alterations.
 		PrintF(format string, args ...interface{})
 		// LogF formats the given format string and prints it to stdout using the color set by UseColor, defaulting to InfoColor if not set.

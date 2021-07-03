@@ -9,6 +9,7 @@ import (
 
 	"github.com/ccremer/git-repo-sync/cfg"
 	"github.com/ccremer/git-repo-sync/printer"
+	pipeline "github.com/ccremer/go-command-pipeline"
 	"github.com/knadh/koanf"
 	"github.com/knadh/koanf/parsers/yaml"
 	"github.com/knadh/koanf/providers/file"
@@ -41,7 +42,6 @@ func NewServicesFromFile(config *cfg.Configuration) []*Service {
 	gitBase := "git@github.com:"
 	for _, repo := range m {
 		u := parseUrl(repo, gitBase, config.Git.Namespace)
-		u.User = nil
 		repoName := path.Base(u.Path)
 		s := &Service{
 			p: printer.New().MapColorToLevel(printer.Blue, printer.LevelInfo).SetLevel(printer.LevelDebug).SetName(repoName),
@@ -60,7 +60,6 @@ func NewServicesFromFile(config *cfg.Configuration) []*Service {
 				CreatePR:      config.PullRequest.Create,
 			},
 		}
-		s.Config.DefaultBranch = s.GetDefaultBranch()
 		list = append(list, s)
 	}
 	return list
@@ -89,4 +88,10 @@ func (s *Service) DirExists(path string) bool {
 		return false
 	}
 	return true
+}
+
+func (s *Service) DirExistsPredicate(path string) pipeline.Predicate {
+	return func(step pipeline.Step) bool {
+		return s.DirExists(path)
+	}
 }

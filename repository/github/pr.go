@@ -47,33 +47,34 @@ func NewProvider(config *Config) *PrProvider {
 	return provider
 }
 
-func (p *PrProvider) CreateOrUpdatePR() {
-
-	if pr := p.findExistingPr(); pr == nil {
-		err := p.createPR()
-		p.log.CheckIfError(err)
+func (p *PrProvider) CreateOrUpdatePR() error {
+	if pr, err := p.findExistingPr(); err != nil {
+		return err
+	} else if pr == nil {
+		return p.createPR()
 	} else {
 		if *pr.Body != p.cfg.Body || *pr.Title != p.cfg.Subject {
 			p.log.InfoF("Updating PR#%d", *pr.Number)
-			err := p.updatePr(pr)
-			p.log.CheckIfError(err)
+			return p.updatePr(pr)
 		} else {
 			p.log.InfoF("PR#%d is up-to-date.", *pr.Number)
+			return nil
 		}
 	}
-
 }
 
-func (p *PrProvider) findExistingPr() *github.PullRequest {
+func (p *PrProvider) findExistingPr() (*github.PullRequest, error) {
 	p.log.DebugF("Searching existing PRs with same branch %s...", p.cfg.CommitBranch)
 	list, _, err := p.client.PullRequests.List(p.ctx, p.cfg.RepoOwner, p.cfg.Repo, &github.PullRequestListOptions{
 		Head: fmt.Sprintf("%s:%s", p.cfg.RepoOwner, p.cfg.CommitBranch),
 	})
-	p.log.CheckIfError(err)
-	if len(list) > 0 {
-		return list[0]
+	if err != nil {
+		return nil, err
 	}
-	return nil
+	if len(list) > 0 {
+		return list[0], nil
+	}
+	return nil, nil
 }
 
 // createPR creates a pull request. Based on: https://godoc.org/github.com/google/go-github/github#example-PullRequestsService-Create

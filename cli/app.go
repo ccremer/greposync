@@ -70,6 +70,7 @@ func combineWithGlobalFlags(flags ...cli.Flag) []cli.Flag {
 func validateGlobalFlags(ctx *cli.Context) error {
 	if ctx.Bool("verbose") {
 		config.Log.Level = "debug"
+		printer.DefaultLevel = printer.LevelDebug
 	}
 	return nil
 }
