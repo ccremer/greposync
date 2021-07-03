@@ -1,4 +1,4 @@
-# git-repo-sync
+# greposync
 
 This is a PoC to reimplement modulesync in Go
 
@@ -11,7 +11,7 @@ Most features are untested yet ("it works on my machine").
 
 ## Features implemented
 
-Feature | modulesync | git-repo-sync
+Feature | modulesync | greposync
 ---     | ---        | ---
 Git Clone | ✔️ | ✔️
 Git Commit | ✔️ | ✔️
@@ -38,11 +38,11 @@ Changelog | ✔️ | ❌
 >
 > ❌ Feature not implemented (not planned)
 
-Some features aren't planned yet resp. won't be added to git-repo-sync.
+Some features aren't planned yet resp. won't be added to greposync.
 
 ## Differences
 
-Feature | modulesync | git-repo-sync
+Feature | modulesync | greposync
 ---     | ---        | ---
 Template engine | ERB | gotemplate
 Installation | Gemfile | single binary, Docker, gomodule, apk, deb, rpm

@@ -25,16 +25,16 @@ snapshot:
 
 dockers:
 - image_templates:
-  - "quay.io/ccremer/git-repo-sync:v{{ .Version }}"
+  - "quay.io/ccremer/greposync:v{{ .Version }}"
 
     # For prereleases, updating `latest` and the floating tags of the major version does not make sense.
     # Only the image for the exact version should be pushed.
-  - "{{ if not .Prerelease }}quay.io/ccremer/git-repo-sync:v{{ .Major }}{{ end }}"
-  - "{{ if not .Prerelease }}quay.io/ccremer/git-repo-sync:latest{{ end }}"
+  - "{{ if not .Prerelease }}quay.io/ccremer/greposync:v{{ .Major }}{{ end }}"
+  - "{{ if not .Prerelease }}quay.io/ccremer/greposync:latest{{ end }}"
 
 nfpms:
 - vendor: ccremer
-  homepage: https://github.com/ccremer/git-repo-sync
+  homepage: https://github.com/ccremer/greposync
   maintainer: ccremer
   description: ModuleSync reimplemented in Go with extras
   license: Apache 2.0
@@ -48,4 +48,4 @@ release:
   prerelease: auto
   github:
     owner: ccremer
-    name: git-repo-sync
+    name: greposync

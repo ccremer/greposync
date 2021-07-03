@@ -3,8 +3,8 @@ package repository
 import (
 	"strings"
 
-	"github.com/ccremer/git-repo-sync/printer"
 	pipeline "github.com/ccremer/go-command-pipeline"
+	"github.com/ccremer/greposync/printer"
 )
 
 func (s *Service) ShowDiff() pipeline.ActionFunc {

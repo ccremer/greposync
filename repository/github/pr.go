@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/ccremer/git-repo-sync/printer"
+	"github.com/ccremer/greposync/printer"
 	"github.com/google/go-github/v36/github"
 	"golang.org/x/oauth2"
 )

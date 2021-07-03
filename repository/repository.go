@@ -7,9 +7,9 @@ import (
 	"path"
 	"strings"
 
-	"github.com/ccremer/git-repo-sync/cfg"
-	"github.com/ccremer/git-repo-sync/printer"
 	pipeline "github.com/ccremer/go-command-pipeline"
+	"github.com/ccremer/greposync/cfg"
+	"github.com/ccremer/greposync/printer"
 	"github.com/knadh/koanf"
 	"github.com/knadh/koanf/parsers/yaml"
 	"github.com/knadh/koanf/providers/file"

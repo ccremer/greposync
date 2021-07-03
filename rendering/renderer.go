@@ -8,9 +8,9 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/ccremer/git-repo-sync/cfg"
-	"github.com/ccremer/git-repo-sync/printer"
 	pipeline "github.com/ccremer/go-command-pipeline"
+	"github.com/ccremer/greposync/cfg"
+	"github.com/ccremer/greposync/printer"
 	"github.com/knadh/koanf"
 )
 

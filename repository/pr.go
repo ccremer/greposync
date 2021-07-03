@@ -3,9 +3,9 @@ package repository
 import (
 	"os"
 
-	"github.com/ccremer/git-repo-sync/cfg"
-	"github.com/ccremer/git-repo-sync/repository/github"
 	pipeline "github.com/ccremer/go-command-pipeline"
+	"github.com/ccremer/greposync/cfg"
+	"github.com/ccremer/greposync/repository/github"
 )
 
 func (s *Service) CreateOrUpdatePR(config *cfg.PullRequestConfig) pipeline.ActionFunc {
