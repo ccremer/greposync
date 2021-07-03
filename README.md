@@ -1,5 +1,11 @@
 # greposync
 
+![Go version](https://img.shields.io/github/go-mod/go-version/ccremer/go-command-pipeline)
+[![Version](https://img.shields.io/github/v/release/ccremer/go-command-pipeline)][releases]
+[![GitHub downloads](https://img.shields.io/github/downloads/ccremer/go-command-pipeline/total)][releases]
+[![Go Report Card](https://goreportcard.com/badge/github.com/ccremer/greposync)][goreport]
+[![Codecov](https://img.shields.io/codecov/c/github/ccremer/greposync?token=6DQY7397LS)][codecov]
+
 This is a PoC to reimplement modulesync in Go
 
 ## Project status
@@ -13,11 +19,7 @@ Most features are untested yet ("it works on my machine").
 
 Feature | modulesync | greposync
 ---     | ---        | ---
-Git Clone | ✔️ | ✔️
-Git Commit | ✔️ | ✔️
-Git Commit --amend | ✔️ | ✔️
-Git Push | ✔️ | ✔️
-Git Push --force | ✔️ | ✔️
+Git Clone, Commit, Push | ✔️ | ✔️
 Git Tags | ✔️ |
 GitHub create PR | ✔️ | ✔️
 GitHub update PR | ❌ | ✔️
@@ -59,3 +61,12 @@ To clearly differentiate between the two, the `template` dir is `moduleroot`'s p
 
 The configuration syntax in `managed_repos.yml` (`managed_modules.yml`) and `gitreposync.yml` (`modulesync.yml`) has changed as well compared to their predecessors.
 Checkout the examples and documentation (coming later).
+
+## The name
+
+It's a short form for **G**it-**Repo-Sync**.
+
+
+[releases]: https://github.com/ccremer/greposync/releases
+[codecov]: https://app.codecov.io/gh/ccremer/greposync
+[goreport]: https://goreportcard.com/report/github.com/ccremer/greposync
