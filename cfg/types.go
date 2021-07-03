@@ -61,11 +61,11 @@ func NewDefaultConfig() *Configuration {
 			Level: "info",
 		},
 		Git: &GitConfig{
-			CommitMessage: "Update from git-repo-sync",
+			CommitMessage: "Update from greposync",
 		},
 		PullRequest: &PullRequestConfig{
-			BodyTemplate: `This Pull request updates this repository with changes from a git-repo-sync template repository.`,
-			Subject:      "Update from git-repo-sync",
+			BodyTemplate: `This Pull request updates this repository with changes from a greposync template repository.`,
+			Subject:      "Update from greposync",
 		},
 		Template: &TemplateConfig{
 			RootDir: "template",

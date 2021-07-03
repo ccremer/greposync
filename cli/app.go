@@ -5,8 +5,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/ccremer/git-repo-sync/cfg"
-	"github.com/ccremer/git-repo-sync/printer"
+	"github.com/ccremer/greposync/cfg"
+	"github.com/ccremer/greposync/printer"
 	"github.com/urfave/cli/v2"
 )
 

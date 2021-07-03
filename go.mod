@@ -1,4 +1,4 @@
-module github.com/ccremer/git-repo-sync
+module github.com/ccremer/greposync
 
 go 1.16
 

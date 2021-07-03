@@ -1,6 +1,8 @@
 package repository
 
-import pipeline "github.com/ccremer/go-command-pipeline"
+import (
+	pipeline "github.com/ccremer/go-command-pipeline"
+)
 
 func (s *Service) PushToRemote() pipeline.ActionFunc {
 	return func() pipeline.Result {

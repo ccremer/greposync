@@ -3,7 +3,7 @@ package main
 import (
 	"time"
 
-	"github.com/ccremer/git-repo-sync/cli"
+	"github.com/ccremer/greposync/cli"
 )
 
 var (
