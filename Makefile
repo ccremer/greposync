@@ -43,7 +43,7 @@ clean: ## Clean the project
 
 .PHONY: test
 test: ## Run unit tests
-	@go test -coverprofile cover.out -v ./...
+	@go test -race -coverprofile cover.out -covermode atomic -count 1 -v ./...
 
 .PHONY: run
 run: ## Run locally
