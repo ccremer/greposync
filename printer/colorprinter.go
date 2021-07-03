@@ -78,6 +78,12 @@ func (p *colorPrinter) WarnF(format string, args ...interface{}) {
 	}
 }
 
+func (p *colorPrinter) ErrorF(format string, args ...interface{}) {
+	if p.level >= LevelError {
+		p.printWithColorAndPrefix(os.Stderr, p.colorMap[LevelError], format, args...)
+	}
+}
+
 func (p *colorPrinter) LogF(format string, args ...interface{}) {
 	p.printWithColor(os.Stdout, p.color, format, args...)
 }
