@@ -47,21 +47,18 @@ func NewProvider(config *Config) *PrProvider {
 	return provider
 }
 
-func (p *PrProvider) CreateOrUpdatePR() {
-
+func (p *PrProvider) CreateOrUpdatePR() error {
 	if pr := p.findExistingPr(); pr == nil {
-		err := p.createPR()
-		p.log.CheckIfError(err)
+		return p.createPR()
 	} else {
 		if *pr.Body != p.cfg.Body || *pr.Title != p.cfg.Subject {
 			p.log.InfoF("Updating PR#%d", *pr.Number)
-			err := p.updatePr(pr)
-			p.log.CheckIfError(err)
+			return p.updatePr(pr)
 		} else {
 			p.log.InfoF("PR#%d is up-to-date.", *pr.Number)
+			return nil
 		}
 	}
-
 }
 
 func (p *PrProvider) findExistingPr() *github.PullRequest {

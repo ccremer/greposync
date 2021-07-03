@@ -7,5 +7,5 @@ type (
 )
 
 func (p PipelineLogger) Log(message, name string) {
-	p.Logger.DebugF("%s %s", message, name)
+	p.Logger.DebugF("%s '%s'", message, name)
 }

@@ -126,25 +126,50 @@ func runUpdateCommand(*cli.Context) error {
 			pipeline.NewStepWithPredicate("commit", r.MakeCommit(), pipeline.Not(r.SkipCommit())),
 			pipeline.NewStepWithPredicate("show diff", r.ShowDiff(), pipeline.Not(r.SkipCommit())),
 			pipeline.NewStepWithPredicate("push", r.PushToRemote(), pipeline.Not(r.SkipPush())),
+			pipeline.NewPipeline().WithSteps(
+				pipeline.NewStep("render pull request template", RenderPrTemplate(log, renderer)),
+				pipeline.NewStep("create or update pull request", r.CreateOrUpdatePR(config.PullRequest)),
+			).AsNestedStep("pull request", CreatePr()),
 		)
 		result := p.Run()
 		log.CheckIfError(result.Err)
 
 		if config.PullRequest.Create {
-			template := config.PullRequest.BodyTemplate
-			if template == "" {
-				log.InfoF("No PullRequest template defined")
-				config.PullRequest.BodyTemplate = config.Git.CommitMessage
-			}
 
-			data := rendering.Values{"Metadata": renderer.ConstructMetadata()}
-			if renderer.FileExists(template) {
-				config.PullRequest.BodyTemplate = renderer.RenderTemplateFile(data, template)
-			} else {
-				config.PullRequest.BodyTemplate = renderer.RenderString(data, template)
-			}
 			r.CreateOrUpdatePR(config.PullRequest)
 		}
 	}
 	return nil
+}
+
+func RenderPrTemplate(log printer.Printer, renderer *rendering.Renderer) pipeline.ActionFunc {
+	return func() pipeline.Result {
+		template := config.PullRequest.BodyTemplate
+		if template == "" {
+			log.InfoF("No PullRequest template defined")
+			config.PullRequest.BodyTemplate = config.Git.CommitMessage
+		}
+
+		data := rendering.Values{"Metadata": renderer.ConstructMetadata()}
+		if renderer.FileExists(template) {
+			if str, err := renderer.RenderTemplateFile(data, template); err != nil {
+				return pipeline.Result{Err: err}
+			} else {
+				config.PullRequest.BodyTemplate = str
+			}
+		} else {
+			if str, err := renderer.RenderString(data, template); err != nil {
+				return pipeline.Result{Err: err}
+			} else {
+				config.PullRequest.BodyTemplate = str
+			}
+		}
+		return pipeline.Result{}
+	}
+}
+
+func CreatePr() pipeline.Predicate {
+	return func(step pipeline.Step) bool {
+		return config.PullRequest.Create
+	}
 }
