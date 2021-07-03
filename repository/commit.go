@@ -3,26 +3,43 @@ package repository
 import (
 	"fmt"
 	"os"
+
+	pipeline "github.com/ccremer/go-command-pipeline"
 )
 
-func (s *Service) MakeCommit() {
-	if s.Config.SkipCommit {
-		s.p.WarnF("Skipped: git commit")
-		return
-	}
-	f, err := os.CreateTemp("", "COMMIT_MSG_")
-	s.p.CheckIfError(err)
-	defer s.deleteFile(f)
-	args := []string{"commit", "-a", "-F", f.Name()}
-	if s.Config.Amend {
-		args = append(args, "--amend")
-	}
+func (s *Service) MakeCommit() pipeline.ActionFunc {
+	return func() pipeline.Result {
+		f, err := os.CreateTemp("", "COMMIT_MSG_")
+		if err != nil {
+			return pipeline.Result{Err: err}
+		}
+		defer s.deleteFile(f)
 
-	_, err = fmt.Fprint(f, s.Config.CommitMessage)
-	s.p.CheckIfError(err)
-	out, _, err := s.execGitCommand(s.logArgs(args...)...)
-	s.p.DebugF(out)
-	s.p.CheckIfError(err)
+		// Write commit message
+		_, err = fmt.Fprint(f, s.Config.CommitMessage)
+		if err != nil {
+			return pipeline.Result{Err: err}
+		}
+
+		// Commit
+		args := []string{"commit", "-a", "-F", f.Name()}
+		if s.Config.Amend {
+			args = append(args, "--amend")
+		}
+
+		out, stderr, err := s.execGitCommand(s.logArgs(args...)...)
+		if err != nil {
+			return s.toResult(err, stderr)
+		}
+		s.p.DebugF(out)
+		return pipeline.Result{}
+	}
+}
+
+func (s *Service) SkipCommit() pipeline.Predicate {
+	return func(step pipeline.Step) bool {
+		return s.Config.SkipCommit
+	}
 }
 
 func (s *Service) deleteFile(file *os.File) {

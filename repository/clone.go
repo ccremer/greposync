@@ -1,23 +1,17 @@
 package repository
 
 import (
-	"os"
+	pipeline "github.com/ccremer/go-command-pipeline"
 )
 
-func (s *Service) PrepareWorkspace() {
-	if _, err := os.Stat(s.Config.Dir); os.IsNotExist(err) {
-		s.CloneGitRepository()
-		s.SwitchBranch()
-		return
+func (s *Service) CloneGitRepositoryAction() pipeline.ActionFunc {
+	return func() pipeline.Result {
+		out, stderr, err := s.execGitCommand(s.logArgs("clone", s.Config.Url.Redacted(), s.Config.Dir)...)
+		if err != nil {
+			return s.toResult(err, stderr)
+		}
+		s.p.PrintF(out)
+		s.Config.DefaultBranch = s.GetDefaultBranch()
+		return pipeline.Result{}
 	}
-	s.ResetRepository()
-	s.SwitchBranch()
-	s.Pull()
-}
-
-func (s *Service) CloneGitRepository() {
-	out, _, err := s.execGitCommand(s.logArgs("clone", s.Config.Url.Redacted(), s.Config.Dir)...)
-	s.p.CheckIfError(err)
-	s.p.PrintF(out)
-	s.Config.DefaultBranch = s.GetDefaultBranch()
 }

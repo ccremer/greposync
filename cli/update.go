@@ -104,23 +104,23 @@ func runUpdateCommand(*cli.Context) error {
 	}
 	services := repository.NewServicesFromFile(config)
 
-	for _, repo := range services {
-		log := printer.New().SetName(repo.Config.Name).SetLevel(printer.LevelDebug)
+	for _, r := range services {
+		log := printer.New().SetName(r.Config.Name).SetLevel(printer.LevelDebug)
 
 		sc := &cfg.SyncConfig{
-			Git:         repo.Config,
+			Git:         r.Config,
 			PullRequest: config.PullRequest,
 			Template: &cfg.TemplateConfig{
 				RootDir: config.Template.RootDir,
 			},
 		}
-		gitDirExists := repo.DirExists(repo.Config.Dir)
+		gitDirExists := r.DirExists(r.Config.Dir)
 		p := pipeline.NewPipelineWithLogger(printer.PipelineLogger{Logger: log})
 		p.WithSteps(
-			pipeline.NewStepWithPredicate("clone repository", repo.CloneGitRepositoryAction(), pipeline.Bool(!gitDirExists)),
-			pipeline.NewStepWithPredicate("reset repository", repo.ResetRepository(), pipeline.Not(repo.SkipReset())),
-			pipeline.NewStep("checkout branch", repo.CheckoutBranch()),
-			pipeline.NewStepWithPredicate("pull", repo.Pull(), pipeline.Not(repo.SkipReset())),
+			pipeline.NewStepWithPredicate("clone repository", r.CloneGitRepositoryAction(), pipeline.Bool(!gitDirExists)),
+			pipeline.NewStepWithPredicate("reset repository", r.ResetRepository(), pipeline.Not(r.SkipReset())),
+			pipeline.NewStep("checkout branch", r.CheckoutBranch()),
+			pipeline.NewStepWithPredicate("pull", r.Pull(), pipeline.Not(r.SkipReset())),
 		)
 		result := p.Run()
 		log.CheckIfError(result.Err)
@@ -130,10 +130,12 @@ func runUpdateCommand(*cli.Context) error {
 
 		p = pipeline.NewPipeline()
 		p.WithSteps(
-			pipeline.NewStepWithPredicate("commit", repo.MakeCommit(), pipeline.Not(repo.SkipCommit())),
-			pipeline.NewStepWithPredicate("show diff", repo.ShowDiff(), pipeline.Not(repo.SkipCommit())),
-			pipeline.NewStepWithPredicate("push", repo.PushToRemote(), pipeline.Not(repo.SkipPush())),
+			pipeline.NewStepWithPredicate("commit", r.MakeCommit(), pipeline.Not(r.SkipCommit())),
+			pipeline.NewStepWithPredicate("show diff", r.ShowDiff(), pipeline.Not(r.SkipCommit())),
+			pipeline.NewStepWithPredicate("push", r.PushToRemote(), pipeline.Not(r.SkipPush())),
 		)
+		result = p.Run()
+		log.CheckIfError(result.Err)
 
 		if config.PullRequest.Create {
 			template := config.PullRequest.BodyTemplate
@@ -148,7 +150,7 @@ func runUpdateCommand(*cli.Context) error {
 			} else {
 				config.PullRequest.BodyTemplate = renderer.RenderString(data, template)
 			}
-			repo.CreateOrUpdatePR(config.PullRequest)
+			r.CreateOrUpdatePR(config.PullRequest)
 		}
 	}
 	return nil

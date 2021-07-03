@@ -4,15 +4,18 @@ import (
 	"strings"
 
 	"github.com/ccremer/git-repo-sync/printer"
+	pipeline "github.com/ccremer/go-command-pipeline"
 )
 
-func (s *Service) ShowDiff() {
-	if s.Config.SkipCommit {
-		return
+func (s *Service) ShowDiff() pipeline.ActionFunc {
+	return func() pipeline.Result {
+		out, stderr, err := s.execGitCommand(s.logArgs("diff", "HEAD~1")...)
+		if err != nil {
+			return s.toResult(err, stderr)
+		}
+		s.prettyPrint(out)
+		return pipeline.Result{}
 	}
-	out, _, err := s.execGitCommand(s.logArgs("diff", "HEAD~1")...)
-	s.p.CheckIfError(err)
-	s.prettyPrint(out)
 }
 
 func (s *Service) prettyPrint(diff string) {

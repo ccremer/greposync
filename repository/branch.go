@@ -2,19 +2,25 @@ package repository
 
 import (
 	"strings"
+
+	pipeline "github.com/ccremer/go-command-pipeline"
 )
 
-func (s *Service) SwitchBranch() {
-	if s.Config.SkipReset || s.Config.CommitBranch == "" {
-		return
+func (s *Service) SkipCheckoutPredicate() pipeline.Predicate {
+	return func(step pipeline.Step) bool {
+		return s.Config.SkipReset || s.Config.CommitBranch == ""
 	}
-	s.CheckoutBranch(s.Config.CommitBranch)
 }
 
-func (s *Service) CheckoutBranch(branch string) {
-	out, _, err := s.execGitCommand(s.logArgs("checkout", branch)...)
-	s.p.CheckIfError(err)
-	s.p.DebugF(out)
+func (s *Service) CheckoutBranch() pipeline.ActionFunc {
+	return func() pipeline.Result {
+		out, stderr, err := s.execGitCommand(s.logArgs("checkout", s.Config.CommitBranch)...)
+		if err != nil {
+			return s.toResult(err, stderr)
+		}
+		s.p.DebugF(out)
+		return pipeline.Result{}
+	}
 }
 
 func (s *Service) GetDefaultBranch() string {

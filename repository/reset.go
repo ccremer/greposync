@@ -1,17 +1,24 @@
 package repository
 
-func (s *Service) ResetRepository() {
-	if s.Config.SkipReset {
-		s.p.WarnF("Skipped: git reset")
-		return
-	}
-	out, _, err := s.execGitCommand(s.logArgs("fetch")...)
-	s.p.CheckIfError(err)
-	if out != "" {
-		s.p.InfoF(out)
-	}
+import (
+	pipeline "github.com/ccremer/go-command-pipeline"
+)
 
-	out, _, err = s.execGitCommand(s.logArgs("reset", "--hard")...)
-	s.p.CheckIfError(err)
-	s.p.DebugF(out)
+func (s *Service) ResetRepository() pipeline.ActionFunc {
+	return func() pipeline.Result {
+		out, stderr, err := s.execGitCommand(s.logArgs("fetch")...)
+		if err != nil {
+			return s.toResult(err, stderr)
+		}
+		if out != "" {
+			s.p.InfoF(out)
+		}
+
+		out, stderr, err = s.execGitCommand(s.logArgs("reset", "--hard")...)
+		if err != nil {
+			return s.toResult(err, stderr)
+		}
+		s.p.DebugF(out)
+		return pipeline.Result{}
+	}
 }
