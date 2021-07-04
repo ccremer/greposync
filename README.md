@@ -1,8 +1,8 @@
 # greposync
 
-![Go version](https://img.shields.io/github/go-mod/go-version/ccremer/go-command-pipeline)
-[![Version](https://img.shields.io/github/v/release/ccremer/go-command-pipeline)][releases]
-[![GitHub downloads](https://img.shields.io/github/downloads/ccremer/go-command-pipeline/total)][releases]
+![Go version](https://img.shields.io/github/go-mod/go-version/ccremer/greposync)
+[![Version](https://img.shields.io/github/v/release/ccremer/greposync)][releases]
+[![GitHub downloads](https://img.shields.io/github/downloads/ccremer/greposync/total)][releases]
 [![Go Report Card](https://goreportcard.com/badge/github.com/ccremer/greposync)][goreport]
 [![Codecov](https://img.shields.io/codecov/c/github/ccremer/greposync?token=6DQY7397LS)][codecov]
 
