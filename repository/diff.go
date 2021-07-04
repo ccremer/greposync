@@ -7,7 +7,8 @@ import (
 	"github.com/ccremer/greposync/printer"
 )
 
-func (s *Service) ShowDiff() pipeline.ActionFunc {
+// Diff invokes git to show the changes between HEAD and previous commit.
+func (s *Service) Diff() pipeline.ActionFunc {
 	return func() pipeline.Result {
 		out, stderr, err := s.execGitCommand(s.logArgs("diff", "HEAD~1")...)
 		if err != nil {

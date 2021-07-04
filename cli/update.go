@@ -105,7 +105,7 @@ func runUpdateCommand(*cli.Context) error {
 	services := repository.NewServicesFromFile(config)
 
 	for _, r := range services {
-		log := printer.New().SetName(r.Config.Name).SetLevel(printer.LevelDebug)
+		log := printer.New().SetName(r.Config.Name).SetLevel(printer.DefaultLevel)
 
 		sc := &cfg.SyncConfig{
 			Git:         r.Config,
@@ -122,58 +122,24 @@ func runUpdateCommand(*cli.Context) error {
 			pipeline.NewPipelineWithLogger(logger).WithSteps(
 				pipeline.NewStepWithPredicate("clone repository", r.CloneGitRepository(), pipeline.Bool(!gitDirExists)),
 				pipeline.NewStep("determine default branch", r.GetDefaultBranch()),
-				pipeline.NewStepWithPredicate("reset repository", r.ResetRepository(), pipeline.Not(r.SkipReset())),
+				pipeline.NewStepWithPredicate("fetch", r.Fetch(), r.EnabledReset()),
+				pipeline.NewStepWithPredicate("reset repository", r.ResetRepository(), r.EnabledReset()),
 				pipeline.NewStep("checkout branch", r.CheckoutBranch()),
-				pipeline.NewStepWithPredicate("pull", r.Pull(), pipeline.Not(r.SkipReset())),
+				pipeline.NewStepWithPredicate("pull", r.Pull(), r.EnabledReset()),
 			).AsNestedStep("prepare workspace", nil),
 			pipeline.NewStep("render templates", renderer.ProcessTemplates()),
-			pipeline.NewStepWithPredicate("commit", r.MakeCommit(), pipeline.Not(r.SkipCommit())),
-			pipeline.NewStepWithPredicate("show diff", r.ShowDiff(), pipeline.Not(r.SkipCommit())),
-			pipeline.NewStepWithPredicate("push", r.PushToRemote(), pipeline.Not(r.SkipPush())),
+			pipeline.NewStepWithPredicate("commit", r.Commit(), r.EnabledCommit()),
+			pipeline.NewStepWithPredicate("show diff", r.Diff(), r.EnabledCommit()),
+			pipeline.NewStepWithPredicate("push", r.PushToRemote(), r.EnabledPush()),
 			pipeline.NewPipelineWithLogger(logger).WithSteps(
-				pipeline.NewStep("render pull request template", RenderPrTemplate(log, renderer)),
-				pipeline.NewStep("create or update pull request", r.CreateOrUpdatePR(config.PullRequest)),
-			).AsNestedStep("pull request", CreatePr()),
+				pipeline.NewStep("render pull request template", renderer.RenderPrTemplate()),
+				pipeline.NewStep("create or update pull request", r.CreateOrUpdatePr(config.PullRequest)),
+			).AsNestedStep("pull request", r.EnabledPr()),
 		)
 		result := p.Run()
-		log.CheckIfError(result.Err)
-
-		if config.PullRequest.Create {
-
-			r.CreateOrUpdatePR(config.PullRequest)
+		if !result.IsSuccessful() {
+			return result.Err
 		}
 	}
 	return nil
-}
-
-func RenderPrTemplate(log printer.Printer, renderer *rendering.Renderer) pipeline.ActionFunc {
-	return func() pipeline.Result {
-		template := config.PullRequest.BodyTemplate
-		if template == "" {
-			log.InfoF("No PullRequest template defined")
-			config.PullRequest.BodyTemplate = config.Git.CommitMessage
-		}
-
-		data := rendering.Values{"Metadata": renderer.ConstructMetadata()}
-		if renderer.FileExists(template) {
-			if str, err := renderer.RenderTemplateFile(data, template); err != nil {
-				return pipeline.Result{Err: err}
-			} else {
-				config.PullRequest.BodyTemplate = str
-			}
-		} else {
-			if str, err := renderer.RenderString(data, template); err != nil {
-				return pipeline.Result{Err: err}
-			} else {
-				config.PullRequest.BodyTemplate = str
-			}
-		}
-		return pipeline.Result{}
-	}
-}
-
-func CreatePr() pipeline.Predicate {
-	return func(step pipeline.Step) bool {
-		return config.PullRequest.Create
-	}
 }

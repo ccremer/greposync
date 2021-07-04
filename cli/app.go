@@ -48,13 +48,13 @@ func CreateCLI(version, commit, date string) {
 			_ = cli.ShowCommandHelp(context, context.Command.Name)
 		},
 		Before: func(context *cli.Context) error {
-			cfg.ParseConfig("gitreposync.yml", c)
-			return nil
+			return cfg.ParseConfig("gitreposync.yml", c)
 		},
 	}
 	config = c
 }
 
+// Run the CLI application
 func Run() {
 	err := app.Run(os.Args)
 	printer.CheckIfError(err)

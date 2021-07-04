@@ -33,15 +33,47 @@ var (
 	templateFunctions = funcMap()
 )
 
+// NewRenderer returns a new instance of a renderer.
 func NewRenderer(c *cfg.SyncConfig, globalDefaults *koanf.Koanf) *Renderer {
 	return &Renderer{
-		p:              printer.New().SetLevel(printer.LevelDebug).MapColorToLevel(printer.Magenta, printer.LevelInfo).SetName(c.Git.Name),
+		p:              printer.New().SetLevel(printer.DefaultLevel).MapColorToLevel(printer.Magenta, printer.LevelInfo).SetName(c.Git.Name),
 		k:              koanf.New("."),
 		globalDefaults: globalDefaults,
 		cfg:            c,
 	}
 }
 
+// RenderPrTemplate renders the PR template.
+// If the BodyTemplate config is a path to an existing file, it will use the file and overwrite the config with the rendered result.
+// IF the BodyTemplate config is a string, it will overwrite it with a rendered and data-injected string.
+// If the BodyTemplate config is empty, it will use the CommitMessage.
+func (r *Renderer) RenderPrTemplate() pipeline.ActionFunc {
+	return func() pipeline.Result {
+		t := r.cfg.PullRequest.BodyTemplate
+		if t == "" {
+			r.p.InfoF("No PullRequest template defined")
+			r.cfg.PullRequest.BodyTemplate = r.cfg.Git.CommitMessage
+		}
+
+		data := Values{"Metadata": r.ConstructMetadata()}
+		if r.fileExists(t) {
+			if str, err := r.RenderTemplateFile(data, t); err != nil {
+				return pipeline.Result{Err: err}
+			} else {
+				r.cfg.PullRequest.BodyTemplate = str
+			}
+		} else {
+			if str, err := r.RenderString(data, t); err != nil {
+				return pipeline.Result{Err: err}
+			} else {
+				r.cfg.PullRequest.BodyTemplate = str
+			}
+		}
+		return pipeline.Result{}
+	}
+}
+
+// ProcessTemplates searches for template files in the configure dir, renders the template with injected data and writes them to git target directory.
 func (r *Renderer) ProcessTemplates() pipeline.ActionFunc {
 	return func() pipeline.Result {
 		err := r.loadVariables(path.Join(r.cfg.Git.Dir, ".sync.yml"))
@@ -78,7 +110,7 @@ func (r *Renderer) processTemplate(templateFullPath string) error {
 
 	templates := []string{templateFullPath}
 	helperFilePath := path.Join(r.cfg.Template.RootDir, helperFileName)
-	if r.FileExists(helperFilePath) {
+	if r.fileExists(helperFilePath) {
 		templates = append(templates, helperFilePath)
 	}
 	// Read template and helpers

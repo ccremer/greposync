@@ -2,7 +2,6 @@ package cfg
 
 import (
 	"net/url"
-	"path"
 )
 
 type (
@@ -33,6 +32,7 @@ type (
 		Git         *GitConfig
 		Template    *TemplateConfig
 	}
+	// GitConfig configures a git repository
 	GitConfig struct {
 		Url           *url.URL `json:"-"`
 		Dir           string   `json:"-"`
@@ -48,6 +48,7 @@ type (
 		Name          string
 		Namespace     string
 	}
+	// TemplateConfig configures template settings
 	TemplateConfig struct {
 		RootDir string
 	}
@@ -71,8 +72,4 @@ func NewDefaultConfig() *Configuration {
 			RootDir: "template",
 		},
 	}
-}
-
-func (c GitConfig) GetName() string {
-	return path.Base(c.Dir)
 }

@@ -10,6 +10,7 @@ import (
 )
 
 type (
+	// Config configures the GitHub provider with all necessary information.
 	Config struct {
 		Token        string
 		Subject      string
@@ -20,6 +21,7 @@ type (
 		Body         string
 		Labels       []string
 	}
+	// PrProvider contains the methods and data to interact with the GitHub API.
 	PrProvider struct {
 		cfg    *Config
 		client *github.Client
@@ -38,16 +40,20 @@ func (p *PrProvider) createClient() {
 	p.client = github.NewClient(tc)
 }
 
+// NewProvider returns a new GitHub provider instance.
 func NewProvider(config *Config) *PrProvider {
 	provider := &PrProvider{
 		cfg: config,
-		log: printer.New().SetName(config.Repo).SetLevel(printer.LevelDebug),
+		log: printer.New().SetName(config.Repo).SetLevel(printer.DefaultLevel),
 	}
 	provider.createClient()
 	return provider
 }
 
-func (p *PrProvider) CreateOrUpdatePR() error {
+// CreateOrUpdatePr creates the PR if it doesn't exist, or updates an existing one if the branch matches.
+// A PR is considered out-of-date if the subject or body don't match with current configuration.
+// Labels are left unmodified.
+func (p *PrProvider) CreateOrUpdatePr() error {
 	if pr, err := p.findExistingPr(); err != nil {
 		return err
 	} else if pr == nil {

@@ -7,12 +7,14 @@ import (
 	pipeline "github.com/ccremer/go-command-pipeline"
 )
 
-func (s *Service) SkipCheckout() pipeline.Predicate {
+// EnabledCheckout returns true if the git branch should be checked out.
+func (s *Service) EnabledCheckout() pipeline.Predicate {
 	return func(step pipeline.Step) bool {
-		return s.Config.SkipReset || s.Config.CommitBranch == ""
+		return !(s.Config.SkipReset || s.Config.CommitBranch == "")
 	}
 }
 
+// CheckoutBranch invokes git to checkout the configured commit branch.
 func (s *Service) CheckoutBranch() pipeline.ActionFunc {
 	return func() pipeline.Result {
 		out, stderr, err := s.execGitCommand(s.logArgs("checkout", s.Config.CommitBranch)...)
@@ -24,6 +26,7 @@ func (s *Service) CheckoutBranch() pipeline.ActionFunc {
 	}
 }
 
+// GetDefaultBranch invokes git and parses the output to determine the default branch in origin.
 func (s *Service) GetDefaultBranch() pipeline.ActionFunc {
 	return func() pipeline.Result {
 		out, stderr, err := s.execGitCommand("remote", "show", "origin")

@@ -8,7 +8,8 @@ import (
 	"github.com/ccremer/greposync/repository/github"
 )
 
-func (s *Service) CreateOrUpdatePR(config *cfg.PullRequestConfig) pipeline.ActionFunc {
+// CreateOrUpdatePr creates a PR if it doesn't exist or updates if the remote branch exists already.
+func (s *Service) CreateOrUpdatePr(config *cfg.PullRequestConfig) pipeline.ActionFunc {
 	return func() pipeline.Result {
 		if config.TargetBranch == "" {
 			config.TargetBranch = s.Config.DefaultBranch
@@ -16,13 +17,20 @@ func (s *Service) CreateOrUpdatePR(config *cfg.PullRequestConfig) pipeline.Actio
 		c := &github.Config{
 			Token:        os.Getenv("GITHUB_TOKEN"),
 			Subject:      config.Subject,
-			Repo:         s.Config.GetName(),
+			Repo:         s.Config.Name,
 			RepoOwner:    s.Config.Namespace,
 			CommitBranch: s.Config.CommitBranch,
 			TargetBranch: config.TargetBranch,
 			Body:         config.BodyTemplate,
 		}
 		gh := github.NewProvider(c)
-		return pipeline.Result{Err: gh.CreateOrUpdatePR()}
+		return pipeline.Result{Err: gh.CreateOrUpdatePr()}
+	}
+}
+
+// EnabledPr returns true if a PR should be created or updated.
+func (s *Service) EnabledPr() pipeline.Predicate {
+	return func(step pipeline.Step) bool {
+		return s.Config.CreatePR
 	}
 }

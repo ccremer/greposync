@@ -31,9 +31,13 @@ const (
 )
 
 var (
-	InfoColor  Color = BrightWhite
+	// DebugColor is the color which is used for LevelDebug logging level.
 	DebugColor Color = Gray
-	WarnColor  Color = Yellow
+	// InfoColor is the color which is used for LevelInfo logging level.
+	InfoColor Color = BrightWhite
+	// WarnColor is the color which is used for LevelWarn logging level.
+	WarnColor Color = Yellow
+	// ErrorColor is the color which is used for LevelError logging level.
 	ErrorColor Color = Red
 )
 

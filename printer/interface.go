@@ -6,6 +6,7 @@ import (
 )
 
 type (
+	// Printer represents a logging interface.
 	Printer interface {
 		// DebugF sets the color to DebugColor, prints the string as given and resets the color, provided the LogLevel is LevelDebug or higher.
 		DebugF(format string, args ...interface{})
@@ -43,17 +44,24 @@ type (
 )
 
 const (
+	// LevelError is the error logging level.
 	LevelError = 0
-	LevelWarn  = 1
-	LevelInfo  = 2
+	// LevelWarn is the warning logging level.
+	LevelWarn = 1
+	// LevelInfo is the info logging level.
+	LevelInfo = 2
+	// LevelDebug is the debug logging level.
 	LevelDebug = 3
 )
 
 var (
-	DefaultPrinter          = New()
-	DefaultLevel   LogLevel = LevelInfo
+	// DefaultPrinter is the default logger instance.
+	DefaultPrinter = New()
+	// DefaultLevel is the default logging level for new logger instances.
+	DefaultLevel LogLevel = LevelInfo
 )
 
+// New returns a new colored logger.
 func New() Printer {
 	return &colorPrinter{
 		level: DefaultLevel,
@@ -68,21 +76,28 @@ func New() Printer {
 	}
 }
 
+// DebugF uses DefaultPrinter to log the given format string and its arguments.
 func DebugF(format string, args ...interface{}) {
 	DefaultPrinter.DebugF(format, args...)
 }
 
+// InfoF uses DefaultPrinter to log the given format string and its arguments.
 func InfoF(format string, args ...interface{}) {
 	DefaultPrinter.InfoF(format, args...)
 }
 
+// WarnF uses DefaultPrinter to log the given format string and its arguments.
 func WarnF(format string, args ...interface{}) {
 	DefaultPrinter.WarnF(format, args...)
 }
+
+// CheckIfError uses DefaultPrinter to print the given error and exit the program.
 func CheckIfError(err error) {
 	DefaultPrinter.CheckIfError(err)
 }
 
+// ParseLogLevel returns the parsed log level from a given lower-cased string.
+// If it cannot be parsed, the LevelInfo is returned along with an error.
 func ParseLogLevel(level string) (LogLevel, error) {
 	levelMap := map[string]LogLevel{
 		"error": LevelError,
@@ -93,7 +108,6 @@ func ParseLogLevel(level string) (LogLevel, error) {
 	lvl, found := levelMap[strings.ToLower(level)]
 	if found {
 		return lvl, nil
-	} else {
-		return LevelInfo, errors.New("log level invalid: " + level)
 	}
+	return LevelInfo, errors.New("log level invalid: " + level)
 }
