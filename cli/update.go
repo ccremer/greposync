@@ -123,7 +123,7 @@ func runUpdateCommand(*cli.Context) error {
 				pipeline.NewStepWithPredicate("clone repository", r.CloneGitRepository(), pipeline.Bool(!gitDirExists)),
 				pipeline.NewStep("determine default branch", r.GetDefaultBranch()),
 				pipeline.NewStepWithPredicate("fetch", r.Fetch(), r.EnabledReset()),
-				pipeline.NewStepWithPredicate("reset repository", r.ResetRepository(),r.EnabledReset()),
+				pipeline.NewStepWithPredicate("reset repository", r.ResetRepository(), r.EnabledReset()),
 				pipeline.NewStep("checkout branch", r.CheckoutBranch()),
 				pipeline.NewStepWithPredicate("pull", r.Pull(), r.EnabledReset()),
 			).AsNestedStep("prepare workspace", nil),

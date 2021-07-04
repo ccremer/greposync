@@ -28,7 +28,7 @@ type (
 )
 
 var (
-	k                    = koanf.New(".")
+	k = koanf.New(".")
 	// ManagedReposFileName is the base file name where managed git repositories config is searched.
 	ManagedReposFileName = "managed_repos.yml"
 )
