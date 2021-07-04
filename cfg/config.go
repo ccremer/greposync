@@ -40,6 +40,7 @@ func loadConfigHierarchy(configPath string, config *Configuration) error {
 	return koanfInstance.Unmarshal("", &config)
 }
 
+// Sanitize does corrective actions on the configuration hierarchy.
 func (config *Configuration) Sanitize() {
 	level, err := printer.ParseLogLevel(config.Log.Level)
 	if err != nil {

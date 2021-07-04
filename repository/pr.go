@@ -16,7 +16,7 @@ func (s *Service) CreateOrUpdatePR(config *cfg.PullRequestConfig) pipeline.Actio
 		c := &github.Config{
 			Token:        os.Getenv("GITHUB_TOKEN"),
 			Subject:      config.Subject,
-			Repo:         s.Config.GetName(),
+			Repo:         s.Config.Name,
 			RepoOwner:    s.Config.Namespace,
 			CommitBranch: s.Config.CommitBranch,
 			TargetBranch: config.TargetBranch,
