@@ -25,6 +25,10 @@ clean: ## Clean documentation artifacts
 preview: build ## Preview Antora build in local web server and browser
 	npm run preview
 
+.PHONY: deploy
+deploy: build ## Publishes the documentation in gh-pages
+	npm run deploy
+
 .PHONY: help
 help: ## Show this help
 	@grep -E -h '\s##\s' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'

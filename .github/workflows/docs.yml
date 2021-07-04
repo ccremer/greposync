@@ -1,0 +1,14 @@
+name: Docs
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  gh-pages:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Publish documentation
+      run: make docs:publish

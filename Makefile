@@ -63,3 +63,6 @@ docs\:preview: ## Preview documentation in local web server and browser
 
 docs\:build: ## Build documentation
 	@$(docs_make) build
+
+docs\:publish: ## Publishes the documentation in gh-pages
+	@$(docs_make) deploy
