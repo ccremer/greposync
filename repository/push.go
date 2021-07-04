@@ -4,6 +4,7 @@ import (
 	pipeline "github.com/ccremer/go-command-pipeline"
 )
 
+// PushToRemote invokes git to push the commits to origin.
 func (s *Service) PushToRemote() pipeline.ActionFunc {
 	return func() pipeline.Result {
 		args := []string{"push"}
@@ -19,8 +20,9 @@ func (s *Service) PushToRemote() pipeline.ActionFunc {
 	}
 }
 
-func (s *Service) SkipPush() pipeline.Predicate {
+// EnabledPush returns true if git pushes are enabled.
+func (s *Service) EnabledPush() pipeline.Predicate {
 	return func(step pipeline.Step) bool {
-		return s.Config.SkipPush
+		return !s.Config.SkipPush
 	}
 }

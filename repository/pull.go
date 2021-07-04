@@ -4,6 +4,7 @@ import (
 	pipeline "github.com/ccremer/go-command-pipeline"
 )
 
+// Pull invokes git to pull the latest commits from origin.
 func (s *Service) Pull() pipeline.ActionFunc {
 	return func() pipeline.Result {
 		exists, err := s.remoteBranchExists(s.Config.CommitBranch)
@@ -21,8 +22,9 @@ func (s *Service) Pull() pipeline.ActionFunc {
 	}
 }
 
-func (s *Service) SkipReset() pipeline.Predicate {
+// EnabledReset returns true if git reset is enabled.
+func (s *Service) EnabledReset() pipeline.Predicate {
 	return func(step pipeline.Step) bool {
-		return s.Config.SkipReset
+		return !s.Config.SkipReset
 	}
 }

@@ -122,17 +122,18 @@ func runUpdateCommand(*cli.Context) error {
 			pipeline.NewPipelineWithLogger(logger).WithSteps(
 				pipeline.NewStepWithPredicate("clone repository", r.CloneGitRepository(), pipeline.Bool(!gitDirExists)),
 				pipeline.NewStep("determine default branch", r.GetDefaultBranch()),
-				pipeline.NewStepWithPredicate("reset repository", r.ResetRepository(), pipeline.Not(r.SkipReset())),
+				pipeline.NewStepWithPredicate("fetch", r.Fetch(), r.EnabledReset()),
+				pipeline.NewStepWithPredicate("reset repository", r.ResetRepository(),r.EnabledReset()),
 				pipeline.NewStep("checkout branch", r.CheckoutBranch()),
-				pipeline.NewStepWithPredicate("pull", r.Pull(), pipeline.Not(r.SkipReset())),
+				pipeline.NewStepWithPredicate("pull", r.Pull(), r.EnabledReset()),
 			).AsNestedStep("prepare workspace", nil),
 			pipeline.NewStep("render templates", renderer.ProcessTemplates()),
-			pipeline.NewStepWithPredicate("commit", r.MakeCommit(), pipeline.Not(r.SkipCommit())),
-			pipeline.NewStepWithPredicate("show diff", r.ShowDiff(), pipeline.Not(r.SkipCommit())),
-			pipeline.NewStepWithPredicate("push", r.PushToRemote(), pipeline.Not(r.SkipPush())),
+			pipeline.NewStepWithPredicate("commit", r.Commit(), r.EnabledCommit()),
+			pipeline.NewStepWithPredicate("show diff", r.Diff(), r.EnabledCommit()),
+			pipeline.NewStepWithPredicate("push", r.PushToRemote(), r.EnabledPush()),
 			pipeline.NewPipelineWithLogger(logger).WithSteps(
 				pipeline.NewStep("render pull request template", renderer.RenderPrTemplate()),
-				pipeline.NewStep("create or update pull request", r.CreateOrUpdatePR(config.PullRequest)),
+				pipeline.NewStep("create or update pull request", r.CreateOrUpdatePr(config.PullRequest)),
 			).AsNestedStep("pull request", r.EnabledPr()),
 		)
 		result := p.Run()

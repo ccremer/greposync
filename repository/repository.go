@@ -7,7 +7,6 @@ import (
 	"path"
 	"strings"
 
-	pipeline "github.com/ccremer/go-command-pipeline"
 	"github.com/ccremer/greposync/cfg"
 	"github.com/ccremer/greposync/printer"
 	"github.com/knadh/koanf"
@@ -17,10 +16,12 @@ import (
 )
 
 type (
+	// Service represents a git repository that comes with utility methods
 	Service struct {
 		p      printer.Printer
 		Config *cfg.GitConfig
 	}
+	// ManagedGitRepo is the representation of the managed git repos in the config file.
 	ManagedGitRepo struct {
 		Name string
 	}
@@ -28,9 +29,11 @@ type (
 
 var (
 	k                    = koanf.New(".")
+	// ManagedReposFileName is the base file name where managed git repositories config is searched.
 	ManagedReposFileName = "managed_repos.yml"
 )
 
+// NewServicesFromFile parses a config file with managed git repositories and provides a Service for each.
 func NewServicesFromFile(config *cfg.Configuration) []*Service {
 	err := k.Load(file.Provider(ManagedReposFileName), yaml.Parser())
 	printer.CheckIfError(err)
@@ -76,22 +79,10 @@ func parseUrl(m ManagedGitRepo, gitBase, defaultNs string) *url.URL {
 	return u
 }
 
-func (s *Service) FileExists(path string) bool {
-	if info, err := os.Stat(path); err != nil || info.IsDir() {
-		return false
-	}
-	return true
-}
-
+// DirExists returns true if the given path exists and is a directory.
 func (s *Service) DirExists(path string) bool {
-	if info, err := os.Stat(path); err != nil || !info.IsDir() {
-		return false
+	if info, err := os.Stat(path); err == nil && info.IsDir() {
+		return true
 	}
-	return true
-}
-
-func (s *Service) DirExistsPredicate(path string) pipeline.Predicate {
-	return func(step pipeline.Step) bool {
-		return s.DirExists(path)
-	}
+	return false
 }

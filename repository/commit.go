@@ -7,7 +7,8 @@ import (
 	pipeline "github.com/ccremer/go-command-pipeline"
 )
 
-func (s *Service) MakeCommit() pipeline.ActionFunc {
+// Commit invokes git to stage all files and commit to the current branch.
+func (s *Service) Commit() pipeline.ActionFunc {
 	return func() pipeline.Result {
 		f, err := os.CreateTemp("", "COMMIT_MSG_")
 		if err != nil {
@@ -36,9 +37,10 @@ func (s *Service) MakeCommit() pipeline.ActionFunc {
 	}
 }
 
-func (s *Service) SkipCommit() pipeline.Predicate {
+// EnabledCommit returns true if commits are enabled.
+func (s *Service) EnabledCommit() pipeline.Predicate {
 	return func(step pipeline.Step) bool {
-		return s.Config.SkipCommit
+		return !s.Config.SkipCommit
 	}
 }
 
