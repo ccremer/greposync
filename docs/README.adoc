@@ -1,0 +1,19 @@
+= Documentation with Antora
+
+This documentation is built with https://docs.antora.org/[Antora].
+
+== Build Documentation
+
+`make docs:build`
+
+== Live Reload and Preview
+
+This will run a web server on port 8080 and open your browser.
+Meanwhile you can make changes to the local `modules` dir and view your change 2-3s later without browser plugins.
+
+`make docs:preview`
+
+== Requirements
+
+* node v12
+* npm v6

@@ -8,6 +8,8 @@ MAKEFLAGS += --no-builtin-variables
 
 include Makefile.vars.mk
 
+docs_make := $(MAKE) -C docs
+
 .DEFAULT_GOAL := help
 .PHONY: help
 help: ## Show this help
@@ -48,3 +50,19 @@ test: ## Run unit tests
 .PHONY: run
 run: ## Run locally
 	@go run . -v
+
+###
+### Documentation
+###
+
+docs\:clean: ## Remove all documentation resources
+	@$(docs_make) clean
+
+docs\:preview: ## Preview documentation in local web server and browser
+	@$(docs_make) preview
+
+docs\:build: ## Build documentation
+	@$(docs_make) build
+
+docs\:publish: ## Publishes the documentation in gh-pages
+	@$(docs_make) deploy
