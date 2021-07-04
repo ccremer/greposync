@@ -36,8 +36,8 @@ func CreateCLI(version, commit, date string) {
 		},
 	}
 	app = &cli.App{
-		Name:                 "Git-Repo-Sync",
-		Usage:                "Shameless reimplementation of ModuleSync in Go",
+		Name:                 "greposync",
+		Usage:                "git-repo-sync: Shameless reimplementation of ModuleSync in Go",
 		Version:              fmt.Sprintf("%s, commit %s, date %s", version, commit[0:7], t.Format(dateLayout)),
 		EnableBashCompletion: true,
 		Commands: []*cli.Command{

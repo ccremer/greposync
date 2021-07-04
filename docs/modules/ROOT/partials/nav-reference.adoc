@@ -1,1 +1,1 @@
-//* xref:greposync:ROOT:references/....adoc[...]
+//* xref:references/....adoc[...]
