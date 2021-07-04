@@ -1,0 +1,16 @@
+* xref:index.adoc[Introduction]
+ifeval::['{page-origin-reftype}' == 'tag']
+* https://github.com/ccremer/greposync/releases/tag/{page-origin-refname}[Changelog,window=_blank]
+endif::[]
+
+.Tutorials
+include::partial$nav-tutorials.adoc[]
+
+.How To
+include::partial$nav-howtos.adoc[]
+
+.Technical reference
+include::partial$nav-reference.adoc[]
+
+.Explanation
+include::partial$nav-explanation.adoc[]

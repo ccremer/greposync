@@ -1,0 +1,17 @@
+site:
+  title: greposync docs
+  start_page: greposync::index.adoc
+  url: http://localhost
+content:
+  sources:
+    - url: ../
+      branches: [HEAD]
+      start_path: docs
+ui:
+  bundle:
+    url: https://gitlab.com/antora/antora-ui-default/-/jobs/artifacts/master/raw/build/ui-bundle.zip?job=bundle-stable
+    snapshot: true
+  supplemental_files: ./supplemental-ui
+output:
+  dir: public/
+  clean: true
