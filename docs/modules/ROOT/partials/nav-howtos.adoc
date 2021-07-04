@@ -1,1 +1,1 @@
-* xref:greposync:ROOT:how-tos/migrate-from-modulesync.adoc[Migrate from ModuleSync]
+* xref:how-tos/migrate-from-modulesync.adoc[Migrate from ModuleSync]

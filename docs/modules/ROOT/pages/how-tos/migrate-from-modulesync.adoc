@@ -64,7 +64,7 @@ Be aware of this behaviour difference when migrating the template!
 
 == Migrate sync config
 
-The config syntax between `modulesync.yml` and `greposync.yml` is vastly different.
+The config syntax between `modulesync.yml` and `{page-component-name}.yml` is vastly different.
 
 Compare the example config files:
 
@@ -86,7 +86,7 @@ pr_labels:
 
 [example]
 ====
-.greposync.yml
+.{page-component-name}.yml
 [source,yaml,subs=attributes]
 ----
 git:
