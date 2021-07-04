@@ -1,0 +1,46 @@
+= Feature comparison with ModuleSync
+
+== Features implemented
+
+[%header,format=csv]
+|===
+Feature, ModuleSync, greposync
+
+"Git Clone, Commit, Push", ✔️, ✔️
+Git Tags, ✔️,
+GitHub create PR, ✔️,  ✔️
+GitHub update PR, ❌, ✔️
+GitLab create PR, ✔️, ❌
+GitLab update PR, ❌, ❌
+Pre-Commit script, ✔️, ❌
+Default git namespace, ✔️, ✔️
+Default git base url, ✔️, ✔️
+Template Defaults, ✔️, ✔️
+Per repository overrides, ✔️, ✔️
+Hooks, ✔️, ❌
+CLI help, ✔️, ✔️
+Filtering repositories, ✔️,
+Dry run, ✔️, ✔️
+Changelog, ✔️, ❌
+|===
+
+[NOTE]
+====
+✔️ Feature implemented
+
+❌ Feature not implemented (not planned)
+====
+
+Some features aren't planned yet resp. won't be added to greposync.
+
+== Differences
+
+[%header,format=csv]
+|===
+Feature, ModuleSync, greposync
+
+Template engine, ERB, gotemplate
+Installation, Gemfile, "single binary, Docker, gomodule, apk, deb, rpm"
+Deep-merge YAML, ❌, ✔️
+PullRequest template, ❌, ✔️
+|===

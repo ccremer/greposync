@@ -1,1 +1,1 @@
-//* xref:greposync:ROOT:explanations/....adoc[...]
+* xref:greposync:ROOT:explanations/feature-comparison.adoc[Feature comparison with ModuleSync]
