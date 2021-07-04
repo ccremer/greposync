@@ -1,30 +1,11 @@
 package rendering
 
-import (
-	"path"
-)
-
+// ConstructMetadata returns a map with metadata values.
+// Included are "Repository" and "PullRequest", both deserialized from the config struct.
 func (r *Renderer) ConstructMetadata() Values {
 	d := Values{
 		"Repository":  r.cfg.Git,
 		"PullRequest": r.cfg.PullRequest,
 	}
 	return d
-}
-
-func (r *Renderer) ConstructTemplateMetadata(targetPath string) Values {
-	return Values{
-		"Metadata": Values{
-			"Path":     targetPath,
-			"FileName": path.Base(targetPath),
-		},
-	}
-}
-
-func (r *Renderer) GetMetadata(targetPath string) Values {
-	return map[string]interface{}{
-		"Path":     targetPath,
-		"FileName": path.Base(targetPath),
-		"RepoName": path.Base(r.cfg.Template.RootDir),
-	}
 }

@@ -6,6 +6,7 @@ import (
 	"text/template"
 )
 
+// RenderString renders the template from given content and injected with data.
 func (r *Renderer) RenderString(data interface{}, content string) (string, error) {
 	r.p.DebugF("Parsing template from string")
 	tpl, err := template.
@@ -24,6 +25,7 @@ func (r *Renderer) RenderString(data interface{}, content string) (string, error
 	return buf.String(), nil
 }
 
+// RenderTemplateFile renders a template from the given filePath and injected with data.
 func (r *Renderer) RenderTemplateFile(data interface{}, filePath string) (string, error) {
 	r.p.DebugF("Parsing template file %s", filePath)
 	fileName := path.Base(filePath)
