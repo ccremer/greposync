@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Migrate from ModuleSync :: greposync docs</title>
+    <link rel="canonical" href="http://localhost/greposync/latest/how-tos/migrate-from-modulesync.html">
+    <meta name="generator" content="Antora 2.3.4">
+    <link rel="stylesheet" href="../../../_/css/site.css">
+    <script>var uiRootPath = '../../../_'</script>
+  </head>
+  <body class="article">
+<header class="header" role="banner">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <div class="navbar-item">
+        <a href="http://localhost">greposync docs</a>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="greposync" data-version="latest">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <h3 class="title"><a href="../index.html">greposync</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../index.html">Introduction</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">How To</span>
+<ul class="nav-list">
+  <li class="nav-item is-current-page" data-depth="1">
+    <a class="nav-link" href="migrate-from-modulesync.html">Migrate from ModuleSync</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Explanation</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../explanations/feature-comparison.html">Feature comparison with ModuleSync</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">greposync</span>
+    <span class="version">latest</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <a class="title" href="../index.html">greposync</a>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="../index.html">latest</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../index.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../index.html">greposync</a></li>
+    <li>How To</li>
+    <li><a href="migrate-from-modulesync.html">Migrate from ModuleSync</a></li>
+  </ul>
+</nav>
+  <div class="edit-this-page"><a href="https://github.com/ccremer/greposync/edit/master/docs/modules/ROOT/pages/how-tos/migrate-from-modulesync.adoc">Edit this Page</a></div>
+  </div>
+  <div class="content">
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+<h1 class="page">Migrate from ModuleSync</h1>
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>This guide describes how to migrate from an existing ModuleSync setup.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+There a few notable and incompatible differences between greposync and ModuleSync, see <a href="../explanations/feature-comparison.html" class="page">Feature comparison</a>.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>For the purpose of this guide, let&#8217;s establish following definitions:</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>control-repository</code></dt>
+<dd>
+<p>This is the repository containing the template and configuration files.
+It has familiar files like <code>managed_modules.yml</code>, <code>modulesync.yml</code> <code>config_defaults.yml</code> and the <code>moduleroot/</code> directory.</p>
+</dd>
+<dt class="hdlist1"><code>managed-repo-1</code></dt>
+<dd>
+<p>This is the name of the repository that is managed by <code>control-repository</code>.</p>
+</dd>
+<dt class="hdlist1">module</dt>
+<dd>
+<p>This is the term that ModuleSync uses to describe a managed git repository.</p>
+</dd>
+</dl>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_migrate_managed_modules_config"><a class="anchor" href="#_migrate_managed_modules_config"></a>Migrate managed modules config</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The config syntax for the managed modules looks different.
+Let&#8217;s suppose we have the following modules:</p>
+</div>
+<div class="listingblock">
+<div class="title">managed_modules.yml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">- managed-repo-1</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The equivalent in greposync would look like this:</p>
+</div>
+<div class="listingblock">
+<div class="title">managed_repos.yml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">repositories:
+  - name: managed-repo-1</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+The file name has changed from <code>managed_modules.yml</code> to <code>managed_repos.yml</code>.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>It contains a top-level key <code>repositories</code> containing an array of objects with <code>name</code> property.
+This structure is more forward compatible for future features.</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Namespaces work similar to ModuleSync.
+You can add a prefix to override the default namespace, e.g. <code>name: orga/managed-repo-1</code>.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Do it for every module and you&#8217;re done with this file.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_migrate_config_defaults"><a class="anchor" href="#_migrate_config_defaults"></a>Migrate config defaults</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>There is nothing to be done in <code>config_defaults.yml</code>, the syntax is the same.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>greposync will do a deep-merge with <code>.sync.yml</code> coming from managed repositories.
+Be aware of this behaviour difference when migrating the template!</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_migrate_sync_config"><a class="anchor" href="#_migrate_sync_config"></a>Migrate sync config</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The config syntax between <code>modulesync.yml</code> and <code>greposync.yml</code> is vastly different.</p>
+</div>
+<div class="paragraph">
+<p>Compare the example config files:</p>
+</div>
+<div class="exampleblock">
+<div class="content">
+<div class="listingblock">
+<div class="title">modulesync.yml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">namespace: orga
+branch: master
+message: Update from orga/control-repository
+pr_target_branch: master
+pr_remote_branch: modulesync-update
+pr_title: Update from orga/control-repository
+pr_labels:
+  - modulesync</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="exampleblock">
+<div class="content">
+<div class="listingblock">
+<div class="title">greposync.yml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">git:
+  namespace: orga
+  commitMessage: Update from orga/control-repository
+  commitBranch: greposync-update
+pullRequest:
+  targetBranch: master
+  subject: Update from orga/control-repository
+  labels:
+    - greposync</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+The best way to know which parameters have been removed, moved or renamed is to consult the <a href="../references/greposync.html" class="page">reference</a>.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_migrate_template"><a class="anchor" href="#_migrate_template"></a>Migrate template</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Obviously this is the largest part to migrate.
+The entire ERB template in <code>moduleroot/</code> has to be rewritten with <a href="https://golang.org/pkg/text/template/">Go template</a>.</p>
+</div>
+<div class="paragraph">
+<p>The Go template have their home in <code>template/</code> by default.
+Every file is considered a template, no matter the file extension.</p>
+</div>
+<div class="paragraph">
+<p>The only difference is <code>_helpers.tpl</code>, in which additional Go template definitions can be created.</p>
+</div>
+<div class="paragraph">
+<p>Additional utility functions are documented in the <a href="https://masterminds.github.io/sprig/">Sprig function documentation</a>.</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+Consult the template <a href="../references/template.html" class="page">reference</a>.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</article>
+  </div>
+</main>
+</div>
+<!--
+This page was built using the Antora default UI.
+The source code for this UI is licensed under the terms of the MPL-2.0 license.
+-->
+<script src="../../../_/js/site.js"></script>
+<script async src="../../../_/js/vendor/highlight.js"></script>
+  </body>
+</html>
