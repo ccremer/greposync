@@ -1,0 +1,118 @@
+= Migrate from ModuleSync
+:control-repo: control-repository
+:managed-repo: managed-repo-1
+:namespace: orga
+
+This guide describes how to migrate from an existing ModuleSync setup.
+
+IMPORTANT: There a few notable and incompatible differences between {page-component-name} and ModuleSync, see xref:explanations/feature-comparison.adoc[Feature comparison].
+
+For the purpose of this guide, let's establish following definitions:
+
+`{control-repo}`::
+This is the repository containing the template and configuration files.
+It has familiar files like `managed_modules.yml`, `modulesync.yml` `config_defaults.yml` and the `moduleroot/` directory.
+
+`{managed-repo}`::
+This is the name of the repository that is managed by `{control-repo}`.
+
+module::
+This is the term that ModuleSync uses to describe a managed git repository.
+
+== Migrate managed modules config
+
+The config syntax for the managed modules looks different.
+Let's suppose we have the following modules:
+
+.managed_modules.yml
+[source,yaml,subs=attributes]
+----
+- {managed-repo}
+----
+
+The equivalent in {page-component-name} would look like this:
+
+.managed_repos.yml
+[source,yaml,subs=attributes]
+----
+repositories:
+  - name: {managed-repo}
+----
+
+NOTE: The file name has changed from `managed_modules.yml` to `managed_repos.yml`.
+
+It contains a top-level key `repositories` containing an array of objects with `name` property.
+This structure is more forward compatible for future features.
+
+[TIP]
+====
+Namespaces work similar to ModuleSync.
+You can add a prefix to override the default namespace, e.g. `name: {namespace}/{managed-repo}`.
+====
+
+Do it for every module and you're done with this file.
+
+== Migrate config defaults
+
+There is nothing to be done in `config_defaults.yml`, the syntax is the same.
+
+[NOTE]
+====
+{page-component-name} will do a deep-merge with `.sync.yml` coming from managed repositories.
+Be aware of this behaviour difference when migrating the template!
+====
+
+== Migrate sync config
+
+The config syntax between `modulesync.yml` and `greposync.yml` is vastly different.
+
+Compare the example config files:
+
+[example]
+====
+.modulesync.yml
+[source,yaml,subs=attributes]
+----
+namespace: {namespace}
+branch: master
+message: Update from {namespace}/{control-repo}
+pr_target_branch: master
+pr_remote_branch: modulesync-update
+pr_title: Update from {namespace}/{control-repo}
+pr_labels:
+  - modulesync
+----
+====
+
+[example]
+====
+.greposync.yml
+[source,yaml,subs=attributes]
+----
+git:
+  namespace: {namespace}
+  commitMessage: Update from {namespace}/{control-repo}
+  commitBranch: {page-component-name}-update
+pullRequest:
+  targetBranch: master
+  subject: Update from {namespace}/{control-repo}
+  labels:
+    - {page-component-name}
+----
+====
+
+TIP: The best way to know which parameters have been removed, moved or renamed is to consult the xref:references/greposync.adoc[reference].
+
+== Migrate template
+
+Obviously this is the largest part to migrate.
+The entire ERB template in `moduleroot/` has to be rewritten with https://golang.org/pkg/text/template/[Go template].
+
+The Go template have their home in `template/` by default.
+Every file is considered a template, no matter the file extension.
+
+The only difference is `_helpers.tpl`, in which additional Go template definitions can be created.
+
+Additional utility functions are documented in the https://masterminds.github.io/sprig/[Sprig function documentation].
+
+TIP: Consult the template xref:references/template.adoc[reference].
