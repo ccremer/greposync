@@ -42,6 +42,32 @@ func NewRenderer(c *cfg.SyncConfig, globalDefaults *koanf.Koanf) *Renderer {
 	}
 }
 
+func (r *Renderer) RenderPrTemplate() pipeline.ActionFunc {
+	return func() pipeline.Result {
+		t := r.cfg.PullRequest.BodyTemplate
+		if t == "" {
+			r.p.InfoF("No PullRequest template defined")
+			r.cfg.PullRequest.BodyTemplate = r.cfg.Git.CommitMessage
+		}
+
+		data := Values{"Metadata": r.ConstructMetadata()}
+		if r.FileExists(t) {
+			if str, err := r.RenderTemplateFile(data, t); err != nil {
+				return pipeline.Result{Err: err}
+			} else {
+				r.cfg.PullRequest.BodyTemplate = str
+			}
+		} else {
+			if str, err := r.RenderString(data, t); err != nil {
+				return pipeline.Result{Err: err}
+			} else {
+				r.cfg.PullRequest.BodyTemplate = str
+			}
+		}
+		return pipeline.Result{}
+	}
+}
+
 func (r *Renderer) ProcessTemplates() pipeline.ActionFunc {
 	return func() pipeline.Result {
 		err := r.loadVariables(path.Join(r.cfg.Git.Dir, ".sync.yml"))

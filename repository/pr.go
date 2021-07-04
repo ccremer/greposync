@@ -26,3 +26,9 @@ func (s *Service) CreateOrUpdatePR(config *cfg.PullRequestConfig) pipeline.Actio
 		return pipeline.Result{Err: gh.CreateOrUpdatePR()}
 	}
 }
+
+func (s *Service) EnabledPr() pipeline.Predicate {
+	return func(step pipeline.Step) bool {
+		return s.Config.CreatePR
+	}
+}

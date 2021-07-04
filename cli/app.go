@@ -54,6 +54,7 @@ func CreateCLI(version, commit, date string) {
 	config = c
 }
 
+// Run the CLI application
 func Run() {
 	err := app.Run(os.Args)
 	printer.CheckIfError(err)
