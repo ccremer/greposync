@@ -35,7 +35,7 @@ var (
 
 func NewRenderer(c *cfg.SyncConfig, globalDefaults *koanf.Koanf) *Renderer {
 	return &Renderer{
-		p:              printer.New().SetLevel(printer.LevelDebug).MapColorToLevel(printer.Magenta, printer.LevelInfo).SetName(c.Git.Name),
+		p:              printer.New().SetLevel(printer.DefaultLevel).MapColorToLevel(printer.Magenta, printer.LevelInfo).SetName(c.Git.Name),
 		k:              koanf.New("."),
 		globalDefaults: globalDefaults,
 		cfg:            c,

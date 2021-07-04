@@ -41,7 +41,7 @@ func (p *PrProvider) createClient() {
 func NewProvider(config *Config) *PrProvider {
 	provider := &PrProvider{
 		cfg: config,
-		log: printer.New().SetName(config.Repo).SetLevel(printer.LevelDebug),
+		log: printer.New().SetName(config.Repo).SetLevel(printer.DefaultLevel),
 	}
 	provider.createClient()
 	return provider

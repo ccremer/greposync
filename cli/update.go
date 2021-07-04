@@ -105,7 +105,7 @@ func runUpdateCommand(*cli.Context) error {
 	services := repository.NewServicesFromFile(config)
 
 	for _, r := range services {
-		log := printer.New().SetName(r.Config.Name).SetLevel(printer.LevelDebug)
+		log := printer.New().SetName(r.Config.Name).SetLevel(printer.DefaultLevel)
 
 		sc := &cfg.SyncConfig{
 			Git:         r.Config,
@@ -136,11 +136,8 @@ func runUpdateCommand(*cli.Context) error {
 			).AsNestedStep("pull request", CreatePr()),
 		)
 		result := p.Run()
-		log.CheckIfError(result.Err)
-
-		if config.PullRequest.Create {
-
-			r.CreateOrUpdatePR(config.PullRequest)
+		if !result.IsSuccessful() {
+			return result.Err
 		}
 	}
 	return nil

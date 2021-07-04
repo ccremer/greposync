@@ -44,7 +44,7 @@ func NewServicesFromFile(config *cfg.Configuration) []*Service {
 		u := parseUrl(repo, gitBase, config.Git.Namespace)
 		repoName := path.Base(u.Path)
 		s := &Service{
-			p: printer.New().MapColorToLevel(printer.Blue, printer.LevelInfo).SetLevel(printer.LevelDebug).SetName(repoName),
+			p: printer.New().MapColorToLevel(printer.Blue, printer.LevelInfo).SetLevel(printer.DefaultLevel).SetName(repoName),
 			Config: &cfg.GitConfig{
 				Dir:           path.Clean(path.Join(config.ProjectRoot, strings.ReplaceAll(u.Hostname(), ":", "-"), u.Path)),
 				Url:           u,
