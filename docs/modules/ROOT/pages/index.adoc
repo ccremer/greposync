@@ -1,9 +1,15 @@
-= greposync
+= {page-component-name} - ModuleSync reimplementation in Go
 
 [discrete]
 == Introduction
 
+{page-component-name} is very similar to https://github.com/voxpupuli/modulesync[ModuleSync]:
 
+. It clones several Git repositories to a local workspace.
+. It parses a template directory and saves each rendered template in the Git repositories
+. It commits and pushes the changes back to each Git repository.
+
+image::overview.drawio.svg[]
 
 [discrete]
 == Documentation
