@@ -127,7 +127,7 @@ func runUpdateCommand(*cli.Context) error {
 				pipeline.NewStep("checkout branch", r.CheckoutBranch()),
 				pipeline.NewStepWithPredicate("pull", r.Pull(), r.EnabledReset()),
 			).AsNestedStep("prepare workspace", nil),
-			pipeline.NewStep("render templates", renderer.ProcessTemplates()),
+			pipeline.NewStep("render templates", renderer.ProcessTemplateDir()),
 			pipeline.NewStepWithPredicate("commit", r.Commit(), r.EnabledCommit()),
 			pipeline.NewStepWithPredicate("show diff", r.Diff(), r.EnabledCommit()),
 			pipeline.NewStepWithPredicate("push", r.PushToRemote(), r.EnabledPush()),
