@@ -54,6 +54,10 @@ func createUpdateCommand(c *cfg.Configuration) *cli.Command {
 }
 
 func validateUpdateCommand(ctx *cli.Context) error {
+	if err := cfg.ParseConfig("greposync.yml", config); err != nil {
+		return err
+	}
+
 	if err := validateGlobalFlags(ctx); err != nil {
 		return err
 	}
