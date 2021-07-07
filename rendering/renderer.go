@@ -43,54 +43,19 @@ func NewRenderer(c *cfg.SyncConfig, globalDefaults *koanf.Koanf) *Renderer {
 	}
 }
 
-// RenderPrTemplate renders the PR template.
-// If the BodyTemplate config is a path to an existing file, it will use the file and overwrite the config with the rendered result.
-// IF the BodyTemplate config is a string, it will overwrite it with a rendered and data-injected string.
-// If the BodyTemplate config is empty, it will use the CommitMessage.
-func (r *Renderer) RenderPrTemplate() pipeline.ActionFunc {
-	return func() pipeline.Result {
-		t := r.cfg.PullRequest.BodyTemplate
-		if t == "" {
-			r.p.InfoF("No PullRequest template defined")
-			r.cfg.PullRequest.BodyTemplate = r.cfg.Git.CommitMessage
-		}
-
-		data := Values{"Metadata": r.ConstructMetadata()}
-		if r.fileExists(t) {
-			if str, err := r.RenderTemplateFile(data, t); err != nil {
-				return pipeline.Result{Err: err}
-			} else {
-				r.cfg.PullRequest.BodyTemplate = str
-			}
-		} else {
-			if str, err := r.RenderString(data, t); err != nil {
-				return pipeline.Result{Err: err}
-			} else {
-				r.cfg.PullRequest.BodyTemplate = str
-			}
-		}
-		return pipeline.Result{}
-	}
-}
-
-// ProcessTemplates searches for template files in the configure dir, renders the template with injected data and writes them to git target directory.
-func (r *Renderer) ProcessTemplates() pipeline.ActionFunc {
+// ProcessTemplateDir searches for template files in the configure dir, renders the template with injected data and writes them to git target directory.
+func (r *Renderer) ProcessTemplateDir() pipeline.ActionFunc {
 	return func() pipeline.Result {
 		err := r.loadVariables(path.Join(r.cfg.Git.Dir, ".sync.yml"))
 		if err != nil {
 			return pipeline.Result{Err: err}
 		}
 
-		files, err := filepath.Glob(path.Join(r.cfg.Template.RootDir, "*"))
+		files, err := r.listAllFiles(path.Clean(r.cfg.Template.RootDir))
 		if err != nil {
 			return pipeline.Result{Err: err}
 		}
 		for _, file := range files {
-			fileName := path.Base(file)
-			if fileName == helperFileName {
-				// File is a helper file
-				continue
-			}
 			if err = r.processTemplate(file); err != nil {
 				return pipeline.Result{Err: err}
 			}
@@ -99,23 +64,21 @@ func (r *Renderer) ProcessTemplates() pipeline.ActionFunc {
 	}
 }
 
-func (r *Renderer) processTemplate(templateFullPath string) error {
-	relativePath, err := filepath.Rel(r.cfg.Template.RootDir, templateFullPath)
+func (r *Renderer) processTemplate(originalTemplatePath string) error {
+	relativePath, err := filepath.Rel(r.cfg.Template.RootDir, sanitizeTargetPath(originalTemplatePath))
 	if err != nil {
 		return err
 	}
-	targetPath := path.Join(r.cfg.Git.Dir, relativePath)
-	targetPath = sanitizeTargetPath(targetPath)
-	fileName := path.Base(relativePath)
+	originalFileName := path.Base(originalTemplatePath)
 
-	templates := []string{templateFullPath}
+	templates := []string{originalTemplatePath}
 	helperFilePath := path.Join(r.cfg.Template.RootDir, helperFileName)
 	if r.fileExists(helperFilePath) {
 		templates = append(templates, helperFilePath)
 	}
 	// Read template and helpers
 	tpl, err := template.
-		New(fileName).
+		New(originalFileName).
 		Option(errorOnMissingKey).
 		Funcs(templateFunctions).
 		ParseFiles(templates...)
@@ -133,11 +96,16 @@ func (r *Renderer) processTemplate(templateFullPath string) error {
 	}
 
 	// Write target file
+	targetPath := path.Join(r.cfg.Git.Dir, relativePath)
 	return r.writeFile(targetPath, tpl, data)
 }
 
 func (r *Renderer) writeFile(targetPath string, tpl *template.Template, data Values) error {
 	r.p.InfoF("Writing file: %s", path.Base(targetPath))
+	dir := path.Dir(targetPath)
+	if err := os.MkdirAll(dir, 0775); err != nil {
+		return err
+	}
 	f, err := os.Create(targetPath)
 	if err != nil {
 		return err
@@ -149,6 +117,22 @@ func (r *Renderer) writeFile(targetPath string, tpl *template.Template, data Val
 		return err
 	}
 	return w.Flush()
+}
+
+func (r *Renderer) listAllFiles(root string) (files []string, err error) {
+	err = filepath.Walk(root,
+		func(file string, info os.FileInfo, err error) error {
+			if err != nil {
+				return err
+			}
+			fileName := path.Base(file)
+			// Don't add helper file or directories
+			if fileName != helperFileName && r.fileExists(file) {
+				files = append(files, file)
+			}
+			return nil
+		})
+	return files, err
 }
 
 func sanitizeTargetPath(targetPath string) string {

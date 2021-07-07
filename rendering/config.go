@@ -17,7 +17,7 @@ func (r *Renderer) loadVariables(syncFile string) error {
 	// Load the config from .sync.yml
 	err = r.k.Load(file.Provider(syncFile), yaml.Parser())
 	if err != nil {
-		r.p.WarnF("file %s not loaded: %s", syncFile, err)
+		r.p.WarnF("file not loaded: %s", err)
 	}
 	return nil
 }
@@ -35,8 +35,8 @@ func (r *Renderer) loadDataForFile(fileName string) (Values, error) {
 }
 
 func (r *Renderer) fileExists(fileName string) bool {
-	if info, err := os.Stat(fileName); err != nil || info.IsDir() {
-		return false
+	if info, err := os.Stat(fileName); err == nil && !info.IsDir() {
+		return true
 	}
-	return true
+	return false
 }
