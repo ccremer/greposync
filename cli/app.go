@@ -21,7 +21,7 @@ func CreateCLI(version, commit, date string) {
 	t, err := time.Parse(dateLayout, date)
 	printer.CheckIfError(err)
 
-	c := cfg.NewDefaultConfig()
+	config = cfg.NewDefaultConfig()
 	globalFlags = []cli.Flag{
 		&cli.BoolFlag{
 			Name:    "verbose",
@@ -30,7 +30,7 @@ func CreateCLI(version, commit, date string) {
 		},
 		&cli.StringFlag{
 			Name:        "log-level",
-			Destination: &c.Log.Level,
+			Destination: &config.Log.Level,
 			Usage:       "Log level. Allowed values are [debug, info, warn, error].",
 			Value:       "info",
 		},
@@ -41,17 +41,13 @@ func CreateCLI(version, commit, date string) {
 		Version:              fmt.Sprintf("%s, commit %s, date %s", version, commit[0:7], t.Format(dateLayout)),
 		EnableBashCompletion: true,
 		Commands: []*cli.Command{
-			createUpdateCommand(c),
+			createUpdateCommand(config),
 		},
 		Compiled: t,
 		ExitErrHandler: func(context *cli.Context, err error) {
 			_ = cli.ShowCommandHelp(context, context.Command.Name)
 		},
-		Before: func(context *cli.Context) error {
-			return cfg.ParseConfig("gitreposync.yml", c)
-		},
 	}
-	config = c
 }
 
 // Run the CLI application
