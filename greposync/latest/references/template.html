@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Template :: greposync docs</title>
+    <title>Go Template :: greposync docs</title>
     <link rel="canonical" href="http://localhost/greposync/latest/references/template.html">
     <meta name="generator" content="Antora 2.3.4">
     <link rel="stylesheet" href="../../../_/css/site.css">
@@ -45,8 +45,20 @@
   </li>
   <li class="nav-item" data-depth="0">
     <button class="nav-item-toggle"></button>
+    <span class="nav-text">Technical reference</span>
+<ul class="nav-list">
+  <li class="nav-item is-current-page" data-depth="1">
+    <a class="nav-link" href="template.html">Template</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+    <button class="nav-item-toggle"></button>
     <span class="nav-text">Explanation</span>
 <ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../explanations/deep-merge.html">Configuration deep merge</a>
+  </li>
   <li class="nav-item" data-depth="1">
     <a class="nav-link" href="../explanations/feature-comparison.html">Feature comparison with ModuleSync</a>
   </li>
@@ -81,6 +93,7 @@
 <nav class="breadcrumbs" aria-label="breadcrumbs">
   <ul>
     <li><a href="../index.html">greposync</a></li>
+    <li>Technical reference</li>
     <li><a href="template.html">Template</a></li>
   </ul>
 </nav>
@@ -91,8 +104,68 @@
   <div class="toc-menu"></div>
 </aside>
 <article class="doc">
-<h1 class="page">Template</h1>
-
+<h1 class="page">Go Template</h1>
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>The template or rendering engine is <a href="https://golang.org/pkg/text/template/">Go template</a>.
+Go template engine can be extended and this allows us to utilize and integrate custom functions.</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">Sprig</dt>
+<dd>
+<p>A library that enhances templates with many utility functions.
+Visit the <a href="https://masterminds.github.io/sprig/">Sprig function documentation</a> for reference.</p>
+</dd>
+<dt class="hdlist1">YAML, JSON, TOML</dt>
+<dd>
+<p>Additional functions to format data structure into YAML, JSON or TOML.</p>
+</dd>
+</dl>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_the_template_directory"><a class="anchor" href="#_the_template_directory"></a>The template directory</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>By default, templates are placed into the <code>template/</code> directory.</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Any file is regarded as a template, regardless of file extension.</p>
+</li>
+<li>
+<p>The special file <code>_helpers.tpl</code> doesn&#8217;t get created but can host custom template definitions.</p>
+</li>
+<li>
+<p>Templates in subdirectories will get the same relative directory structure in the repository.</p>
+</li>
+<li>
+<p>1 occurrence of <code>.gotmpl</code> is removed from the file name, if any.</p>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>This rule exists since some IDEs provide syntax highlighting for Go template and the markup language at the same time if <code>.gotmpl</code> occurrs in the file name.
+A file named <code>README.gotmpl.md</code> will become <code>README.md</code> in the target repository.
+If you actually need a file called <code>README.gotmpl.md</code>, you need to name it <code>README.gotmpl.gotmpl.md</code>.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</li>
+</ol>
+</div>
+</div>
+</div>
 </article>
   </div>
 </main>

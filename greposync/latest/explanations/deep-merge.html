@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Configuration deep merge :: greposync docs</title>
+    <link rel="canonical" href="http://localhost/greposync/latest/explanations/deep-merge.html">
+    <meta name="generator" content="Antora 2.3.4">
+    <link rel="stylesheet" href="../../../_/css/site.css">
+    <script>var uiRootPath = '../../../_'</script>
+  </head>
+  <body class="article">
+<header class="header" role="banner">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <div class="navbar-item">
+        <a href="http://localhost">greposync docs</a>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="greposync" data-version="latest">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <h3 class="title"><a href="../index.html">greposync</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../index.html">Introduction</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">How To</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../how-tos/migrate-from-modulesync.html">Migrate from ModuleSync</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Technical reference</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../references/template.html">Template</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Explanation</span>
+<ul class="nav-list">
+  <li class="nav-item is-current-page" data-depth="1">
+    <a class="nav-link" href="deep-merge.html">Configuration deep merge</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="feature-comparison.html">Feature comparison with ModuleSync</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">greposync</span>
+    <span class="version">latest</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <a class="title" href="../index.html">greposync</a>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="../index.html">latest</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../index.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../index.html">greposync</a></li>
+    <li>Explanation</li>
+    <li><a href="deep-merge.html">Configuration deep merge</a></li>
+  </ul>
+</nav>
+  <div class="edit-this-page"><a href="https://github.com/ccremer/greposync/edit/master/docs/modules/ROOT/pages/explanations/deep-merge.adoc">Edit this Page</a></div>
+  </div>
+  <div class="content">
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+<h1 class="page">Configuration deep merge</h1>
+<div class="paragraph">
+<p>Template configuration from <code>config_defaults.yml</code> is merged with the config from <code>.sync.yml</code>.</p>
+</div>
+<div class="paragraph">
+<p>There are a few rules of deep merging:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>The config from <code>.sync.yml</code> takes precendence over <code>config_defaults.yml</code>.</p>
+</li>
+<li>
+<p>Any array is being replaced entirely.</p>
+</li>
+<li>
+<p>The value type of a key can be overwritten.</p>
+</li>
+<li>
+<p>Keys not affected stay unchanged even in nested structures (except arrays).</p>
+</li>
+</ol>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>You should at least be familiar with the behaviour, as this greatly affects template development.
+This is a major difference from ModuleSync.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="exampleblock">
+<div class="title">Example 1. Merge behaviour example</div>
+<div class="content">
+<div class="listingblock">
+<div class="title">config_defaults.yml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">README.md:
+  title: My file name
+  features:
+    documentation: true
+    contributions: false
+  homepages:
+    - www.example.com
+    - github.com/example/project</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">.sync.yml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">README.md:
+  title: My custom title
+  features:
+    contributions:
+      members:
+        - Alice
+        - Bob
+  homepages:
+    - gitlab.com</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Deep merged config</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">README.md:
+  title: My custom title <i class="conum" data-value="1"></i><b>(1)</b>
+  features:
+    documentation: true <i class="conum" data-value="2"></i><b>(2)</b>
+    contributions: <i class="conum" data-value="3"></i><b>(3)</b>
+      members:
+        - Alice
+        - Bob
+  homepages: <i class="conum" data-value="4"></i><b>(4)</b>
+    - gitlab.com</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>String is overridden</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Value stays unchanged</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Value type changed from <code>boolean</code> to <code>object</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Array is replaced</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</article>
+  </div>
+</main>
+</div>
+<!--
+This page was built using the Antora default UI.
+The source code for this UI is licensed under the terms of the MPL-2.0 license.
+-->
+<script src="../../../_/js/site.js"></script>
+<script async src="../../../_/js/vendor/highlight.js"></script>
+  </body>
+</html>
