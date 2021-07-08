@@ -21,7 +21,9 @@ build: fmt vet ## Build the Go binary
 	@go build -o gsync .
 
 .PHONY: generate
+generate: export GODOC_YAML_DEFAULTS_PATH = $(GOASCIIDOC_OUT_YAML_EXAMPLE_PATH)
 generate:
+	go generate -tags=generate generate.go
 	$(GOASCIIDOC_CMD) cfg
 
 .PHONY: fmt

@@ -1,14 +1,13 @@
 = github.com/ccremer/greposync
-:author_name: chris
-:author: {author_name}
-:source-highlighter: highlightjs
-:icons: font
 :kroki-default-format: svg
-:doctype: book
-
 = package cfg
 
 
+
+[source,yaml]
+----
+include::example$config.yaml[]
+----
 
 == Structs
 
@@ -26,19 +25,14 @@ type Configuration struct {
 
 
 
-==== ProjectRoot string
 
 
-==== Log *LogConfig
 
 
-==== PullRequest *PullRequestConfig
 
 
-==== Template *TemplateConfig
 
 
-==== Git *GitConfig
 
 
 
@@ -64,7 +58,6 @@ type LogConfig struct {
 
 
 
-==== Level string
 
 
 
@@ -84,19 +77,24 @@ type PullRequestConfig struct {
 
 
 
-==== Create bool
 
+TargetBranch::
+TargetBranch is the target remote branch of the pull request.
+If left empty, it will target the default branch.
 
-==== TargetBranch string
+Labels::
+Labels is an array of issue labels to apply when creating a pull request.
+Labels on existing pull requests are not updated.
+It is not validated whether the labels exist, the API may or may not create non-existing labels dynamically.
 
+BodyTemplate::
+BodyTemplate is the description used in pull requests.
+Supports Go template with the `.Metadata` key.
+If this string is a relative path to an existing file in the greposync directory, the file is parsed as a Go template.
+If empty, the CommitMessage is used.
 
-==== Labels []string
-
-
-==== BodyTemplate string
-
-
-==== Subject string
+Subject::
+Subject is the Pull Request title.
 
 
 
@@ -114,13 +112,10 @@ type SyncConfig struct {
 
 
 
-==== PullRequest *PullRequestConfig
 
 
-==== Git *GitConfig
 
 
-==== Template *TemplateConfig
 
 
 
@@ -136,7 +131,6 @@ type GitConfig struct {
     SkipCommit       bool
     SkipPush         bool
     ForcePush        bool
-    CreatePR         bool
     Amend            bool
     CommitMessage    string
     CommitBranch     string
@@ -147,44 +141,43 @@ type GitConfig struct {
 ----
 
 
+Url::
+Url is the full Git URL to the remote repository.
+This option is not configurable in `greposync.yml`.
+In templates, the URL is looking like ``
 
-==== Url *url.URL
-
-
-==== Dir string
-
-
-==== SkipReset bool
-
-
-==== SkipCommit bool
+Dir::
+Dir is the relative path to current working directory where the repository is cloned locally.
+This option is not configurable in `greposync.yml`.
 
 
-==== SkipPush bool
 
 
-==== ForcePush bool
 
 
-==== CreatePR bool
 
 
-==== Amend bool
+
+Amend::
+Amend will amend the last commit.
+This option is not configurable in `greposync.yml`.
+Configurable only via environment variables or CLI flag.
+
+CommitMessage::
+CommitMessage is the string that is passed to `git commit`.
+It can contain newlines, for example to pass a long description.
 
 
-==== CommitMessage string
 
+DefaultBranch::
+DefaultBranch is the name of the default branch in origin.
 
-==== CommitBranch string
+Name::
+Name is the git repository name without .git extension.
 
-
-==== DefaultBranch string
-
-
-==== Name string
-
-
-==== Namespace string
+Namespace::
+Namespace is the repository owner without the repository name.
+This is often a user or organization name in GitHub.com or GitLab.com.
 
 
 
@@ -199,8 +192,8 @@ type TemplateConfig struct {
 ----
 
 
-
-==== RootDir string
+RootDir::
+RootDir is the path relative to the current workdir where the template files are located.
 
 
 
