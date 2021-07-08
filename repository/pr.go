@@ -27,10 +27,3 @@ func (s *Service) CreateOrUpdatePr(config *cfg.PullRequestConfig) pipeline.Actio
 		return pipeline.Result{Err: gh.CreateOrUpdatePr()}
 	}
 }
-
-// EnabledPr returns true if a PR should be created or updated.
-func (s *Service) EnabledPr() pipeline.Predicate {
-	return func(step pipeline.Step) bool {
-		return s.Config.CreatePR
-	}
-}

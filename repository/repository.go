@@ -60,7 +60,6 @@ func NewServicesFromFile(config *cfg.Configuration) []*Service {
 				CommitBranch:  config.Git.CommitBranch,
 				Namespace:     config.Git.Namespace,
 				Name:          repoName,
-				CreatePR:      config.PullRequest.Create,
 			},
 		}
 		list = append(list, s)
