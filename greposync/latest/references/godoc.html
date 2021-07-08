@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>github.com/ccremer/greposync :: greposync docs</title>
+    <link rel="canonical" href="http://localhost/greposync/latest/references/godoc.html">
+    <meta name="generator" content="Antora 2.3.4">
+    <link rel="stylesheet" href="../../../_/css/site.css">
+    <script>var uiRootPath = '../../../_'</script>
+  </head>
+  <body class="article">
+<header class="header" role="banner">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <div class="navbar-item">
+        <a href="http://localhost">greposync docs</a>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="greposync" data-version="latest">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <h3 class="title"><a href="../index.html">greposync</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../index.html">Introduction</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">How To</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../how-tos/migrate-from-modulesync.html">Migrate from ModuleSync</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Technical reference</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="template.html">Template</a>
+  </li>
+  <li class="nav-item is-current-page" data-depth="1">
+    <a class="nav-link" href="godoc.html">Godoc</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Explanation</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../explanations/deep-merge.html">Configuration deep merge</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../explanations/feature-comparison.html">Feature comparison with ModuleSync</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">greposync</span>
+    <span class="version">latest</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <a class="title" href="../index.html">greposync</a>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="../index.html">latest</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../index.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../index.html">greposync</a></li>
+    <li>Technical reference</li>
+    <li><a href="godoc.html">Godoc</a></li>
+  </ul>
+</nav>
+  <div class="edit-this-page"><a href="https://github.com/ccremer/greposync/edit/master/docs/modules/ROOT/pages/references/godoc.adoc">Edit this Page</a></div>
+  </div>
+  <div class="content">
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+<h1 class="page">github.com/ccremer/greposync</h1>
+<div id="preamble">
+<div class="sectionbody">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">Git:
+  CommitBranch: ""
+  CommitMessage: Update from greposync
+  DefaultBranch: ""
+  ForcePush: false
+  Name: ""
+  Namespace: ""
+  SkipCommit: false
+  SkipPush: false
+  SkipReset: false
+Log:
+  Level: info
+ProjectRoot: repos
+PullRequest:
+  BodyTemplate: This Pull request updates this repository with changes from a greposync template repository.
+  Create: false
+  Labels: null
+  Subject: Update from greposync
+  TargetBranch: ""
+Template:
+  RootDir: template</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_structs"><a class="anchor" href="#_structs"></a>Structs</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_configuration"><a class="anchor" href="#_configuration"></a>Configuration</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">type Configuration struct {
+    ProjectRoot    string
+    Log            *LogConfig
+    PullRequest    *PullRequestConfig
+    Template       *TemplateConfig
+    Git            *GitConfig
+}</code></pre>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_receivers"><a class="anchor" href="#_receivers"></a>Receivers</h4>
+<div class="sect4">
+<h5 id="_sanitize"><a class="anchor" href="#_sanitize"></a>Sanitize</h5>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func (config *Configuration) Sanitize()</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Sanitize does corrective actions on the configuration hierarchy.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_logconfig"><a class="anchor" href="#_logconfig"></a>LogConfig</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">type LogConfig struct {
+    Level    string
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_pullrequestconfig"><a class="anchor" href="#_pullrequestconfig"></a>PullRequestConfig</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">type PullRequestConfig struct {
+    Create          bool
+    TargetBranch    string
+    Labels          []string
+    BodyTemplate    string
+    Subject         string
+}</code></pre>
+</div>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">TargetBranch</dt>
+<dd>
+<p>TargetBranch is the target remote branch of the pull request.
+If left empty, it will target the default branch.</p>
+</dd>
+<dt class="hdlist1">Labels</dt>
+<dd>
+<p>Labels is an array of issue labels to apply when creating a pull request.
+Labels on existing pull requests are not updated.
+It is not validated whether the labels exist, the API may or may not create non-existing labels dynamically.</p>
+</dd>
+<dt class="hdlist1">BodyTemplate</dt>
+<dd>
+<p>BodyTemplate is the description used in pull requests.
+Supports Go template with the <code>.Metadata</code> key.
+If this string is a relative path to an existing file in the greposync directory, the file is parsed as a Go template.
+If empty, the CommitMessage is used.</p>
+</dd>
+<dt class="hdlist1">Subject</dt>
+<dd>
+<p>Subject is the Pull Request title.</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_syncconfig"><a class="anchor" href="#_syncconfig"></a>SyncConfig</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">type SyncConfig struct {
+    PullRequest    *PullRequestConfig
+    Git            *GitConfig
+    Template       *TemplateConfig
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_gitconfig"><a class="anchor" href="#_gitconfig"></a>GitConfig</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">type GitConfig struct {
+    Url              *url.URL
+    Dir              string
+    SkipReset        bool
+    SkipCommit       bool
+    SkipPush         bool
+    ForcePush        bool
+    Amend            bool
+    CommitMessage    string
+    CommitBranch     string
+    DefaultBranch    string
+    Name             string
+    Namespace        string
+}</code></pre>
+</div>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">Url</dt>
+<dd>
+<p>Url is the full Git URL to the remote repository.
+This option is not configurable in <code>greposync.yml</code>.
+In templates, the URL is looking like ``</p>
+</dd>
+<dt class="hdlist1">Dir</dt>
+<dd>
+<p>Dir is the relative path to current working directory where the repository is cloned locally.
+This option is not configurable in <code>greposync.yml</code>.</p>
+</dd>
+<dt class="hdlist1">Amend</dt>
+<dd>
+<p>Amend will amend the last commit.
+This option is not configurable in <code>greposync.yml</code>.
+Configurable only via environment variables or CLI flag.</p>
+</dd>
+<dt class="hdlist1">CommitMessage</dt>
+<dd>
+<p>CommitMessage is the string that is passed to <code>git commit</code>.
+It can contain newlines, for example to pass a long description.</p>
+</dd>
+<dt class="hdlist1">DefaultBranch</dt>
+<dd>
+<p>DefaultBranch is the name of the default branch in origin.</p>
+</dd>
+<dt class="hdlist1">Name</dt>
+<dd>
+<p>Name is the git repository name without .git extension.</p>
+</dd>
+<dt class="hdlist1">Namespace</dt>
+<dd>
+<p>Namespace is the repository owner without the repository name.
+This is often a user or organization name in GitHub.com or GitLab.com.</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_templateconfig"><a class="anchor" href="#_templateconfig"></a>TemplateConfig</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">type TemplateConfig struct {
+    RootDir    string
+}</code></pre>
+</div>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">RootDir</dt>
+<dd>
+<p>RootDir is the path relative to the current workdir where the template files are located.</p>
+</dd>
+</dl>
+</div>
+</div>
+</div>
+</div>
+</article>
+  </div>
+</main>
+</div>
+<!--
+This page was built using the Antora default UI.
+The source code for this UI is licensed under the terms of the MPL-2.0 license.
+-->
+<script src="../../../_/js/site.js"></script>
+<script async src="../../../_/js/vendor/highlight.js"></script>
+  </body>
+</html>
