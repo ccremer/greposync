@@ -1,0 +1,210 @@
+= github.com/ccremer/greposync
+:author_name: chris
+:author: {author_name}
+:source-highlighter: highlightjs
+:icons: font
+:kroki-default-format: svg
+:doctype: book
+
+= package cfg
+
+
+
+== Structs
+
+=== Configuration
+[source, go]
+----
+type Configuration struct {
+    ProjectRoot    string
+    Log            *LogConfig
+    PullRequest    *PullRequestConfig
+    Template       *TemplateConfig
+    Git            *GitConfig
+}
+----
+
+
+
+==== ProjectRoot string
+
+
+==== Log *LogConfig
+
+
+==== PullRequest *PullRequestConfig
+
+
+==== Template *TemplateConfig
+
+
+==== Git *GitConfig
+
+
+
+==== Receivers
+
+===== Sanitize
+[source, go]
+----
+func (config *Configuration) Sanitize()
+----
+
+Sanitize does corrective actions on the configuration hierarchy.
+
+
+
+=== LogConfig
+[source, go]
+----
+type LogConfig struct {
+    Level    string
+}
+----
+
+
+
+==== Level string
+
+
+
+
+
+=== PullRequestConfig
+[source, go]
+----
+type PullRequestConfig struct {
+    Create          bool
+    TargetBranch    string
+    Labels          []string
+    BodyTemplate    string
+    Subject         string
+}
+----
+
+
+
+==== Create bool
+
+
+==== TargetBranch string
+
+
+==== Labels []string
+
+
+==== BodyTemplate string
+
+
+==== Subject string
+
+
+
+
+
+=== SyncConfig
+[source, go]
+----
+type SyncConfig struct {
+    PullRequest    *PullRequestConfig
+    Git            *GitConfig
+    Template       *TemplateConfig
+}
+----
+
+
+
+==== PullRequest *PullRequestConfig
+
+
+==== Git *GitConfig
+
+
+==== Template *TemplateConfig
+
+
+
+
+
+=== GitConfig
+[source, go]
+----
+type GitConfig struct {
+    Url              *url.URL
+    Dir              string
+    SkipReset        bool
+    SkipCommit       bool
+    SkipPush         bool
+    ForcePush        bool
+    CreatePR         bool
+    Amend            bool
+    CommitMessage    string
+    CommitBranch     string
+    DefaultBranch    string
+    Name             string
+    Namespace        string
+}
+----
+
+
+
+==== Url *url.URL
+
+
+==== Dir string
+
+
+==== SkipReset bool
+
+
+==== SkipCommit bool
+
+
+==== SkipPush bool
+
+
+==== ForcePush bool
+
+
+==== CreatePR bool
+
+
+==== Amend bool
+
+
+==== CommitMessage string
+
+
+==== CommitBranch string
+
+
+==== DefaultBranch string
+
+
+==== Name string
+
+
+==== Namespace string
+
+
+
+
+
+=== TemplateConfig
+[source, go]
+----
+type TemplateConfig struct {
+    RootDir    string
+}
+----
+
+
+
+==== RootDir string
+
+
+
+
+
+
+

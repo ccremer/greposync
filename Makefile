@@ -20,6 +20,10 @@ build: export GOOS = linux
 build: fmt vet ## Build the Go binary
 	@go build -o gsync .
 
+.PHONY: generate
+generate:
+	$(GOASCIIDOC_CMD) cfg
+
 .PHONY: fmt
 fmt: ## Run 'go fmt' against code
 	go fmt ./...
@@ -29,7 +33,7 @@ vet: ## Run 'go vet' against code
 	go vet ./...
 
 .PHONY: lint
-lint: fmt vet ## Invokes the fmt and vet targets
+lint: fmt vet generate ## Invokes the fmt and vet targets
 	@echo 'Check for uncommitted changes ...'
 	git diff --exit-code
 

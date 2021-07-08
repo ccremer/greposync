@@ -1,1 +1,2 @@
 * xref:references/template.adoc[Template]
+* xref:references/godoc.adoc[Godoc]

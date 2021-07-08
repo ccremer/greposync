@@ -8,6 +8,7 @@ require (
 	github.com/ccremer/go-command-pipeline v0.1.1
 	github.com/google/go-github/v36 v36.0.0
 	github.com/knadh/koanf v1.1.1
+	github.com/mariotoffia/goasciidoc v0.4.5
 	github.com/stretchr/testify v1.7.0
 	github.com/urfave/cli/v2 v2.3.0
 	github.com/whilp/git-urls v1.0.0
