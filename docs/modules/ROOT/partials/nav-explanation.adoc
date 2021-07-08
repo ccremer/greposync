@@ -1,1 +1,2 @@
+* xref:explanations/deep-merge.adoc[Configuration deep merge]
 * xref:explanations/feature-comparison.adoc[Feature comparison with ModuleSync]

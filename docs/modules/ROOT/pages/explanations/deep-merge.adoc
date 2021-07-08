@@ -1,0 +1,66 @@
+= Configuration deep merge
+
+Template configuration from `config_defaults.yml` is merged with the config from `.sync.yml`.
+
+There are a few rules of deep merging:
+
+. The config from `.sync.yml` takes precendence over `config_defaults.yml`.
+. Any array is being replaced entirely.
+. The value type of a key can be overwritten.
+. Keys not affected stay unchanged even in nested structures (except arrays).
+
+[NOTE]
+====
+You should at least be familiar with the behaviour, as this greatly affects template development.
+This is a major difference from ModuleSync.
+====
+
+.Merge behaviour example
+[example]
+====
+.config_defaults.yml
+[source,yaml]
+----
+README.md:
+  title: My file name
+  features:
+    documentation: true
+    contributions: false
+  homepages:
+    - www.example.com
+    - github.com/example/project
+----
+
+..sync.yml
+[source,yaml]
+----
+README.md:
+  title: My custom title
+  features:
+    contributions:
+      members:
+        - Alice
+        - Bob
+  homepages:
+    - gitlab.com
+----
+
+.Deep merged config
+[source,yaml]
+----
+README.md:
+  title: My custom title <1>
+  features:
+    documentation: true <2>
+    contributions: <3>
+      members:
+        - Alice
+        - Bob
+  homepages: <4>
+    - gitlab.com
+----
+<1> String is overridden
+<2> Value stays unchanged
+<3> Value type changed from `boolean` to `object`
+<4> Array is replaced
+====
