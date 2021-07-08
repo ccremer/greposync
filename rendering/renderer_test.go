@@ -57,7 +57,7 @@ func (s *TemplateTestSuite) TestProcessTemplate() {
 		expectErr            bool
 	}{
 		"GivenTemplateFile_WhenProcessing_ThenWriteFile": {
-			givenTemplate: "readme.gotmpl.md",
+			givenTemplate: "readme.tpl.md",
 			expectedFileContents: map[string]string{
 				"readme.md": "# example-repository\n\nEXAMPLE-REPOSITORY\ntest\n",
 			},
@@ -131,13 +131,13 @@ func Test_sanitizeTargetPath(t *testing.T) {
 			givenPath:    "dir/fileName",
 			expectedPath: "dir/fileName",
 		},
-		"GivenFileWithGotmplExtension_WhenSanitizing_ThenReturnStripped": {
-			givenPath:    "dir/fileName.gotmpl",
+		"GivenFileWithTplExtension_WhenSanitizing_ThenReturnStripped": {
+			givenPath:    "dir/fileName.tpl",
 			expectedPath: "dir/fileName",
 		},
-		"GivenFileWithGotmplExtensionTwice_WhenSanitizing_ThenReturnStrippedOnce": {
-			givenPath:    "fileName.gotmpl.gotmpl",
-			expectedPath: "fileName.gotmpl",
+		"GivenFileWithTplExtensionTwice_WhenSanitizing_ThenReturnStrippedOnce": {
+			givenPath:    "fileName.tpl.tpl",
+			expectedPath: "fileName.tpl",
 		},
 	}
 	for name, tt := range tests {

@@ -138,6 +138,6 @@ func (r *Renderer) listAllFiles(root string) (files []string, err error) {
 func sanitizeTargetPath(targetPath string) string {
 	dirName := path.Dir(targetPath)
 	baseName := path.Base(targetPath)
-	newName := strings.Replace(baseName, ".gotmpl", "", 1)
+	newName := strings.Replace(baseName, ".tpl", "", 1)
 	return path.Clean(path.Join(dirName, newName))
 }
