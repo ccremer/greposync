@@ -138,7 +138,7 @@ func runUpdateCommand(*cli.Context) error {
 			pipeline.NewPipelineWithLogger(logger).WithSteps(
 				pipeline.NewStep("render pull request template", renderer.RenderPrTemplate()),
 				pipeline.NewStep("create or update pull request", r.CreateOrUpdatePr(config.PullRequest)),
-			).AsNestedStep("pull request", r.EnabledPr()),
+			).AsNestedStep("pull request", pipeline.Bool(sc.PullRequest.Create)),
 		)
 		result := p.Run()
 		if !result.IsSuccessful() {

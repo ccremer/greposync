@@ -65,7 +65,7 @@ func (s *TemplateTestSuite) TestProcessTemplate() {
 		"GivenTemplateFileInSubDir_WhenProcessing_ThenWriteFileToCorrectDir": {
 			givenTemplate: "ci/pipeline.yml",
 			expectedFileContents: map[string]string{
-				"ci/pipeline.yml": "CommitBranch: \"\"\nCommitMessage: \"\"\nCreatePR: false\nDefaultBranch: \"\"\nForcePush: false\nName: example-repository\nNamespace: \"\"\nSkipCommit: false\nSkipPush: false\nSkipReset: false\n",
+				"ci/pipeline.yml": "CommitBranch: \"\"\nCommitMessage: \"\"\nDefaultBranch: \"\"\nForcePush: false\nName: example-repository\nNamespace: \"\"\nSkipCommit: false\nSkipPush: false\nSkipReset: false\n",
 			},
 		},
 	}

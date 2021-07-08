@@ -4,3 +4,10 @@ IMG_TAG ?= latest
 
 # Image URL to use all building/pushing image targets
 QUAY_IMG ?= quay.io/ccremer/greposync:$(IMG_TAG)
+
+GOASCIIDOC_OUT_ROOT ?= docs/modules/ROOT
+GOASCIIDOC_OUT_GODOC_PATH ?= $(GOASCIIDOC_OUT_ROOT)/pages/references/godoc.adoc
+GOASCIIDOC_OUT_YAML_EXAMPLE_PATH ?= $(GOASCIIDOC_OUT_ROOT)/examples/config.yaml
+
+GOASCIIDOC_ARGS_BUILD ?= -o $(GOASCIIDOC_OUT_GODOC_PATH) --templatedir docs/config-templates
+GOASCIIDOC_CMD = go run github.com/mariotoffia/goasciidoc $(GOASCIIDOC_ARGS_BUILD)
