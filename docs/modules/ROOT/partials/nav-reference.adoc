@@ -1,1 +1,1 @@
-//* xref:references/....adoc[...]
+* xref:references/template.adoc[Template]
