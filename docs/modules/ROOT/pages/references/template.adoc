@@ -1,1 +1,27 @@
-= Template
+= Go Template
+
+The template or rendering engine is https://golang.org/pkg/text/template/[Go template].
+Go template engine can be extended and this allows us to utilize and integrate custom functions.
+
+Sprig::
+A library that enhances templates with many utility functions.
+Visit the https://masterminds.github.io/sprig/[Sprig function documentation] for reference.
+
+YAML, JSON, TOML::
+Additional functions to format data structure into YAML, JSON or TOML.
+
+== The template directory
+
+By default, templates are placed into the `template/` directory.
+
+. Any file is regarded as a template, regardless of file extension.
+. The special file `_helpers.tpl` doesn't get created but can host custom template definitions.
+. Templates in subdirectories will get the same relative directory structure in the repository.
+. 1 occurrence of `.gotmpl` is removed from the file name, if any.
++
+[TIP]
+====
+This rule exists since some IDEs provide syntax highlighting for Go template and the markup language at the same time if `.gotmpl` occurrs in the file name.
+A file named `README.gotmpl.md` will become `README.md` in the target repository.
+If you actually need a file called `README.gotmpl.md`, you need to name it `README.gotmpl.gotmpl.md`.
+====
