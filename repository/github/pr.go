@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/ccremer/greposync/printer"
-	"github.com/google/go-github/v36/github"
+	"github.com/google/go-github/v37/github"
 	"golang.org/x/oauth2"
 )
 
