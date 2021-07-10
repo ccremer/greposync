@@ -132,9 +132,11 @@ func runUpdateCommand(*cli.Context) error {
 				pipeline.NewStepWithPredicate("pull", r.Pull(), r.EnabledReset()),
 			).AsNestedStep("prepare workspace", nil),
 			pipeline.NewStep("render templates", renderer.ProcessTemplateDir()),
-			pipeline.NewStepWithPredicate("commit", r.Commit(), r.EnabledCommit()),
-			pipeline.NewStepWithPredicate("show diff", r.Diff(), r.EnabledCommit()),
-			pipeline.NewStepWithPredicate("push", r.PushToRemote(), r.EnabledPush()),
+			pipeline.NewPipelineWithLogger(logger).WithSteps(
+				pipeline.NewStepWithPredicate("commit", r.Commit(), r.EnabledCommit()),
+				pipeline.NewStepWithPredicate("show diff", r.Diff(), r.EnabledCommit()),
+				pipeline.NewStepWithPredicate("push", r.PushToRemote(), r.EnabledPush()),
+			).AsNestedStep("push changes", r.Dirty()),
 			pipeline.NewPipelineWithLogger(logger).WithSteps(
 				pipeline.NewStep("render pull request template", renderer.RenderPrTemplate()),
 				pipeline.NewStep("create or update pull request", r.CreateOrUpdatePr(config.PullRequest)),

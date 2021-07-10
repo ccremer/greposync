@@ -30,6 +30,7 @@ func (s *Service) Commit() pipeline.ActionFunc {
 
 		out, stderr, err := s.execGitCommand(s.logArgs(args...)...)
 		if err != nil {
+			s.p.InfoF(out)
 			return s.toResult(err, stderr)
 		}
 		s.p.DebugF(out)
@@ -41,6 +42,21 @@ func (s *Service) Commit() pipeline.ActionFunc {
 func (s *Service) EnabledCommit() pipeline.Predicate {
 	return func(step pipeline.Step) bool {
 		return !s.Config.SkipCommit
+	}
+}
+
+func (s *Service) Dirty() pipeline.Predicate {
+	return func(step pipeline.Step) bool {
+		out, stderr, err := s.execGitCommand("status", "--short")
+		if err != nil {
+			s.p.WarnF("Could not determine working tree status: %s: %w", stderr, err)
+			return true
+		}
+		if out == "" {
+			s.p.InfoF("Nothing to commit, working tree clean")
+			return false
+		}
+		return true
 	}
 }
 
