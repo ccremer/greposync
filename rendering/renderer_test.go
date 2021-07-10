@@ -1,8 +1,10 @@
 package rendering
 
 import (
+	"io"
 	"os"
 	"path"
+	"path/filepath"
 	"testing"
 
 	"github.com/ccremer/greposync/cfg"
@@ -16,8 +18,10 @@ import (
 
 type TemplateTestSuite struct {
 	suite.Suite
-	TestGitDir string
-	K          *koanf.Koanf
+	TestGitDir    string
+	SeedSourceDir string
+	SeedTargetDir string
+	K             *koanf.Koanf
 }
 
 func TestRenderer(t *testing.T) {
@@ -32,32 +36,39 @@ func (s *TemplateTestSuite) dirExists(path string) bool {
 }
 
 func (s *TemplateTestSuite) SetupTest() {
-	s.TestGitDir = "testdata/template_test"
+	s.TestGitDir = "testdata/template-1-test"
+	s.SeedSourceDir = "testdata/template-2"
+	s.SeedTargetDir = "testdata/template-2-test"
 	assert.NoError(s.T(), os.RemoveAll(s.TestGitDir))
-	assert.NoError(s.T(), os.Mkdir(s.TestGitDir, 0755))
+	assert.NoError(s.T(), os.RemoveAll(s.SeedTargetDir))
+	assert.NoError(s.T(), os.MkdirAll(s.TestGitDir, 0755))
+	assert.NoError(s.T(), os.MkdirAll(s.SeedTargetDir, 0755))
 	values := Values{
 		"readme.md": Values{
 			"custom": "test",
 		}}
 	k := koanf.New(".")
 	s.Require().NoError(k.Load(confmap.Provider(values, ""), nil))
+	s.copyFiles()
 	s.K = k
 }
 
 func (s *TemplateTestSuite) TearDownTest() {
 	if !s.T().Failed() {
-		assert.NoError(s.T(), os.RemoveAll(s.TestGitDir))
+		s.Assert().NoError(os.RemoveAll(s.TestGitDir))
+		s.Assert().NoError(os.RemoveAll(s.SeedTargetDir))
 	}
 }
 
 func (s *TemplateTestSuite) TestProcessTemplate() {
 	tests := map[string]struct {
 		givenTemplate        string
+		givenValues          Values
 		expectedFileContents map[string]string
 		expectErr            bool
 	}{
 		"GivenTemplateFile_WhenProcessing_ThenWriteFile": {
-			givenTemplate: "readme.gotmpl.md",
+			givenTemplate: "readme.tpl.md",
 			expectedFileContents: map[string]string{
 				"readme.md": "# example-repository\n\nEXAMPLE-REPOSITORY\ntest\n",
 			},
@@ -118,6 +129,32 @@ func (s *TemplateTestSuite) TestRenderer_ProcessTemplateDir() {
 	s.Assert().FileExists(path.Join(s.TestGitDir, "ci", "pipeline.yml"))
 }
 
+func (s *TemplateTestSuite) TestRenderer_GivenUnmanagedFlag_WhenApplyingTemplate_ThenLeaveFileAlone() {
+	r := &Renderer{
+		p: printer.New(),
+	}
+	targetPath := path.Join(s.SeedTargetDir, "readme.md")
+	err := r.applyTemplate(targetPath, nil, Values{
+		"Values": Values{
+			"unmanaged": true,
+		}})
+	s.Require().NoError(err)
+	s.Assert().FileExists(targetPath)
+}
+
+func (s *TemplateTestSuite) TestRenderer_GivenDeleteFlag_WhenApplyingTemplate_ThenRemoveTargetFileInstead() {
+	r := &Renderer{
+		p: printer.New(),
+	}
+	targetPath := path.Join(s.SeedTargetDir, "readme.md")
+	err := r.applyTemplate(targetPath, nil, Values{
+		"Values": Values{
+			"delete": true,
+		}})
+	s.Require().NoError(err)
+	s.Assert().NoFileExists(targetPath)
+}
+
 func Test_sanitizeTargetPath(t *testing.T) {
 	tests := map[string]struct {
 		givenPath    string
@@ -131,13 +168,13 @@ func Test_sanitizeTargetPath(t *testing.T) {
 			givenPath:    "dir/fileName",
 			expectedPath: "dir/fileName",
 		},
-		"GivenFileWithGotmplExtension_WhenSanitizing_ThenReturnStripped": {
-			givenPath:    "dir/fileName.gotmpl",
+		"GivenFileWithTplExtension_WhenSanitizing_ThenReturnStripped": {
+			givenPath:    "dir/fileName.tpl",
 			expectedPath: "dir/fileName",
 		},
-		"GivenFileWithGotmplExtensionTwice_WhenSanitizing_ThenReturnStrippedOnce": {
-			givenPath:    "fileName.gotmpl.gotmpl",
-			expectedPath: "fileName.gotmpl",
+		"GivenFileWithTplExtensionTwice_WhenSanitizing_ThenReturnStrippedOnce": {
+			givenPath:    "fileName.tpl.tpl",
+			expectedPath: "fileName.tpl",
 		},
 	}
 	for name, tt := range tests {
@@ -145,5 +182,21 @@ func Test_sanitizeTargetPath(t *testing.T) {
 			result := sanitizeTargetPath(tt.givenPath)
 			assert.Equal(t, tt.expectedPath, result)
 		})
+	}
+}
+
+func (s *TemplateTestSuite) copyFiles() {
+	files, err := filepath.Glob(s.SeedSourceDir + "/*")
+	s.Require().NoError(err)
+	for _, file := range files {
+		source, openErr := os.Open(file)
+		s.Require().NoError(openErr)
+
+		target, tgtErr := os.Create(path.Join(s.SeedTargetDir, path.Base(source.Name())))
+		s.Require().NoError(tgtErr)
+		_, copyErr := io.Copy(target, source)
+		s.Require().NoError(copyErr)
+		s.Require().NoError(target.Close())
+		s.Require().NoError(source.Close())
 	}
 }

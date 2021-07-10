@@ -1,16 +1,16 @@
 * xref:index.adoc[Introduction]
-ifeval::['{page-origin-reftype}' == 'tag']
-* https://github.com/ccremer/greposync/releases/tag/{page-origin-refname}[Changelog,window=_blank]
-endif::[]
+* https://github.com/ccremer/greposync/releases[Changelog,window=_blank]
 
 .Tutorials
-include::partial$nav-tutorials.adoc[]
 
 .How To
-include::partial$nav-howtos.adoc[]
+* xref:how-tos/migrate-from-modulesync.adoc[Migrate from ModuleSync]
 
 .Technical reference
-include::partial$nav-reference.adoc[]
+* xref:references/template.adoc[Template]
+* xref:references/godoc.adoc[Godoc]
+* xref:references/sync-config.adoc[Sync configuration]
 
 .Explanation
-include::partial$nav-explanation.adoc[]
+* xref:explanations/deep-merge.adoc[Configuration deep merge]
+* xref:explanations/feature-comparison.adoc[Feature comparison with ModuleSync]
