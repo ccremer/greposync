@@ -3,8 +3,8 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>greposync.yml :: greposync docs</title>
-    <link rel="canonical" href="http://localhost/greposync/latest/references/greposync.html">
+    <title>Sync configuration :: greposync docs</title>
+    <link rel="canonical" href="http://localhost/greposync/latest/references/sync-config.html">
     <meta name="generator" content="Antora 2.3.4">
     <link rel="stylesheet" href="../../../_/css/site.css">
     <script>var uiRootPath = '../../../_'</script>
@@ -56,7 +56,7 @@
   <li class="nav-item" data-depth="1">
     <a class="nav-link" href="godoc.html">Godoc</a>
   </li>
-  <li class="nav-item" data-depth="1">
+  <li class="nav-item is-current-page" data-depth="1">
     <a class="nav-link" href="sync-config.html">Sync configuration</a>
   </li>
 </ul>
@@ -102,18 +102,100 @@
 <nav class="breadcrumbs" aria-label="breadcrumbs">
   <ul>
     <li><a href="../index.html">greposync</a></li>
-    <li><a href="greposync.html">greposync.yml</a></li>
+    <li>Technical reference</li>
+    <li><a href="sync-config.html">Sync configuration</a></li>
   </ul>
 </nav>
-  <div class="edit-this-page"><a href="https://github.com/ccremer/greposync/edit/master/docs/modules/ROOT/pages/references/greposync.adoc">Edit this Page</a></div>
+  <div class="edit-this-page"><a href="https://github.com/ccremer/greposync/edit/master/docs/modules/ROOT/pages/references/sync-config.adoc">Edit this Page</a></div>
   </div>
   <div class="content">
 <aside class="toc sidebar" data-title="Contents" data-levels="2">
   <div class="toc-menu"></div>
 </aside>
 <article class="doc">
-<h1 class="page">greposync.yml</h1>
+<h1 class="page">Sync configuration</h1>
+<div class="sect1">
+<h2 id="_special_values"><a class="anchor" href="#_special_values"></a>Special values</h2>
+<div class="sectionbody">
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>delete: true</code></dt>
+<dd>
+<p>When this flag is set, the target file is being deleted.
+It is not rendered at all.</p>
+</dd>
+</dl>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="ulist">
+<ul>
+<li>
+<p>Use this flag in <code>config_defaults.yml</code> to cleanup files that aren&#8217;t needed in the managed repositories anymore.</p>
+</li>
+<li>
+<p>Use this flag in <code>.sync.yml</code> to tell greposync to not create certain files.</p>
+</li>
+</ul>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>unmanaged: true</code></dt>
+<dd>
+<p>If this flag is set, the target file is not modified.</p>
+</dd>
+</dl>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+Use this flag in <code>.sync.yml</code> if a repository maintains its own version of the file outside of greposync.
+</td>
+</tr>
+</table>
+</div>
+<div class="exampleblock">
+<div class="title">Example 1. Special values usage</div>
+<div class="content">
+<div class="listingblock">
+<div class="title">.sync.yml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">.editorconfig:
+  unmanaged: true <i class="conum" data-value="1"></i><b>(1)</b>
 
+Makefile:
+  delete: true <i class="conum" data-value="2"></i><b>(2)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The repository keeps its own version of <code>.editorconfig</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>The repository does not need a <code>Makefile</code>.</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
 </article>
   </div>
 </main>

@@ -32,6 +32,9 @@
   <li class="nav-item" data-depth="1">
     <a class="nav-link" href="../index.html">Introduction</a>
   </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-text"><a href="https://github.com/ccremer/greposync/releases" target="_blank" rel="noopener">Changelog</a></span>
+  </li>
 </ul>
   </li>
   <li class="nav-item" data-depth="0">
@@ -52,6 +55,9 @@
   </li>
   <li class="nav-item" data-depth="1">
     <a class="nav-link" href="godoc.html">Godoc</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="sync-config.html">Sync configuration</a>
   </li>
 </ul>
   </li>
@@ -147,7 +153,7 @@ Visit the <a href="https://masterminds.github.io/sprig/">Sprig function document
 <p>Templates in subdirectories will get the same relative directory structure in the repository.</p>
 </li>
 <li>
-<p>1 occurrence of <code>.gotmpl</code> is removed from the file name, if any.</p>
+<p>1 occurrence of <code>.tpl</code> is removed from the file name, if any.</p>
 <div class="admonitionblock tip">
 <table>
 <tr>
@@ -156,9 +162,9 @@ Visit the <a href="https://masterminds.github.io/sprig/">Sprig function document
 </td>
 <td class="content">
 <div class="paragraph">
-<p>This rule exists since some IDEs provide syntax highlighting for Go template and the markup language at the same time if <code>.gotmpl</code> occurrs in the file name.
-A file named <code>README.gotmpl.md</code> will become <code>README.md</code> in the target repository.
-If you actually need a file called <code>README.gotmpl.md</code>, you need to name it <code>README.gotmpl.gotmpl.md</code>.</p>
+<p>This rule exists since some IDEs provide syntax highlighting for Go template and the markup language at the same time if <code>.tpl</code> occurrs in the file name.
+A file named <code>README.tpl.md</code> will become <code>README.md</code> in the target repository.
+If you actually need a file called <code>README.tpl.md</code>, you need to name it <code>README.tpl.tpl.md</code>.</p>
 </div>
 </td>
 </tr>
