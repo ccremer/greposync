@@ -21,7 +21,8 @@ type (
 		k              *koanf.Koanf
 		globalDefaults *koanf.Koanf
 	}
-	Values map[string]interface{}
+	Values     map[string]interface{}
+	FileAction func(targetPath string, data Values) error
 )
 
 const (
@@ -95,13 +96,27 @@ func (r *Renderer) processTemplate(originalTemplatePath string) error {
 		"Metadata": r.ConstructMetadata(),
 	}
 
-	// Write target file
 	targetPath := path.Join(r.cfg.Git.Dir, relativePath)
-	return r.writeFile(targetPath, tpl, data)
+	return r.applyTemplate(targetPath, tpl, data)
+}
+
+func (r *Renderer) applyTemplate(targetPath string, tpl *template.Template, values Values) error {
+	if values["Values"].(Values)["delete"] == true {
+		if r.fileExists(targetPath) {
+			r.p.DebugF("Deleting file due to 'delete' flag being set: %s", targetPath)
+			return os.Remove(targetPath)
+		}
+		return nil
+	}
+	if values["Values"].(Values)["unmanaged"] == true {
+		r.p.DebugF("Leaving file alone due to 'unmanaged' flag being set: %s", targetPath)
+		return nil
+	}
+	return r.writeFile(targetPath, tpl, values)
 }
 
 func (r *Renderer) writeFile(targetPath string, tpl *template.Template, data Values) error {
-	r.p.InfoF("Writing file: %s", path.Base(targetPath))
+	r.p.InfoF("Writing file from template: %s", path.Base(targetPath))
 	dir := path.Dir(targetPath)
 	if err := os.MkdirAll(dir, 0775); err != nil {
 		return err

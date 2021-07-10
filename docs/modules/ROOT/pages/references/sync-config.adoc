@@ -1,0 +1,34 @@
+= Sync configuration
+
+== Special values
+
+`delete: true`::
+When this flag is set, the target file is being deleted.
+It is not rendered at all.
+
+[TIP]
+====
+* Use this flag in `config_defaults.yml` to cleanup files that aren't needed in the managed repositories anymore.
+* Use this flag in `.sync.yml` to tell greposync to not create certain files.
+====
+
+`unmanaged: true`::
+If this flag is set, the target file is not modified.
+
+TIP: Use this flag in `.sync.yml` if a repository maintains its own version of the file outside of {page-component-name}.
+
+.Special values usage
+[example]
+====
+..sync.yml
+[source,yaml]
+----
+.editorconfig:
+  unmanaged: true <1>
+
+Makefile:
+  delete: true <2>
+----
+<1> The repository keeps its own version of `.editorconfig`.
+<2> The repository does not need a `Makefile`.
+====
