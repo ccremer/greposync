@@ -24,6 +24,7 @@ const (
 	createPrFlagName = "pr"
 	prBodyFlagName   = "pr-body"
 	amendFlagName    = "amend"
+	jobsFlagName     = "jobs"
 )
 
 type (
@@ -62,6 +63,13 @@ func (c *UpdateCommand) createUpdateCommand() *cli.Command {
 				Name:        amendFlagName,
 				Destination: &c.cfg.Git.Amend,
 				Usage:       "Amend previous commit.",
+			},
+			&cli.IntFlag{
+				Name:        jobsFlagName,
+				Destination: nil,
+				Usage:       "Jobs is the number of parallel jobs to run. Requires a minimum of 1, supports a maximum of 8. 1 basically means that jobs are run in sequence.",
+				Aliases:     []string{"j"},
+				Value:       1,
 			},
 			&cli.BoolFlag{
 				Name:        createPrFlagName,
@@ -184,6 +192,10 @@ func (c *UpdateCommand) createPipeline(r *repository.Service) *pipeline.Pipeline
 			pipeline.NewStep("render pull request template", renderer.RenderPrTemplate()),
 			pipeline.NewStep("create or update pull request", r.CreateOrUpdatePr(config.PullRequest)),
 		).AsNestedStep("pull request"), predicate.Bool(sc.PullRequest.Create)),
+		pipeline.NewStep("end", func() pipeline.Result {
+			log.InfoF("Pipeline for '%s/%s' finished", sc.Git.Namespace, sc.Git.Name)
+			return pipeline.Result{}
+		}),
 	)
 	return p
 }

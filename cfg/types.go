@@ -7,12 +7,23 @@ import (
 type (
 	// Configuration holds a strongly-typed tree of the main configuration
 	Configuration struct {
-		ProjectRoot string
+		Project     *ProjectConfig
 		Log         *LogConfig
 		PullRequest *PullRequestConfig
 		Template    *TemplateConfig
 		Git         *GitConfig
 	}
+	// ProjectConfig configures the project
+	ProjectConfig struct {
+		// RootDir is the directory where the various configuration files are found.
+		RootDir string
+		// Jobs is the number of parallel jobs to run.
+		// Requires a minimum of 1, supports a maximum of 8.
+		// 1 basically means that jobs are run in sequence.
+		// If this number is 2 or greater, then the logs are buffered and only displayed in case of errors.
+		Jobs int
+	}
+
 	// LogConfig configures the logging options
 	LogConfig struct {
 		Level string
@@ -83,7 +94,10 @@ type (
 // NewDefaultConfig retrieves the hardcoded configs with sane defaults
 func NewDefaultConfig() *Configuration {
 	return &Configuration{
-		ProjectRoot: "repos",
+		Project: &ProjectConfig{
+			RootDir: "repos",
+			Jobs:    1,
+		},
 		Log: &LogConfig{
 			Level: "info",
 		},

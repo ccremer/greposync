@@ -15,7 +15,7 @@ include::example$config.yaml[]
 [source, go]
 ----
 type Configuration struct {
-    ProjectRoot    string
+    Project        *ProjectConfig
     Log            *LogConfig
     PullRequest    *PullRequestConfig
     Template       *TemplateConfig
@@ -45,6 +45,29 @@ func (config *Configuration) Sanitize()
 ----
 
 Sanitize does corrective actions on the configuration hierarchy.
+
+
+
+=== ProjectConfig
+[source, go]
+----
+type ProjectConfig struct {
+    RootDir    string
+    Jobs       int
+}
+----
+
+
+RootDir::
+RootDir is the directory where the various configuration files are found.
+
+Jobs::
+Jobs is the number of parallel jobs to run.
+Requires a minimum of 1, supports a maximum of 8.
+1 basically means that jobs are run in sequence.
+If this number is 2 or greater, then the logs are buffered and only displayed in case of errors.
+
+
 
 
 

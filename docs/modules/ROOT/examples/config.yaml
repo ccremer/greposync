@@ -10,7 +10,9 @@ Git:
   SkipReset: false
 Log:
   Level: info
-ProjectRoot: repos
+Project:
+  Jobs: 1
+  RootDir: repos
 PullRequest:
   BodyTemplate: This Pull request updates this repository with changes from a greposync template repository.
   Create: false
