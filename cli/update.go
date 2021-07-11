@@ -6,11 +6,13 @@ import (
 	"os"
 
 	pipeline "github.com/ccremer/go-command-pipeline"
+	"github.com/ccremer/go-command-pipeline/parallel"
 	"github.com/ccremer/go-command-pipeline/predicate"
 	"github.com/ccremer/greposync/cfg"
 	"github.com/ccremer/greposync/printer"
 	"github.com/ccremer/greposync/rendering"
 	"github.com/ccremer/greposync/repository"
+	"github.com/hashicorp/go-multierror"
 	"github.com/knadh/koanf"
 	"github.com/knadh/koanf/parsers/yaml"
 	"github.com/knadh/koanf/providers/file"
@@ -107,51 +109,80 @@ func runUpdateCommand(*cli.Context) error {
 			return nil
 		}
 	}
-	services := repository.NewServicesFromFile(config)
+	var services []*repository.Service
 	parser := rendering.NewParser(config.Template)
 
-	if err := parser.ParseTemplateDir(); err != nil {
-		return err
-	}
+	logger := printer.PipelineLogger{Logger: printer.New().SetName("update").SetLevel(printer.DefaultLevel)}
+	p := pipeline.NewPipelineWithLogger(logger).WithSteps(
+		pipeline.NewStep("parse templates", parser.ParseTemplateDirAction()),
+		pipeline.NewStep("parse managed repos config", parseServices(&services)),
+		parallel.NewWorkerPoolStep("update repositories", 1, updateReposInParallel(&services, globalK, parser), errorHandler(&services)),
+	)
+	return p.Run().Err
+}
 
-	for _, r := range services {
-		log := printer.New().SetName(r.Config.Name).SetLevel(printer.DefaultLevel)
-
-		sc := &cfg.SyncConfig{
-			Git:         r.Config,
-			PullRequest: config.PullRequest,
-			Template: &cfg.TemplateConfig{
-				RootDir: config.Template.RootDir,
-			},
-		}
-		renderer := rendering.NewRenderer(sc, globalK, parser)
-		gitDirExists := r.DirExists(r.Config.Dir)
-		logger := printer.PipelineLogger{Logger: log}
-		p := pipeline.NewPipelineWithLogger(logger)
-		p.WithSteps(
-			pipeline.NewPipelineWithLogger(logger).WithSteps(
-				predicate.ToStep("clone repository", r.CloneGitRepository(), predicate.Bool(!gitDirExists)),
-				pipeline.NewStep("determine default branch", r.GetDefaultBranch()),
-				predicate.ToStep("fetch", r.Fetch(), r.EnabledReset()),
-				predicate.ToStep("reset repository", r.ResetRepository(), r.EnabledReset()),
-				pipeline.NewStep("checkout branch", r.CheckoutBranch()),
-				predicate.ToStep("pull", r.Pull(), r.EnabledReset()),
-			).AsNestedStep("prepare workspace"),
-			pipeline.NewStep("render templates", renderer.RenderTemplateDir()),
-			predicate.WrapIn(pipeline.NewPipelineWithLogger(logger).WithSteps(
-				predicate.ToStep("commit", r.Commit(), r.EnabledCommit()),
-				predicate.ToStep("show diff", r.Diff(), r.EnabledCommit()),
-				predicate.ToStep("push", r.PushToRemote(), r.EnabledPush()),
-			).AsNestedStep("push changes"), r.Dirty()),
-			predicate.WrapIn(pipeline.NewPipelineWithLogger(logger).WithSteps(
-				pipeline.NewStep("render pull request template", renderer.RenderPrTemplate()),
-				pipeline.NewStep("create or update pull request", r.CreateOrUpdatePr(config.PullRequest)),
-			).AsNestedStep("pull request"), predicate.Bool(sc.PullRequest.Create)),
-		)
-		result := p.Run()
-		if !result.IsSuccessful() {
-			return result.Err
+func updateReposInParallel(services *[]*repository.Service, globalK *koanf.Koanf, parser *rendering.Parser) parallel.PipelineSupplier {
+	return func(pipelines chan *pipeline.Pipeline) {
+		defer close(pipelines)
+		for _, r := range *services {
+			p := createPipeline(r, globalK, parser)
+			pipelines <- p
 		}
 	}
-	return nil
+}
+
+func createPipeline(r *repository.Service, globalK *koanf.Koanf, parser *rendering.Parser) *pipeline.Pipeline {
+	log := printer.New().SetName(r.Config.Name).SetLevel(printer.DefaultLevel)
+
+	sc := &cfg.SyncConfig{
+		Git:         r.Config,
+		PullRequest: config.PullRequest,
+		Template: &cfg.TemplateConfig{
+			RootDir: config.Template.RootDir,
+		},
+	}
+	renderer := rendering.NewRenderer(sc, globalK, parser)
+	gitDirExists := r.DirExists(r.Config.Dir)
+	logger := printer.PipelineLogger{Logger: log}
+	p := pipeline.NewPipelineWithLogger(logger)
+	p.WithSteps(
+		pipeline.NewPipelineWithLogger(logger).WithSteps(
+			predicate.ToStep("clone repository", r.CloneGitRepository(), predicate.Bool(!gitDirExists)),
+			pipeline.NewStep("determine default branch", r.GetDefaultBranch()),
+			predicate.ToStep("fetch", r.Fetch(), r.EnabledReset()),
+			predicate.ToStep("reset repository", r.ResetRepository(), r.EnabledReset()),
+			pipeline.NewStep("checkout branch", r.CheckoutBranch()),
+			predicate.ToStep("pull", r.Pull(), r.EnabledReset()),
+		).AsNestedStep("prepare workspace"),
+		pipeline.NewStep("render templates", renderer.RenderTemplateDir()),
+		predicate.WrapIn(pipeline.NewPipelineWithLogger(logger).WithSteps(
+			predicate.ToStep("commit", r.Commit(), r.EnabledCommit()),
+			predicate.ToStep("show diff", r.Diff(), r.EnabledCommit()),
+			predicate.ToStep("push", r.PushToRemote(), r.EnabledPush()),
+		).AsNestedStep("push changes"), r.Dirty()),
+		predicate.WrapIn(pipeline.NewPipelineWithLogger(logger).WithSteps(
+			pipeline.NewStep("render pull request template", renderer.RenderPrTemplate()),
+			pipeline.NewStep("create or update pull request", r.CreateOrUpdatePr(config.PullRequest)),
+		).AsNestedStep("pull request"), predicate.Bool(sc.PullRequest.Create)),
+	)
+	return p
+}
+
+func parseServices(services *[]*repository.Service) func() pipeline.Result {
+	return func() pipeline.Result {
+		*services = repository.NewServicesFromFile(config)
+		return pipeline.Result{}
+	}
+}
+
+func errorHandler(services *[]*repository.Service) parallel.ResultHandler {
+	return func(results map[uint64]pipeline.Result) pipeline.Result {
+		var err error
+		for index, service := range *services {
+			if result := results[uint64(index)]; result.Err != nil {
+				err = multierror.Append(err, fmt.Errorf("%s: %w", service.Config.Name, result.Err))
+			}
+		}
+		return pipeline.Result{Err: err}
+	}
 }

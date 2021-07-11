@@ -7,6 +7,7 @@ require (
 	github.com/Masterminds/sprig/v3 v3.2.1
 	github.com/ccremer/go-command-pipeline v0.2.0
 	github.com/google/go-github/v37 v37.0.0
+	github.com/hashicorp/go-multierror v1.1.1
 	github.com/knadh/koanf v1.1.1
 	github.com/mariotoffia/goasciidoc v0.4.5
 	github.com/stretchr/testify v1.7.0
