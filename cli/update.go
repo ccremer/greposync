@@ -107,6 +107,11 @@ func runUpdateCommand(*cli.Context) error {
 		}
 	}
 	services := repository.NewServicesFromFile(config)
+	parser := rendering.NewParser(config.Template)
+
+	if err := parser.ParseTemplateDir(); err != nil {
+		return err
+	}
 
 	for _, r := range services {
 		log := printer.New().SetName(r.Config.Name).SetLevel(printer.DefaultLevel)
@@ -118,7 +123,7 @@ func runUpdateCommand(*cli.Context) error {
 				RootDir: config.Template.RootDir,
 			},
 		}
-		renderer := rendering.NewRenderer(sc, globalK)
+		renderer := rendering.NewRenderer(sc, globalK, parser)
 		gitDirExists := r.DirExists(r.Config.Dir)
 		logger := printer.PipelineLogger{Logger: log}
 		p := pipeline.NewPipelineWithLogger(logger)
@@ -131,8 +136,9 @@ func runUpdateCommand(*cli.Context) error {
 				pipeline.NewStep("checkout branch", r.CheckoutBranch()),
 				pipeline.NewStepWithPredicate("pull", r.Pull(), r.EnabledReset()),
 			).AsNestedStep("prepare workspace", nil),
-			pipeline.NewStep("render templates", renderer.ProcessTemplateDir()),
+			pipeline.NewStep("render templates", renderer.RenderTemplateDir()),
 			pipeline.NewPipelineWithLogger(logger).WithSteps(
+				pipeline.NewStepWithPredicate("add", r.Add(), r.EnabledCommit()),
 				pipeline.NewStepWithPredicate("commit", r.Commit(), r.EnabledCommit()),
 				pipeline.NewStepWithPredicate("show diff", r.Diff(), r.EnabledCommit()),
 				pipeline.NewStepWithPredicate("push", r.PushToRemote(), r.EnabledPush()),

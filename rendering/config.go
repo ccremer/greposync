@@ -34,7 +34,7 @@ func (r *Renderer) loadDataForFile(fileName string) (Values, error) {
 	return data, err
 }
 
-func (r *Renderer) fileExists(fileName string) bool {
+func fileExists(fileName string) bool {
 	if info, err := os.Stat(fileName); err == nil && !info.IsDir() {
 		return true
 	}

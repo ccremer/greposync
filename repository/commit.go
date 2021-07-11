@@ -7,6 +7,18 @@ import (
 	pipeline "github.com/ccremer/go-command-pipeline"
 )
 
+// Add stages all untracked changes.
+func (s *Service) Add() pipeline.ActionFunc {
+	return func() pipeline.Result {
+		out, stderr, err := s.execGitCommand(s.logArgs("add", "*")...)
+		if err != nil {
+			return s.toResult(err, stderr)
+		}
+		s.p.DebugF(out)
+		return pipeline.Result{}
+	}
+}
+
 // Commit invokes git to stage all files and commit to the current branch.
 func (s *Service) Commit() pipeline.ActionFunc {
 	return func() pipeline.Result {
