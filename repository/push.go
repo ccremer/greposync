@@ -2,6 +2,7 @@ package repository
 
 import (
 	pipeline "github.com/ccremer/go-command-pipeline"
+	"github.com/ccremer/go-command-pipeline/predicate"
 )
 
 // PushToRemote invokes git to push the commits to origin.
@@ -21,7 +22,7 @@ func (s *Service) PushToRemote() pipeline.ActionFunc {
 }
 
 // EnabledPush returns true if git pushes are enabled.
-func (s *Service) EnabledPush() pipeline.Predicate {
+func (s *Service) EnabledPush() predicate.Predicate {
 	return func(step pipeline.Step) bool {
 		return !s.Config.SkipPush
 	}

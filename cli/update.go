@@ -6,6 +6,7 @@ import (
 	"os"
 
 	pipeline "github.com/ccremer/go-command-pipeline"
+	"github.com/ccremer/go-command-pipeline/predicate"
 	"github.com/ccremer/greposync/cfg"
 	"github.com/ccremer/greposync/printer"
 	"github.com/ccremer/greposync/rendering"
@@ -129,24 +130,23 @@ func runUpdateCommand(*cli.Context) error {
 		p := pipeline.NewPipelineWithLogger(logger)
 		p.WithSteps(
 			pipeline.NewPipelineWithLogger(logger).WithSteps(
-				pipeline.NewStepWithPredicate("clone repository", r.CloneGitRepository(), pipeline.Bool(!gitDirExists)),
+				predicate.ToStep("clone repository", r.CloneGitRepository(), predicate.Bool(!gitDirExists)),
 				pipeline.NewStep("determine default branch", r.GetDefaultBranch()),
-				pipeline.NewStepWithPredicate("fetch", r.Fetch(), r.EnabledReset()),
-				pipeline.NewStepWithPredicate("reset repository", r.ResetRepository(), r.EnabledReset()),
+				predicate.ToStep("fetch", r.Fetch(), r.EnabledReset()),
+				predicate.ToStep("reset repository", r.ResetRepository(), r.EnabledReset()),
 				pipeline.NewStep("checkout branch", r.CheckoutBranch()),
-				pipeline.NewStepWithPredicate("pull", r.Pull(), r.EnabledReset()),
-			).AsNestedStep("prepare workspace", nil),
+				predicate.ToStep("pull", r.Pull(), r.EnabledReset()),
+			).AsNestedStep("prepare workspace"),
 			pipeline.NewStep("render templates", renderer.RenderTemplateDir()),
-			pipeline.NewPipelineWithLogger(logger).WithSteps(
-				pipeline.NewStepWithPredicate("add", r.Add(), r.EnabledCommit()),
-				pipeline.NewStepWithPredicate("commit", r.Commit(), r.EnabledCommit()),
-				pipeline.NewStepWithPredicate("show diff", r.Diff(), r.EnabledCommit()),
-				pipeline.NewStepWithPredicate("push", r.PushToRemote(), r.EnabledPush()),
-			).AsNestedStep("push changes", r.Dirty()),
-			pipeline.NewPipelineWithLogger(logger).WithSteps(
+			predicate.WrapIn(pipeline.NewPipelineWithLogger(logger).WithSteps(
+				predicate.ToStep("commit", r.Commit(), r.EnabledCommit()),
+				predicate.ToStep("show diff", r.Diff(), r.EnabledCommit()),
+				predicate.ToStep("push", r.PushToRemote(), r.EnabledPush()),
+			).AsNestedStep("push changes"), r.Dirty()),
+			predicate.WrapIn(pipeline.NewPipelineWithLogger(logger).WithSteps(
 				pipeline.NewStep("render pull request template", renderer.RenderPrTemplate()),
 				pipeline.NewStep("create or update pull request", r.CreateOrUpdatePr(config.PullRequest)),
-			).AsNestedStep("pull request", pipeline.Bool(sc.PullRequest.Create)),
+			).AsNestedStep("pull request"), predicate.Bool(sc.PullRequest.Create)),
 		)
 		result := p.Run()
 		if !result.IsSuccessful() {
