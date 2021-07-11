@@ -5,10 +5,11 @@ import (
 	"strings"
 
 	pipeline "github.com/ccremer/go-command-pipeline"
+	"github.com/ccremer/go-command-pipeline/predicate"
 )
 
 // EnabledCheckout returns true if the git branch should be checked out.
-func (s *Service) EnabledCheckout() pipeline.Predicate {
+func (s *Service) EnabledCheckout() predicate.Predicate {
 	return func(step pipeline.Step) bool {
 		return !(s.Config.SkipReset || s.Config.CommitBranch == "")
 	}

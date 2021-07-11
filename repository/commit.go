@@ -5,6 +5,7 @@ import (
 	"os"
 
 	pipeline "github.com/ccremer/go-command-pipeline"
+	"github.com/ccremer/go-command-pipeline/predicate"
 )
 
 // Add stages all untracked changes.
@@ -51,13 +52,13 @@ func (s *Service) Commit() pipeline.ActionFunc {
 }
 
 // EnabledCommit returns true if commits are enabled.
-func (s *Service) EnabledCommit() pipeline.Predicate {
+func (s *Service) EnabledCommit() predicate.Predicate {
 	return func(step pipeline.Step) bool {
 		return !s.Config.SkipCommit
 	}
 }
 
-func (s *Service) Dirty() pipeline.Predicate {
+func (s *Service) Dirty() predicate.Predicate {
 	return func(step pipeline.Step) bool {
 		out, stderr, err := s.execGitCommand("status", "--short")
 		if err != nil {

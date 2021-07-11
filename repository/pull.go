@@ -2,6 +2,7 @@ package repository
 
 import (
 	pipeline "github.com/ccremer/go-command-pipeline"
+	"github.com/ccremer/go-command-pipeline/predicate"
 )
 
 // Pull invokes git to pull the latest commits from origin.
@@ -23,7 +24,7 @@ func (s *Service) Pull() pipeline.ActionFunc {
 }
 
 // EnabledReset returns true if git reset is enabled.
-func (s *Service) EnabledReset() pipeline.Predicate {
+func (s *Service) EnabledReset() predicate.Predicate {
 	return func(step pipeline.Step) bool {
 		return !s.Config.SkipReset
 	}
