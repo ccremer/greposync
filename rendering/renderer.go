@@ -20,44 +20,40 @@ type (
 		cfg            *cfg.SyncConfig
 		k              *koanf.Koanf
 		globalDefaults *koanf.Koanf
+		parser         *Parser
 	}
 	Values     map[string]interface{}
 	FileAction func(targetPath string, data Values) error
 )
 
-const (
-	errorOnMissingKey = "missingkey=error"
-	helperFileName    = "_helpers.tpl"
-)
-
 var (
-	templateFunctions = funcMap()
+	templateFunctions  = funcMap()
+	SyncConfigFileName = ".sync.yml"
 )
 
 // NewRenderer returns a new instance of a renderer.
-func NewRenderer(c *cfg.SyncConfig, globalDefaults *koanf.Koanf) *Renderer {
+func NewRenderer(c *cfg.SyncConfig, globalDefaults *koanf.Koanf, parser *Parser) *Renderer {
 	return &Renderer{
 		p:              printer.New().SetLevel(printer.DefaultLevel).MapColorToLevel(printer.Magenta, printer.LevelInfo).SetName(c.Git.Name),
 		k:              koanf.New("."),
 		globalDefaults: globalDefaults,
 		cfg:            c,
+		parser:         parser,
 	}
 }
 
-// ProcessTemplateDir searches for template files in the configure dir, renders the template with injected data and writes them to git target directory.
-func (r *Renderer) ProcessTemplateDir() pipeline.ActionFunc {
+// RenderTemplateDir renders the templates parsed by ParseTemplateDir.
+// Values from SyncConfigFileName are injected.
+// Files are written to git target directory, although special Values may override that behaviour.
+func (r *Renderer) RenderTemplateDir() pipeline.ActionFunc {
 	return func() pipeline.Result {
-		err := r.loadVariables(path.Join(r.cfg.Git.Dir, ".sync.yml"))
+		err := r.loadVariables(path.Join(r.cfg.Git.Dir, SyncConfigFileName))
 		if err != nil {
 			return pipeline.Result{Err: err}
 		}
 
-		files, err := r.listAllFiles(path.Clean(r.cfg.Template.RootDir))
-		if err != nil {
-			return pipeline.Result{Err: err}
-		}
-		for _, file := range files {
-			if err = r.processTemplate(file); err != nil {
+		for file, tpl := range r.parser.templates {
+			if err = r.processTemplate(file, tpl); err != nil {
 				return pipeline.Result{Err: err}
 			}
 		}
@@ -65,24 +61,8 @@ func (r *Renderer) ProcessTemplateDir() pipeline.ActionFunc {
 	}
 }
 
-func (r *Renderer) processTemplate(originalTemplatePath string) error {
-	relativePath, err := filepath.Rel(r.cfg.Template.RootDir, sanitizeTargetPath(originalTemplatePath))
-	if err != nil {
-		return err
-	}
-	originalFileName := path.Base(originalTemplatePath)
-
-	templates := []string{originalTemplatePath}
-	helperFilePath := path.Join(r.cfg.Template.RootDir, helperFileName)
-	if r.fileExists(helperFilePath) {
-		templates = append(templates, helperFilePath)
-	}
-	// Read template and helpers
-	tpl, err := template.
-		New(originalFileName).
-		Option(errorOnMissingKey).
-		Funcs(templateFunctions).
-		ParseFiles(templates...)
+func (r *Renderer) processTemplate(originalTemplatePath string, tpl *template.Template) error {
+	relativePath, err := filepath.Rel(r.cfg.Template.RootDir, cleanTargetPath(originalTemplatePath))
 	if err != nil {
 		return err
 	}
@@ -102,7 +82,7 @@ func (r *Renderer) processTemplate(originalTemplatePath string) error {
 
 func (r *Renderer) applyTemplate(targetPath string, tpl *template.Template, values Values) error {
 	if values["Values"].(Values)["delete"] == true {
-		if r.fileExists(targetPath) {
+		if fileExists(targetPath) {
 			r.p.DebugF("Deleting file due to 'delete' flag being set: %s", targetPath)
 			return os.Remove(targetPath)
 		}
@@ -134,23 +114,7 @@ func (r *Renderer) writeFile(targetPath string, tpl *template.Template, data Val
 	return w.Flush()
 }
 
-func (r *Renderer) listAllFiles(root string) (files []string, err error) {
-	err = filepath.Walk(root,
-		func(file string, info os.FileInfo, err error) error {
-			if err != nil {
-				return err
-			}
-			fileName := path.Base(file)
-			// Don't add helper file or directories
-			if fileName != helperFileName && r.fileExists(file) {
-				files = append(files, file)
-			}
-			return nil
-		})
-	return files, err
-}
-
-func sanitizeTargetPath(targetPath string) string {
+func cleanTargetPath(targetPath string) string {
 	dirName := path.Dir(targetPath)
 	baseName := path.Base(targetPath)
 	newName := strings.Replace(baseName, ".tpl", "", 1)

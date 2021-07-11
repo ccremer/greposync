@@ -22,7 +22,7 @@ func (r *Renderer) RenderPrTemplate() pipeline.ActionFunc {
 
 		data := Values{"Metadata": r.ConstructMetadata()}
 		filePath := path.Clean(t)
-		if r.fileExists(filePath) {
+		if fileExists(filePath) {
 			if str, err := r.renderTemplateFile(data, t); err != nil {
 				return pipeline.Result{Err: err}
 			} else {

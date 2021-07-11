@@ -6,6 +6,7 @@ import (
 	"path"
 	"path/filepath"
 	"testing"
+	"text/template"
 
 	"github.com/ccremer/greposync/cfg"
 	"github.com/ccremer/greposync/printer"
@@ -70,13 +71,13 @@ func (s *TemplateTestSuite) TestProcessTemplate() {
 		"GivenTemplateFile_WhenProcessing_ThenWriteFile": {
 			givenTemplate: "readme.tpl.md",
 			expectedFileContents: map[string]string{
-				"readme.md": "# example-repository\n\nEXAMPLE-REPOSITORY\ntest\n",
+				"readme.md": "EXAMPLE-REPOSITORY",
 			},
 		},
 		"GivenTemplateFileInSubDir_WhenProcessing_ThenWriteFileToCorrectDir": {
 			givenTemplate: "ci/pipeline.yml",
 			expectedFileContents: map[string]string{
-				"ci/pipeline.yml": "CommitBranch: \"\"\nCommitMessage: \"\"\nDefaultBranch: \"\"\nForcePush: false\nName: example-repository\nNamespace: \"\"\nSkipCommit: false\nSkipPush: false\nSkipReset: false\n",
+				"ci/pipeline.yml": "EXAMPLE-REPOSITORY",
 			},
 		},
 	}
@@ -93,7 +94,9 @@ func (s *TemplateTestSuite) TestProcessTemplate() {
 				},
 				k: s.K,
 			}
-			err := r.processTemplate(path.Join(r.cfg.Template.RootDir, tt.givenTemplate))
+			tpl, err := template.New("").Funcs(funcMap()).Parse("{{ .Metadata.Repository.Name | upper }}")
+			require.NoError(t, err)
+			err = r.processTemplate(path.Join(r.cfg.Template.RootDir, tt.givenTemplate), tpl)
 			if tt.expectErr {
 				require.Error(t, err)
 				return
@@ -108,7 +111,7 @@ func (s *TemplateTestSuite) TestProcessTemplate() {
 	}
 }
 
-func (s *TemplateTestSuite) TestRenderer_ProcessTemplateDir() {
+func (s *TemplateTestSuite) TestRenderer_RenderTemplateDir() {
 	r := &Renderer{
 		p: printer.New(),
 		cfg: &cfg.SyncConfig{
@@ -122,7 +125,9 @@ func (s *TemplateTestSuite) TestRenderer_ProcessTemplateDir() {
 		k:              koanf.New("."),
 		globalDefaults: s.K,
 	}
-	result := r.ProcessTemplateDir()()
+	r.parser = NewParser(r.cfg.Template)
+	s.Require().NoError(r.parser.ParseTemplateDir())
+	result := r.RenderTemplateDir()()
 	s.Require().NoError(result.Err)
 	s.Assert().NoFileExists(path.Join(s.TestGitDir, "_helpers.tpl"))
 	s.Assert().FileExists(path.Join(s.TestGitDir, "readme.md"))
@@ -155,7 +160,7 @@ func (s *TemplateTestSuite) TestRenderer_GivenDeleteFlag_WhenApplyingTemplate_Th
 	s.Assert().NoFileExists(targetPath)
 }
 
-func Test_sanitizeTargetPath(t *testing.T) {
+func Test_cleanTargetPath(t *testing.T) {
 	tests := map[string]struct {
 		givenPath    string
 		expectedPath string
@@ -179,7 +184,7 @@ func Test_sanitizeTargetPath(t *testing.T) {
 	}
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
-			result := sanitizeTargetPath(tt.givenPath)
+			result := cleanTargetPath(tt.givenPath)
 			assert.Equal(t, tt.expectedPath, result)
 		})
 	}
