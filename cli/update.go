@@ -26,12 +26,32 @@ const (
 	amendFlagName    = "amend"
 )
 
-func createUpdateCommand(c *cfg.Configuration) *cli.Command {
-	return &cli.Command{
+type (
+	// UpdateCommand is a facade service for the update command that holds all dependent services and settings.
+	UpdateCommand struct {
+		cfg          *cfg.Configuration
+		cliCommand   *cli.Command
+		repoServices []*repository.Service
+		parser       *rendering.Parser
+		globalK      *koanf.Koanf
+	}
+)
+
+// NewUpdateCommand returns a new UpdateCommand instance.
+func NewUpdateCommand(cfg *cfg.Configuration) *UpdateCommand {
+	return &UpdateCommand{
+		globalK: koanf.New("."),
+		cfg:     cfg,
+		parser:  rendering.NewParser(cfg.Template),
+	}
+}
+
+func (c *UpdateCommand) createUpdateCommand() *cli.Command {
+	c.cliCommand = &cli.Command{
 		Name:   "update",
 		Usage:  "Update the repositories in managed_repos.yml",
-		Action: runUpdateCommand,
-		Before: validateUpdateCommand,
+		Action: c.runUpdateCommand,
+		Before: c.validateUpdateCommand,
 		Flags: combineWithGlobalFlags(
 			&cli.StringFlag{
 				Name:    dryRunFlagName,
@@ -39,14 +59,14 @@ func createUpdateCommand(c *cfg.Configuration) *cli.Command {
 				Usage:   "Select a dry run mode. Allowed values: offline (do not run any Git commands), commit (commit, but don't push), push (push, but don't touch PRs)",
 			},
 			&cli.BoolFlag{
-				Name:        createPrFlagName,
-				Destination: &c.PullRequest.Create,
-				Usage:       "Create a PullRequest on a supported git hoster after pushing to remote.",
+				Name:        amendFlagName,
+				Destination: &c.cfg.Git.Amend,
+				Usage:       "Amend previous commit.",
 			},
 			&cli.BoolFlag{
-				Name:        amendFlagName,
-				Destination: &c.Git.Amend,
-				Usage:       "Amend previous commit.",
+				Name:        createPrFlagName,
+				Destination: &c.cfg.PullRequest.Create,
+				Usage:       "Create a PullRequest on a supported git hoster after pushing to remote.",
 			},
 			&cli.StringFlag{
 				Name:  prBodyFlagName,
@@ -54,9 +74,10 @@ func createUpdateCommand(c *cfg.Configuration) *cli.Command {
 			},
 		),
 	}
+	return c.cliCommand
 }
 
-func validateUpdateCommand(ctx *cli.Context) error {
+func (c *UpdateCommand) validateUpdateCommand(ctx *cli.Context) error {
 	if err := cfg.ParseConfig("greposync.yml", config); err != nil {
 		return err
 	}
@@ -96,42 +117,41 @@ func validateUpdateCommand(ctx *cli.Context) error {
 	return nil
 }
 
-func runUpdateCommand(*cli.Context) error {
-	globalK := koanf.New(".")
-	configDefaultName := "config_defaults.yml"
-
-	if info, err := os.Stat(configDefaultName); err != nil || info.IsDir() {
-		printer.WarnF("File %s does not exist, ignoring template defaults")
-	} else {
-		printer.DebugF("Loading config %s", configDefaultName)
-		err = globalK.Load(file.Provider(configDefaultName), yaml.Parser())
-		if err != nil {
-			return nil
-		}
-	}
-	var services []*repository.Service
-	parser := rendering.NewParser(config.Template)
+func (c *UpdateCommand) runUpdateCommand(_ *cli.Context) error {
 
 	logger := printer.PipelineLogger{Logger: printer.New().SetName("update").SetLevel(printer.DefaultLevel)}
 	p := pipeline.NewPipelineWithLogger(logger).WithSteps(
-		pipeline.NewStep("parse templates", parser.ParseTemplateDirAction()),
-		pipeline.NewStep("parse managed repos config", parseServices(&services)),
-		parallel.NewWorkerPoolStep("update repositories", 1, updateReposInParallel(&services, globalK, parser), errorHandler(&services)),
+		pipeline.NewStep("parse config defaults", c.loadGlobalDefaults()),
+		pipeline.NewStep("parse templates", c.parser.ParseTemplateDirAction()),
+		pipeline.NewStep("parse managed repos config", c.parseServices()),
+		parallel.NewWorkerPoolStep("update repositories", 1, c.updateReposInParallel(), c.errorHandler()),
 	)
 	return p.Run().Err
 }
 
-func updateReposInParallel(services *[]*repository.Service, globalK *koanf.Koanf, parser *rendering.Parser) parallel.PipelineSupplier {
+func (c *UpdateCommand) loadGlobalDefaults() pipeline.ActionFunc {
+	return func() pipeline.Result {
+		if info, err := os.Stat(ConfigDefaultName); err != nil || info.IsDir() {
+			printer.WarnF("File %s does not exist, ignoring template defaults")
+			return pipeline.Result{}
+		}
+		printer.DebugF("Loading config %s", ConfigDefaultName)
+		err := c.globalK.Load(file.Provider(ConfigDefaultName), yaml.Parser())
+		return pipeline.Result{Err: err}
+	}
+}
+
+func (c *UpdateCommand) updateReposInParallel() parallel.PipelineSupplier {
 	return func(pipelines chan *pipeline.Pipeline) {
 		defer close(pipelines)
-		for _, r := range *services {
-			p := createPipeline(r, globalK, parser)
+		for _, r := range c.repoServices {
+			p := c.createPipeline(r)
 			pipelines <- p
 		}
 	}
 }
 
-func createPipeline(r *repository.Service, globalK *koanf.Koanf, parser *rendering.Parser) *pipeline.Pipeline {
+func (c *UpdateCommand) createPipeline(r *repository.Service) *pipeline.Pipeline {
 	log := printer.New().SetName(r.Config.Name).SetLevel(printer.DefaultLevel)
 
 	sc := &cfg.SyncConfig{
@@ -141,7 +161,7 @@ func createPipeline(r *repository.Service, globalK *koanf.Koanf, parser *renderi
 			RootDir: config.Template.RootDir,
 		},
 	}
-	renderer := rendering.NewRenderer(sc, globalK, parser)
+	renderer := rendering.NewRenderer(sc, c.globalK, c.parser)
 	gitDirExists := r.DirExists(r.Config.Dir)
 	logger := printer.PipelineLogger{Logger: log}
 	p := pipeline.NewPipelineWithLogger(logger)
@@ -159,7 +179,7 @@ func createPipeline(r *repository.Service, globalK *koanf.Koanf, parser *renderi
 			predicate.ToStep("commit", r.Commit(), r.EnabledCommit()),
 			predicate.ToStep("show diff", r.Diff(), r.EnabledCommit()),
 			predicate.ToStep("push", r.PushToRemote(), r.EnabledPush()),
-		).AsNestedStep("push changes"), r.Dirty()),
+		).AsNestedStep("push changes"), predicate.And(r.EnabledCommit(), r.Dirty())),
 		predicate.WrapIn(pipeline.NewPipelineWithLogger(logger).WithSteps(
 			pipeline.NewStep("render pull request template", renderer.RenderPrTemplate()),
 			pipeline.NewStep("create or update pull request", r.CreateOrUpdatePr(config.PullRequest)),
@@ -168,17 +188,17 @@ func createPipeline(r *repository.Service, globalK *koanf.Koanf, parser *renderi
 	return p
 }
 
-func parseServices(services *[]*repository.Service) func() pipeline.Result {
+func (c *UpdateCommand) parseServices() func() pipeline.Result {
 	return func() pipeline.Result {
-		*services = repository.NewServicesFromFile(config)
+		c.repoServices = repository.NewServicesFromFile(config)
 		return pipeline.Result{}
 	}
 }
 
-func errorHandler(services *[]*repository.Service) parallel.ResultHandler {
+func (c *UpdateCommand) errorHandler() parallel.ResultHandler {
 	return func(results map[uint64]pipeline.Result) pipeline.Result {
 		var err error
-		for index, service := range *services {
+		for index, service := range c.repoServices {
 			if result := results[uint64(index)]; result.Err != nil {
 				err = multierror.Append(err, fmt.Errorf("%s: %w", service.Config.Name, result.Err))
 			}

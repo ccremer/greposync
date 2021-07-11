@@ -14,6 +14,8 @@ var (
 	app         *cli.App
 	globalFlags []cli.Flag
 	config      *cfg.Configuration
+	// ConfigDefaultName is the fallback file name of the YAML file containing the default template values.
+	ConfigDefaultName = "config_defaults.yml"
 )
 
 func CreateCLI(version, commit, date string) {
@@ -35,13 +37,14 @@ func CreateCLI(version, commit, date string) {
 			Value:       "info",
 		},
 	}
+	updateCommand := NewUpdateCommand(config)
 	app = &cli.App{
 		Name:                 "greposync",
 		Usage:                "git-repo-sync: Shameless reimplementation of ModuleSync in Go",
 		Version:              fmt.Sprintf("%s, commit %s, date %s", version, commit[0:7], t.Format(dateLayout)),
 		EnableBashCompletion: true,
 		Commands: []*cli.Command{
-			createUpdateCommand(config),
+			updateCommand.createUpdateCommand(),
 		},
 		Compiled: t,
 		ExitErrHandler: func(context *cli.Context, err error) {
