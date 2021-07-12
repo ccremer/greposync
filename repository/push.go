@@ -8,7 +8,7 @@ import (
 // PushToRemote invokes git to push the commits to origin.
 func (s *Service) PushToRemote() pipeline.ActionFunc {
 	return func() pipeline.Result {
-		args := []string{"push"}
+		args := []string{"push", "origin", s.Config.CommitBranch}
 		if s.Config.ForcePush {
 			args = append(args, "--force")
 		}

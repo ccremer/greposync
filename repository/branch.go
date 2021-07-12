@@ -18,7 +18,15 @@ func (s *Service) EnabledCheckout() predicate.Predicate {
 // CheckoutBranch invokes git to checkout the configured commit branch.
 func (s *Service) CheckoutBranch() pipeline.ActionFunc {
 	return func() pipeline.Result {
-		out, stderr, err := s.execGitCommand(s.logArgs("checkout", s.Config.CommitBranch)...)
+		args := []string{"checkout"}
+		if localExists, err := s.localBranchExists(s.Config.CommitBranch); err != nil {
+			return pipeline.Result{Err: err}
+		} else if !localExists {
+			args = append(args, "-b")
+		}
+		args = append(args, s.Config.CommitBranch)
+
+		out, stderr, err := s.execGitCommand(s.logArgs(args...)...)
 		if err != nil {
 			return s.toResult(err, stderr)
 		}
@@ -47,6 +55,20 @@ func (s *Service) GetDefaultBranch() pipeline.ActionFunc {
 		s.Config.DefaultBranch = "master"
 		return pipeline.Result{}
 	}
+}
+
+func (s *Service) localBranchExists(branch string) (bool, error) {
+	out, stderr, err := s.execGitCommand("branch", "--list")
+	if err != nil {
+		return false, errors.New(stderr)
+	}
+	branches := strings.Split(out, "\n")
+	for _, line := range branches {
+		if strings.Contains(strings.TrimSpace(line), branch) {
+			return true, nil
+		}
+	}
+	return false, nil
 }
 
 func (s *Service) remoteBranchExists(branch string) (bool, error) {

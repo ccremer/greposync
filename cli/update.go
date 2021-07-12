@@ -124,31 +124,9 @@ func (c *UpdateCommand) runUpdateCommand(_ *cli.Context) error {
 		pipeline.NewStep("parse config defaults", c.loadGlobalDefaults()),
 		pipeline.NewStep("parse templates", c.parser.ParseTemplateDirAction()),
 		pipeline.NewStep("parse managed repos config", c.parseServices()),
-		parallel.NewWorkerPoolStep("update repositories", 1, c.updateReposInParallel(), c.errorHandler()),
+		parallel.NewWorkerPoolStep("update repositories", config.Project.Jobs, c.updateReposInParallel(), c.errorHandler()),
 	)
 	return p.Run().Err
-}
-
-func (c *UpdateCommand) loadGlobalDefaults() pipeline.ActionFunc {
-	return func() pipeline.Result {
-		if info, err := os.Stat(ConfigDefaultName); err != nil || info.IsDir() {
-			printer.WarnF("File %s does not exist, ignoring template defaults")
-			return pipeline.Result{}
-		}
-		printer.DebugF("Loading config %s", ConfigDefaultName)
-		err := c.globalK.Load(file.Provider(ConfigDefaultName), yaml.Parser())
-		return pipeline.Result{Err: err}
-	}
-}
-
-func (c *UpdateCommand) updateReposInParallel() parallel.PipelineSupplier {
-	return func(pipelines chan *pipeline.Pipeline) {
-		defer close(pipelines)
-		for _, r := range c.repoServices {
-			p := c.createPipeline(r)
-			pipelines <- p
-		}
-	}
 }
 
 func (c *UpdateCommand) createPipeline(r *repository.Service) *pipeline.Pipeline {
@@ -176,8 +154,9 @@ func (c *UpdateCommand) createPipeline(r *repository.Service) *pipeline.Pipeline
 		).AsNestedStep("prepare workspace"),
 		pipeline.NewStep("render templates", renderer.RenderTemplateDir()),
 		predicate.WrapIn(pipeline.NewPipelineWithLogger(logger).WithSteps(
-			predicate.ToStep("commit", r.Commit(), r.EnabledCommit()),
-			predicate.ToStep("show diff", r.Diff(), r.EnabledCommit()),
+			pipeline.NewStep("add", r.Add()),
+			pipeline.NewStep("commit", r.Commit()),
+			pipeline.NewStep("show diff", r.Diff()),
 			predicate.ToStep("push", r.PushToRemote(), r.EnabledPush()),
 		).AsNestedStep("push changes"), predicate.And(r.EnabledCommit(), r.Dirty())),
 		predicate.WrapIn(pipeline.NewPipelineWithLogger(logger).WithSteps(
@@ -196,6 +175,28 @@ func (c *UpdateCommand) parseServices() func() pipeline.Result {
 	return func() pipeline.Result {
 		c.repoServices = repository.NewServicesFromFile(config)
 		return pipeline.Result{}
+	}
+}
+
+func (c *UpdateCommand) loadGlobalDefaults() pipeline.ActionFunc {
+	return func() pipeline.Result {
+		if info, err := os.Stat(ConfigDefaultName); err != nil || info.IsDir() {
+			printer.WarnF("File %s does not exist, ignoring template defaults")
+			return pipeline.Result{}
+		}
+		printer.DebugF("Loading config %s", ConfigDefaultName)
+		err := c.globalK.Load(file.Provider(ConfigDefaultName), yaml.Parser())
+		return pipeline.Result{Err: err}
+	}
+}
+
+func (c *UpdateCommand) updateReposInParallel() parallel.PipelineSupplier {
+	return func(pipelines chan *pipeline.Pipeline) {
+		defer close(pipelines)
+		for _, r := range c.repoServices {
+			p := c.createPipeline(r)
+			pipelines <- p
+		}
 	}
 }
 
