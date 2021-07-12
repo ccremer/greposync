@@ -15,7 +15,7 @@ include::example$config.yaml[]
 [source, go]
 ----
 type Configuration struct {
-    ProjectRoot    string
+    Project        *ProjectConfig
     Log            *LogConfig
     PullRequest    *PullRequestConfig
     Template       *TemplateConfig
@@ -45,6 +45,29 @@ func (config *Configuration) Sanitize()
 ----
 
 Sanitize does corrective actions on the configuration hierarchy.
+
+
+
+=== ProjectConfig
+[source, go]
+----
+type ProjectConfig struct {
+    RootDir    string
+    Jobs       int
+}
+----
+
+
+RootDir::
+RootDir is the local directory where the Git repositories are cloned into.
+
+Jobs::
+Jobs is the number of parallel jobs to run.
+Requires a minimum of 1, supports a maximum of 8.
+1 basically means that jobs are run in sequence.
+If this number is 2 or greater, then the logs are buffered and only displayed in case of errors.
+
+
 
 
 
@@ -196,6 +219,60 @@ RootDir::
 RootDir is the path relative to the current workdir where the template files are located.
 
 
+
+
+
+
+
+= package cli
+
+
+
+[source,yaml]
+----
+include::example$config.yaml[]
+----
+
+== Structs
+
+=== Cli
+[source, go]
+----
+type Cli struct {
+}
+----
+
+Cli implements a urfave/cli command line provider.
+
+
+
+
+
+==== Receivers
+
+===== Read
+[source, go]
+----
+func (p *Cli) Read() (map[string]interface{}, error)
+----
+
+Read reads the flag variables and returns a nested conf map.
+
+===== ReadBytes
+[source, go]
+----
+func (p *Cli) ReadBytes() ([]byte, error)
+----
+
+ReadBytes is not supported.
+
+===== Watch
+[source, go]
+----
+func (p *Cli) Watch(cb func(event interface{}, err error)) error
+----
+
+Watch is not supported.
 
 
 
