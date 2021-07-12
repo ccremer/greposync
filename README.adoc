@@ -1,7 +1,7 @@
 = greposync
 
 image:https://img.shields.io/github/go-mod/go-version/ccremer/greposync[Go version]
-image:https://img.shields.io/github/v/release/ccremer/greposync[Version,link=https://github.com/ccremer/greposync/releases]
+image:https://img.shields.io/github/v/release/ccremer/greposync?include_prereleases[Version,link=https://github.com/ccremer/greposync/releases]
 image:https://img.shields.io/github/downloads/ccremer/greposync/total[GitHub downloads,link=https://github.com/ccremer/greposync/releases]
 image:https://goreportcard.com/badge/github.com/ccremer/greposync[goreport,link=https://goreportcard.com/report/github.com/ccremer/greposync]
 image:https://img.shields.io/codecov/c/github/ccremer/greposync?token=6DQY7397LS[Codecov,link=https://app.codecov.io/gh/ccremer/greposync]
