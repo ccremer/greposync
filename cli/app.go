@@ -16,6 +16,12 @@ var (
 	config      *cfg.Configuration
 	// ConfigDefaultName is the fallback file name of the YAML file containing the default template values.
 	ConfigDefaultName = "config_defaults.yml"
+	// GrepoSyncFileName is the default file name of the YAML file containing the main settings.
+	GrepoSyncFileName = "greposync.yml"
+
+	logLevelFlagName    = "log-level"
+	projectRootFlagName = "project-root"
+	projectJobsFlagName = "project-jobs"
 )
 
 func CreateCLI(version, commit, date string) {
@@ -28,13 +34,23 @@ func CreateCLI(version, commit, date string) {
 		&cli.BoolFlag{
 			Name:    "verbose",
 			Aliases: []string{"v"},
-			Usage:   "Shorthand for --log-level=debug",
+			Usage:   fmt.Sprintf("Shorthand for --%s=debug", logLevelFlagName),
 		},
 		&cli.StringFlag{
-			Name:        "log-level",
-			Destination: &config.Log.Level,
-			Usage:       "Log level. Allowed values are [debug, info, warn, error].",
-			Value:       "info",
+			Name:  logLevelFlagName,
+			Usage: "Log level. Allowed values are [debug, info, warn, error].",
+			Value: config.Log.Level,
+		},
+		&cli.PathFlag{
+			Name:  projectRootFlagName,
+			Usage: "Local directory path where git clones repositories into.",
+			Value: config.Project.RootDir,
+		},
+		&cli.IntFlag{
+			Name:    projectJobsFlagName,
+			Usage:   "Jobs is the number of parallel jobs to run. 1 basically means that jobs are run in sequence.",
+			Aliases: []string{"j"},
+			Value:   1,
 		},
 	}
 	updateCommand := NewUpdateCommand(config)

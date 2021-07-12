@@ -3,19 +3,17 @@ package cfg
 import (
 	"strings"
 
+	"github.com/ccremer/greposync/cfg/cli"
 	"github.com/ccremer/greposync/printer"
 	"github.com/knadh/koanf"
 	"github.com/knadh/koanf/parsers/yaml"
 	"github.com/knadh/koanf/providers/env"
 	"github.com/knadh/koanf/providers/file"
+	urfavecli "github.com/urfave/cli/v2"
 )
 
 // ParseConfig overrides given config defaults from file and with environment variables.
-func ParseConfig(configPath string, config *Configuration) error {
-	return loadConfigHierarchy(configPath, config)
-}
-
-func loadConfigHierarchy(configPath string, config *Configuration) error {
+func ParseConfig(configPath string, config *Configuration, ctx *urfavecli.Context) error {
 	koanfInstance := koanf.New(".")
 
 	// Load file
@@ -34,6 +32,11 @@ func loadConfigHierarchy(configPath string, config *Configuration) error {
 		s = strings.Replace(strings.ToLower(s), "_", "-", -1)
 		return s
 	}), nil); err != nil {
+		return err
+	}
+
+	// CLI flags
+	if err := koanfInstance.Load(cli.Provider(ctx, "-", koanfInstance), nil); err != nil {
 		return err
 	}
 

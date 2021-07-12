@@ -59,7 +59,7 @@ type ProjectConfig struct {
 
 
 RootDir::
-RootDir is the directory where the various configuration files are found.
+RootDir is the local directory where the Git repositories are cloned into.
 
 Jobs::
 Jobs is the number of parallel jobs to run.
@@ -219,6 +219,60 @@ RootDir::
 RootDir is the path relative to the current workdir where the template files are located.
 
 
+
+
+
+
+
+= package cli
+
+
+
+[source,yaml]
+----
+include::example$config.yaml[]
+----
+
+== Structs
+
+=== Cli
+[source, go]
+----
+type Cli struct {
+}
+----
+
+Cli implements a urfave/cli command line provider.
+
+
+
+
+
+==== Receivers
+
+===== Read
+[source, go]
+----
+func (p *Cli) Read() (map[string]interface{}, error)
+----
+
+Read reads the flag variables and returns a nested conf map.
+
+===== ReadBytes
+[source, go]
+----
+func (p *Cli) ReadBytes() ([]byte, error)
+----
+
+ReadBytes is not supported.
+
+===== Watch
+[source, go]
+----
+func (p *Cli) Watch(cb func(event interface{}, err error)) error
+----
+
+Watch is not supported.
 
 
 

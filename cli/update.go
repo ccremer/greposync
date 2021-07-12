@@ -21,10 +21,14 @@ import (
 
 const (
 	dryRunFlagName   = "dry-run"
-	createPrFlagName = "pr"
+	prCreateFlagName = "pr-create"
 	prBodyFlagName   = "pr-body"
-	amendFlagName    = "amend"
-	jobsFlagName     = "jobs"
+	amendFlagName    = "git-amend"
+)
+
+var (
+	JobsMinimumCount = 1
+	JobsMaximumCount = 8
 )
 
 type (
@@ -60,21 +64,12 @@ func (c *UpdateCommand) createUpdateCommand() *cli.Command {
 				Usage:   "Select a dry run mode. Allowed values: offline (do not run any Git commands), commit (commit, but don't push), push (push, but don't touch PRs)",
 			},
 			&cli.BoolFlag{
-				Name:        amendFlagName,
-				Destination: &c.cfg.Git.Amend,
-				Usage:       "Amend previous commit.",
-			},
-			&cli.IntFlag{
-				Name:        jobsFlagName,
-				Destination: nil,
-				Usage:       "Jobs is the number of parallel jobs to run. Requires a minimum of 1, supports a maximum of 8. 1 basically means that jobs are run in sequence.",
-				Aliases:     []string{"j"},
-				Value:       1,
+				Name:  amendFlagName,
+				Usage: "Amend previous commit.",
 			},
 			&cli.BoolFlag{
-				Name:        createPrFlagName,
-				Destination: &c.cfg.PullRequest.Create,
-				Usage:       "Create a PullRequest on a supported git hoster after pushing to remote.",
+				Name:  prCreateFlagName,
+				Usage: "Create a PullRequest on a supported git hoster after pushing to remote.",
 			},
 			&cli.StringFlag{
 				Name:  prBodyFlagName,
@@ -86,7 +81,7 @@ func (c *UpdateCommand) createUpdateCommand() *cli.Command {
 }
 
 func (c *UpdateCommand) validateUpdateCommand(ctx *cli.Context) error {
-	if err := cfg.ParseConfig("greposync.yml", config); err != nil {
+	if err := cfg.ParseConfig(GrepoSyncFileName, config, ctx); err != nil {
 		return err
 	}
 
@@ -94,11 +89,8 @@ func (c *UpdateCommand) validateUpdateCommand(ctx *cli.Context) error {
 		return err
 	}
 
-	if ctx.Bool(createPrFlagName) {
-		config.PullRequest.Create = true
-	}
-	if v := ctx.String(prBodyFlagName); v != "" {
-		config.PullRequest.BodyTemplate = v
+	if jobs := config.Project.Jobs; jobs > JobsMaximumCount || jobs < JobsMinimumCount {
+		return fmt.Errorf("--%s is required to be between %d and %d", projectJobsFlagName, JobsMinimumCount, JobsMaximumCount)
 	}
 
 	if ctx.IsSet(dryRunFlagName) {
