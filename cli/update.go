@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"regexp"
 
 	pipeline "github.com/ccremer/go-command-pipeline"
 	"github.com/ccremer/go-command-pipeline/parallel"
@@ -20,10 +21,12 @@ import (
 )
 
 const (
-	dryRunFlagName   = "dry-run"
-	prCreateFlagName = "pr-create"
-	prBodyFlagName   = "pr-body"
-	amendFlagName    = "git-amend"
+	dryRunFlagName         = "dry-run"
+	prCreateFlagName       = "pr-create"
+	prBodyFlagName         = "pr-body"
+	amendFlagName          = "git-amend"
+	projectIncludeFlagName = "project-include"
+	projectExcludeFlagName = "project-exclude"
 )
 
 var (
@@ -59,6 +62,14 @@ func (c *UpdateCommand) createUpdateCommand() *cli.Command {
 		Before: c.validateUpdateCommand,
 		Flags: combineWithGlobalFlags(
 			&cli.StringFlag{
+				Name:  projectIncludeFlagName,
+				Usage: "Includes only repositories in the update that match the given filter (regex).",
+			},
+			&cli.StringFlag{
+				Name:  projectExcludeFlagName,
+				Usage: "Excludes repositories from updating that match the given filter (regex). Repositories matching both include and exclude filter are still excluded.",
+			},
+			&cli.StringFlag{
 				Name:    dryRunFlagName,
 				Aliases: []string{"d"},
 				Usage:   "Select a dry run mode. Allowed values: offline (do not run any Git commands), commit (commit, but don't push), push (push, but don't touch PRs)",
@@ -87,6 +98,13 @@ func (c *UpdateCommand) validateUpdateCommand(ctx *cli.Context) error {
 
 	if err := validateGlobalFlags(ctx); err != nil {
 		return err
+	}
+
+	if _, err := regexp.Compile(config.Project.Include); err != nil {
+		return fmt.Errorf("invalid flag --%s: %v", projectIncludeFlagName, err)
+	}
+	if _, err := regexp.Compile(config.Project.Exclude); err != nil {
+		return fmt.Errorf("invalid flag --%s: %v", projectExcludeFlagName, err)
 	}
 
 	if jobs := config.Project.Jobs; jobs > JobsMaximumCount || jobs < JobsMinimumCount {
@@ -173,8 +191,9 @@ func (c *UpdateCommand) createPipeline(r *repository.Service) *pipeline.Pipeline
 
 func (c *UpdateCommand) parseServices() func() pipeline.Result {
 	return func() pipeline.Result {
-		c.repoServices = repository.NewServicesFromFile(config)
-		return pipeline.Result{}
+		s, err := repository.NewServicesFromFile(config)
+		c.repoServices = s
+		return pipeline.Result{Err: err}
 	}
 }
 

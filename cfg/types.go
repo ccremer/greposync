@@ -22,6 +22,13 @@ type (
 		// 1 basically means that jobs are run in sequence.
 		// If this number is 2 or greater, then the logs are buffered and only displayed in case of errors.
 		Jobs int `json:"jobs" koanf:"jobs"`
+		// Include is a regex filter that includes repositories only when they match.
+		// The filter is applied to the whole URL.
+		// This option is not configurable in `greposync.yml`.
+		Include string `json:"-" koanf:"include"`
+		// Exclude is similar to Include, only that matching repository URLs are skipped.
+		// This option is not configurable in `greposync.yml`.
+		Exclude string `json:"-" koanf:"exclude"`
 	}
 
 	// LogConfig configures the logging options
