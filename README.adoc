@@ -10,23 +10,15 @@ https://github.com/voxpupuli/modulesync[ModuleSync] reimplemented in Go.
 
 image::docs/modules/ROOT/assets/images/overview.drawio.svg[]
 
+Documentation::
+https://ccremer.github.io/greposync[ccremer.github.io/greposync,window=_blank]
+
 == Project status
 
 This project in its current status is in heavy development.
 It got triggered by the lack of deep-merging YAML in modulesync configs and limitations in ERB templates.
 It got inspired by Helm's templating mechanisms.
 Most features are untested yet ("it works on my machine").
-
-== Note before migrating
-
-> It's too soon yet!
-
-Most notably, the template engine is using gotemplate with Sprig library.
-This means that you would have to rewrite your templates when migrating to gsync.
-To clearly differentiate between the two, the `template` dir is `moduleroot`'s pendent.
-
-The configuration syntax in `managed_repos.yml` (`managed_modules.yml`) and `gitreposync.yml` (`modulesync.yml`) has changed as well compared to their predecessors.
-Checkout the examples and documentation (coming later).
 
 == The name
 
