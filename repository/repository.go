@@ -5,6 +5,7 @@ import (
 	"net/url"
 	"os"
 	"path"
+	"regexp"
 	"strings"
 
 	"github.com/ccremer/greposync/cfg"
@@ -34,20 +35,33 @@ var (
 )
 
 // NewServicesFromFile parses a config file with managed git repositories and provides a Service for each.
-func NewServicesFromFile(config *cfg.Configuration) []*Service {
-	err := k.Load(file.Provider(ManagedReposFileName), yaml.Parser())
-	printer.CheckIfError(err)
-
+func NewServicesFromFile(config *cfg.Configuration) ([]*Service, error) {
+	if err := k.Load(file.Provider(ManagedReposFileName), yaml.Parser()); err != nil {
+		return nil, err
+	}
 	var list []*Service
 	var m []ManagedGitRepo
-	err = k.Unmarshal("repositories", &m)
-	printer.CheckIfError(err)
+	if err := k.Unmarshal("repositories", &m); err != nil {
+		return nil, err
+	}
 	gitBase := "git@github.com:"
+
+	includeRegex, excludeRegex, err := compileRegex(config.Project.Include, config.Project.Exclude)
+	if err != nil {
+		return nil, err
+	}
+
 	for _, repo := range m {
 		u := parseUrl(repo, gitBase, config.Git.Namespace)
 		repoName := path.Base(u.Path)
+		log := printer.New().MapColorToLevel(printer.Blue, printer.LevelInfo).SetLevel(printer.DefaultLevel).SetName(repoName)
+		if skipRepository(u, includeRegex, excludeRegex) {
+			log.InfoF("Skipping '%s%s' due to filters", u.Hostname(), u.Path)
+			continue
+		}
+
 		s := &Service{
-			p: printer.New().MapColorToLevel(printer.Blue, printer.LevelInfo).SetLevel(printer.DefaultLevel).SetName(repoName),
+			p: log,
 			Config: &cfg.GitConfig{
 				Dir:           path.Clean(path.Join(config.Project.RootDir, strings.ReplaceAll(u.Hostname(), ":", "-"), u.Path)),
 				Url:           u,
@@ -64,7 +78,33 @@ func NewServicesFromFile(config *cfg.Configuration) []*Service {
 		}
 		list = append(list, s)
 	}
-	return list
+	return list, nil
+}
+
+func skipRepository(u *url.URL, includeRegex *regexp.Regexp, excludeRegex *regexp.Regexp) bool {
+	return matchRegex(excludeRegex, u) || !matchRegex(includeRegex, u)
+}
+
+func compileRegex(includeFilter, excludeFilter string) (includeRegex, excludeRegex *regexp.Regexp, err error) {
+	if includeFilter == "" {
+		includeFilter = ".*"
+	}
+	if excludeFilter == "" {
+		excludeFilter = "^$"
+	}
+	includeRegex, err = regexp.Compile(includeFilter)
+	if err != nil {
+		return nil, nil, err
+	}
+	excludeRegex, err = regexp.Compile(excludeFilter)
+	if err != nil {
+		return nil, nil, err
+	}
+	return includeRegex, excludeRegex, nil
+}
+
+func matchRegex(regex *regexp.Regexp, u *url.URL) bool {
+	return regex.MatchString(u.String())
 }
 
 func parseUrl(m ManagedGitRepo, gitBase, defaultNs string) *url.URL {
