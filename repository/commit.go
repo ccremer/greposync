@@ -11,7 +11,7 @@ import (
 // Add stages all untracked changes.
 func (s *Service) Add() pipeline.ActionFunc {
 	return func() pipeline.Result {
-		out, stderr, err := s.execGitCommand(s.logArgs("add", "*")...)
+		out, stderr, err := s.execGitCommand(s.logArgs("add", "-A")...)
 		if err != nil {
 			return s.toResult(err, stderr)
 		}
@@ -37,7 +37,7 @@ func (s *Service) Commit() pipeline.ActionFunc {
 
 		// Commit
 		args := []string{"commit", "-a", "-F", f.Name()}
-		if s.Config.Amend {
+		if s.Config.Amend && s.branchHasCommits() {
 			args = append(args, "--amend")
 		}
 
@@ -71,6 +71,14 @@ func (s *Service) Dirty() predicate.Predicate {
 		}
 		return true
 	}
+}
+
+func (s *Service) branchHasCommits() bool {
+	out, stderr, err := s.execGitCommand("log", fmt.Sprintf("%s..%s", s.Config.DefaultBranch, s.Config.CommitBranch), "--oneline")
+	if err != nil {
+		s.p.WarnF("could not determine if there is already a commit in %s: %s", s.Config.CommitBranch, stderr)
+	}
+	return out != ""
 }
 
 func (s *Service) deleteFile(file *os.File) {
