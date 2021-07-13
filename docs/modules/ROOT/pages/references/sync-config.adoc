@@ -1,4 +1,53 @@
 = Sync configuration
+:global-defaults: config_defaults.yml
+:sync-yml: .sync.yml
+
+== Value hierarchy
+
+The following hierarchy of merging and inheriting values is applied.
+The last element in the list is overwriting anything defined before.
+
+. `:globals` in `{global-defaults}`
+. `directory` in `{global-defaults}`
+. `directory/filename` in `{global-defaults}`
+. `:globals` in `{sync-yml}`
+. `directory` in `{sync-yml}`
+. `directory/filename` in `{sync-yml}`
+
+.Value hierarchy
+[example]
+====
+.{global-defaults}
+[source,yaml]
+----
+:globals:
+  key: 1
+
+dir:
+  key: 2 <1>
+
+dir/subdir:
+  key: 3
+
+dir/subdir/file:
+  key: a
+----
+
+.{sync-yml}
+[source,yaml]
+----
+:globals:
+  key: 4
+
+dir/subdir:
+  key: 5
+
+dir/subdir/file:
+  key: b <2>
+----
+<1> Any file within `dir` would get the value `key=2` as there is no override in `{sync-yml}`.
+<2> The `dir/subdir/file` would get the value `key=b` since it's overriding the key in `{global-defaults}`.
+====
 
 == Special values
 
@@ -20,7 +69,7 @@ TIP: Use this flag in `.sync.yml` if a repository maintains its own version of t
 .Special values usage
 [example]
 ====
-..sync.yml
+.`.sync.yml`
 [source,yaml]
 ----
 .editorconfig:

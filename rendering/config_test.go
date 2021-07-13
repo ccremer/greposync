@@ -67,11 +67,54 @@ func TestRenderer_loadDataForFile(t *testing.T) {
 			givenFileName: "README.md",
 			givenValues: Values{
 				":globals": Values{"key": "variable"},
-				"README.md": Values{"key": Values{
-					"nested": "key",
-				}},
+				"README.md": Values{
+					"key": Values{
+						"nested": "key",
+					}},
 			},
 			expectedValues: Values{"key": Values{"nested": "key"}},
+		},
+		"GivenSubDirectory_WhenBuildingVarsForFile_ThenMergeDirectoryValues": {
+			givenFileName: "subdir/README.md",
+			givenValues: Values{
+				":globals": Values{"key": "variable"},
+				"subdir": Values{
+					"intermediate": "value",
+				},
+				"subdir/README.md": Values{
+					"key": Values{
+						"nested": "key",
+					}},
+			},
+			expectedValues: Values{
+				"key": Values{
+					"nested": "key"},
+				"intermediate": "value"},
+		},
+		"GivenMultipleSubDirectories_WhenBuildingVarsForFile_ThenMergeSubDirectoryValues": {
+			givenFileName: "subdir1/subdir2/README.md",
+			givenValues: Values{
+				":globals": Values{"key": "variable"},
+				"subdir1": Values{
+					"intermediate1": "foo",
+					"override":      "to-be-overridden",
+				},
+				"subdir1/subdir2": Values{
+					"intermediate2": "bar",
+					"override":      "inherited",
+				},
+				"subdir1/subdir2/README.md": Values{
+					"key": Values{
+						"nested": "key",
+					}},
+			},
+			expectedValues: Values{
+				"key": Values{
+					"nested": "key"},
+				"intermediate1": "foo",
+				"intermediate2": "bar",
+				"override":      "inherited",
+			},
 		},
 	}
 	for name, tt := range tests {

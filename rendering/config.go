@@ -2,6 +2,9 @@ package rendering
 
 import (
 	"os"
+	"path"
+	"path/filepath"
+	"strings"
 
 	"github.com/knadh/koanf/parsers/yaml"
 	"github.com/knadh/koanf/providers/file"
@@ -27,10 +30,18 @@ func (r *Renderer) loadDataForFile(fileName string) (Values, error) {
 	data := make(Values)
 	err := r.k.Unmarshal(":globals", &data)
 	if err != nil {
-		return nil, err
+		return data, err
 	}
-	// Load the file-specific variables into values
-	err = r.k.Unmarshal(fileName, &data)
+	segments := strings.Split(fileName, string(filepath.Separator))
+	filePath := ""
+	// Load the top-dir first (if any), then subdirs, then file-specific variables into values
+	for _, segment := range segments {
+		filePath = path.Join(filePath, segment)
+		err = r.k.Unmarshal(filePath, &data)
+		if err != nil {
+			return data, err
+		}
+	}
 	return data, err
 }
 
