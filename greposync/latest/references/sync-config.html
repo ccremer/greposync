@@ -115,6 +115,83 @@
 <article class="doc">
 <h1 class="page">Sync configuration</h1>
 <div class="sect1">
+<h2 id="_value_hierarchy"><a class="anchor" href="#_value_hierarchy"></a>Value hierarchy</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The following hierarchy of merging and inheriting values is applied.
+The last element in the list is overwriting anything defined before.</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><code>:globals</code> in <code>config_defaults.yml</code></p>
+</li>
+<li>
+<p><code>directory</code> in <code>config_defaults.yml</code></p>
+</li>
+<li>
+<p><code>directory/filename</code> in <code>config_defaults.yml</code></p>
+</li>
+<li>
+<p><code>:globals</code> in <code>.sync.yml</code></p>
+</li>
+<li>
+<p><code>directory</code> in <code>.sync.yml</code></p>
+</li>
+<li>
+<p><code>directory/filename</code> in <code>.sync.yml</code></p>
+</li>
+</ol>
+</div>
+<div class="exampleblock">
+<div class="title">Example 1. Value hierarchy</div>
+<div class="content">
+<div class="listingblock">
+<div class="title">config_defaults.yml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">:globals:
+  key: 1
+
+dir:
+  key: 2 <i class="conum" data-value="1"></i><b>(1)</b>
+
+dir/subdir:
+  key: 3
+
+dir/subdir/file:
+  key: a</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">.sync.yml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">:globals:
+  key: 4
+
+dir/subdir:
+  key: 5
+
+dir/subdir/file:
+  key: b <i class="conum" data-value="2"></i><b>(2)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Any file within <code>dir</code> would get the value <code>key=2</code> as there is no override in <code>.sync.yml</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>The <code>dir/subdir/file</code> would get the value <code>key=b</code> since it&#8217;s overriding the key in <code>config_defaults.yml</code>.</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
 <h2 id="_special_values"><a class="anchor" href="#_special_values"></a>Special values</h2>
 <div class="sectionbody">
 <div class="dlist">
@@ -168,10 +245,10 @@ Use this flag in <code>.sync.yml</code> if a repository maintains its own versio
 </table>
 </div>
 <div class="exampleblock">
-<div class="title">Example 1. Special values usage</div>
+<div class="title">Example 2. Special values usage</div>
 <div class="content">
 <div class="listingblock">
-<div class="title">.sync.yml</div>
+<div class="title"><code>.sync.yml</code></div>
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">.editorconfig:
   unmanaged: true <i class="conum" data-value="1"></i><b>(1)</b>
