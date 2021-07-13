@@ -161,20 +161,6 @@ template:
 }</code></pre>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_receivers"><a class="anchor" href="#_receivers"></a>Receivers</h4>
-<div class="sect4">
-<h5 id="_sanitize"><a class="anchor" href="#_sanitize"></a>Sanitize</h5>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func (config *Configuration) Sanitize()</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Sanitize does corrective actions on the configuration hierarchy.</p>
-</div>
-</div>
-</div>
 </div>
 <div class="sect2">
 <h3 id="_projectconfig"><a class="anchor" href="#_projectconfig"></a>ProjectConfig</h3>
@@ -183,6 +169,8 @@ template:
 <pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">type ProjectConfig struct {
     RootDir    string
     Jobs       int
+    Include    string
+    Exclude    string
 }</code></pre>
 </div>
 </div>
@@ -198,6 +186,17 @@ template:
 Requires a minimum of 1, supports a maximum of 8.
 1 basically means that jobs are run in sequence.
 If this number is 2 or greater, then the logs are buffered and only displayed in case of errors.</p>
+</dd>
+<dt class="hdlist1">Include</dt>
+<dd>
+<p>Include is a regex filter that includes repositories only when they match.
+The filter is applied to the whole URL.
+This option is not configurable in <code>greposync.yml</code>.</p>
+</dd>
+<dt class="hdlist1">Exclude</dt>
+<dd>
+<p>Exclude is similar to Include, only that matching repository URLs are skipped.
+This option is not configurable in <code>greposync.yml</code>.</p>
 </dd>
 </dl>
 </div>
@@ -340,87 +339,6 @@ This is often a user or organization name in GitHub.com or GitLab.com.</p>
 <p>RootDir is the path relative to the current workdir where the template files are located.</p>
 </dd>
 </dl>
-</div>
-</div>
-</div>
-</div>
-<h1 id="_package_cli" class="sect0"><a class="anchor" href="#_package_cli"></a>package cli</h1>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">git:
-  commitBranch: ""
-  commitMessage: Update from greposync
-  defaultBranch: ""
-  forcePush: false
-  name: ""
-  namespace: ""
-  skipCommit: false
-  skipPush: false
-  skipReset: false
-log:
-  level: info
-pr:
-  bodyTemplate: This Pull request updates this repository with changes from a greposync template repository.
-  create: false
-  labels: null
-  subject: Update from greposync
-  targetBranch: ""
-project:
-  jobs: 1
-  rootDir: repos
-template:
-  rootDir: template</code></pre>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_structs_2"><a class="anchor" href="#_structs_2"></a>Structs</h2>
-<div class="sectionbody">
-<div class="sect2">
-<h3 id="_cli"><a class="anchor" href="#_cli"></a>Cli</h3>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">type Cli struct {
-}</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Cli implements a urfave/cli command line provider.</p>
-</div>
-<div class="sect3">
-<h4 id="_receivers_2"><a class="anchor" href="#_receivers_2"></a>Receivers</h4>
-<div class="sect4">
-<h5 id="_read"><a class="anchor" href="#_read"></a>Read</h5>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func (p *Cli) Read() (map[string]interface{}, error)</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Read reads the flag variables and returns a nested conf map.</p>
-</div>
-</div>
-<div class="sect4">
-<h5 id="_readbytes"><a class="anchor" href="#_readbytes"></a>ReadBytes</h5>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func (p *Cli) ReadBytes() ([]byte, error)</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>ReadBytes is not supported.</p>
-</div>
-</div>
-<div class="sect4">
-<h5 id="_watch"><a class="anchor" href="#_watch"></a>Watch</h5>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func (p *Cli) Watch(cb func(event interface{}, err error)) error</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Watch is not supported.</p>
-</div>
-</div>
 </div>
 </div>
 </div>
