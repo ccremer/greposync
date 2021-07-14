@@ -92,6 +92,16 @@ func (r *Renderer) applyTemplate(targetPath string, tpl *template.Template, valu
 		r.p.DebugF("Leaving file alone due to 'unmanaged' flag being set: %s", targetPath)
 		return nil
 	}
+	if newTarget := values["Values"].(Values)["targetPath"]; newTarget != nil && newTarget != "" {
+		newPath := newTarget.(string)
+		if strings.HasSuffix(newPath, string(filepath.Separator)) {
+			newPath = path.Clean(path.Join(r.cfg.Git.Dir, newPath, path.Base(targetPath)))
+		} else {
+			newPath = path.Clean(path.Join(r.cfg.Git.Dir, newPath))
+		}
+		r.p.DebugF("Redefining target path from '%s' to '%s", targetPath, newPath)
+		targetPath = newPath
+	}
 	return r.writeFile(targetPath, tpl, values)
 }
 

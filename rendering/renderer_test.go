@@ -160,6 +160,47 @@ func (s *TemplateTestSuite) TestRenderer_GivenDeleteFlag_WhenApplyingTemplate_Th
 	s.Assert().NoFileExists(targetPath)
 }
 
+func (s *TemplateTestSuite) TestRenderer_GivenTargetPath() {
+	tests := map[string]struct {
+		givenTargetDir              string
+		givenOriginalPath           string
+		expectedEffectiveTargetFile string
+	}{
+		"GivenTargetDir_WhenApplyingTemplate_ThenChangeDirectoryButNotFileName": {
+			givenTargetDir:              "dir/",
+			givenOriginalPath:           path.Join(s.TestGitDir, "readme.md"),
+			expectedEffectiveTargetFile: path.Join(s.SeedTargetDir, "dir", "readme.md"),
+		},
+		"GivenTargetPath_WhenApplyingTemplate_ThenChangeFileName": {
+			givenTargetDir:              "dir/newFile.ext",
+			givenOriginalPath:           path.Join(s.TestGitDir, "readme.md"),
+			expectedEffectiveTargetFile: path.Join(s.SeedTargetDir, "dir", "newFile.ext"),
+		},
+	}
+
+	for name, tt := range tests {
+		s.T().Run(name, func(t *testing.T) {
+			r := &Renderer{
+				p: printer.New(),
+				cfg: &cfg.SyncConfig{
+					Git: &cfg.GitConfig{
+						Dir: s.SeedTargetDir,
+					},
+				},
+			}
+			targetPath := path.Join(s.SeedTargetDir, "readme.md")
+			tpl, err := template.New("readme.md").Parse("")
+			require.NoError(t, err)
+			err = r.applyTemplate(targetPath, tpl, Values{
+				"Values": Values{
+					"targetPath": tt.givenTargetDir,
+				}})
+			require.NoError(t, err)
+			assert.FileExists(t, tt.expectedEffectiveTargetFile)
+		})
+	}
+}
+
 func Test_cleanTargetPath(t *testing.T) {
 	tests := map[string]struct {
 		givenPath    string

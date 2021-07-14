@@ -73,6 +73,13 @@ If this flag is set, the target file is not modified.
 
 TIP: Use this flag in `.sync.yml` if a repository maintains its own version of the file outside of {page-component-name}.
 
+`targetPath: <path>`::
+This property can override where the templated file is actually being written to.
+It is relative to the Git root directory.
+
+If the path contains the suffix `/`, the directory is changed but the file name is kept.
+Any parent directories are created as needed, with `0775` permission flags (before `umask`).
+
 .Special values usage
 [example]
 ====
@@ -84,7 +91,11 @@ TIP: Use this flag in `.sync.yml` if a repository maintains its own version of t
 
 Makefile:
   delete: true <2>
+
+subdir/.gitignore:
+  targetPath: newDir/ <3>
 ----
 <1> The repository keeps its own version of `.editorconfig`.
 <2> The repository does not need a `Makefile`.
+<3> Parse the template in `subdir/.gitignore`, but write the output to `newDir/.gitignore` in the repository root.
 ====
