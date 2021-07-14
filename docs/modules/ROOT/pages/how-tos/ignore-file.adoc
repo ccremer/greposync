@@ -1,0 +1,35 @@
+= Ignore file in a repository
+
+❓ Question::
+In a repository I maintain a special version of a file that cannot be easily templated.
+How can I tell {page-component-name} to ignore this file?
+
+📝 Use case::
+Normally I have `Makefile` in the template but in `example-repository` that file is too deviating to be managed by the template.
+
+'''
+
+💡 Solution::
+Add the `unmanaged: true` special value to a file.
+{page-component-name} will not touch that file when updating.
++
+.`.sync.yml` in `example-repository`
+[source,yaml]
+----
+Makefile:
+  unmanaged: true
+----
++
+[TIP]
+====
+You can ignore whole directories when appending `/` to the path:
+
+[source,yaml]
+----
+my-dir/:
+  unmanaged: true
+----
+====
+
+🔗 Reference::
+* xref:references/sync-config.adoc[Sync config syntax]

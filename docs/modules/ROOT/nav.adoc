@@ -4,6 +4,10 @@
 .Tutorials
 
 .How To
+* xref:how-tos/inherit-value.adoc[Inherit values in directories]
+* xref:how-tos/ignore-file.adoc[Ignore file in a repository]
+* xref:how-tos/delete-file.adoc[Remove file in a specific repository]
+* xref:how-tos/delete-files.adoc[Remove files in all repositories]
 * xref:how-tos/migrate-from-modulesync.adoc[Migrate from ModuleSync]
 
 .Technical reference

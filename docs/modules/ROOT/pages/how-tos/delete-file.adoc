@@ -1,0 +1,38 @@
+= Remove file in a specific repository
+
+❓ Question::
+In my template, I have a file that I don't need in a particular Git repository.
+Rendering an empty file is not sufficient.
+How can tell {page-component-name} to not create that file?
+
+📝 Use case::
+Normally I have `.github/workflows/test.yml` in the template but in `example-repository` that file shouldn't exist.
+
+'''
+
+💡 Solution::
+Add the `delete: true` special value to a file.
+{page-component-name} will delete that file when updating.
++
+.`.sync.yml` in `example-repository`
+[source,yaml]
+----
+.github/workflows/test.yml:
+  delete: true
+----
++
+[TIP]
+====
+You can delete whole directories when appending `/` to the path:
+
+[source,yaml]
+----
+my-dir/:
+  delete: true
+----
+Be aware though, that it only applies to files that are in the template.
+"Foreign" files are not being deleted.
+====
+
+🔗 Reference::
+* xref:references/sync-config.adoc[Sync config syntax]

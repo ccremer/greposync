@@ -12,14 +12,16 @@ GitHub create PR, ✔️,  ✔️
 GitHub update PR, ❌, ✔️
 GitLab create PR, ✔️, ❌
 GitLab update PR, ❌, ❌
+PullRequest template, ❌, ✔️
 Pre-Commit script, ✔️, ❌
-Default git namespace, ✔️, ✔️
-Default git base url, ✔️, ✔️
+Default git namespace and base URL, ✔️, ✔️
 Template Defaults, ✔️, ✔️
-Per repository overrides, ✔️, ✔️
+Per repository template value overrides, ✔️, ✔️
+Per file path overrides, ❌, ✔️
+Per directory path overrides, ❌, ✔️
 Hooks, ✔️, ❌
 CLI help, ✔️, ✔️
-Filtering repositories, ✔️,
+Filtering repositories, ✔️, ✔️
 Dry run, ✔️, ✔️
 Changelog, ✔️, ❌
 |===
@@ -42,5 +44,4 @@ Feature, ModuleSync, greposync
 Template engine, ERB, gotemplate
 Installation, Gemfile, "single binary, Docker, gomodule, apk, deb, rpm"
 Deep-merge YAML, ❌, ✔️
-PullRequest template, ❌, ✔️
 |===
