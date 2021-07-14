@@ -1,0 +1,30 @@
+= Remove obsolete files in all repositories
+
+❓ Question::
+I need to clean up a file in all managed repositories.
+How can I mass-delete it?
+
+📝 Use case::
+I am migrating from Travis CI to GitHub actions.
+I don't need `.travis.yml` anymore.
+
+'''
+
+💡 Solution::
+Add the `delete: true` special value to the file.
+{page-component-name} will delete that file in each repository when updating.
++
+.`config_defaults.yml` in template repository
+[source,yaml]
+----
+.travis.yml:
+  delete: true
+----
++
+[TIP]
+====
+Repositories that still need this file (e.g. for legacy reasons) can set `delete: false` in their `.sync.yml`.
+====
+
+🔗 Reference::
+* xref:references/sync-config.adoc[Sync config syntax]

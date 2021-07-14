@@ -1,0 +1,38 @@
+= Inherit values for all files in directory
+
+❓ Question::
+When templating, I want to provide default values for all files in a directory.
+How can I inherit a value to my file?
+
+📝 Use case::
+I have numerous files in `.github/workflows` but I want all to have the same variable.
++
+.`config_defaults.yml` in template repository
+[source,yaml]
+----
+.github/workflows/release.yml:
+  defaultBranch: main
+.github/workflows/test.yml:
+  defaultBranch: main
+# etc.
+----
+
+'''
+
+💡 Solution::
+You can declare a variable to apply to a directory using the following syntax.
++
+.`config_defaults.yml` in template repository
+[source,yaml]
+----
+.github/workflows/: <1>
+  defaultBranch: main <2>
+.github/workflows/build.yml:
+  defaultBranch: develop <3>
+----
+<1> Specify which directory with `/` suffix.
+<2> Every file within `.github/workflows` receives the same value for `defaultBranch`...
+<3> ...unless a specific file overrides this again.
+
+🔗 Reference::
+* xref:references/sync-config.adoc[Sync config syntax]
