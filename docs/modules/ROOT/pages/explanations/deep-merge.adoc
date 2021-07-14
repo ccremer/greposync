@@ -4,7 +4,6 @@ Template configuration from `config_defaults.yml` is merged with the config from
 
 There are a few rules of deep merging:
 
-. The config from `.sync.yml` takes precendence over `config_defaults.yml`.
 . Any array is being replaced entirely.
 . The value type of a key can be overwritten.
 . Keys not affected stay unchanged even in nested structures (except arrays).
@@ -64,3 +63,5 @@ README.md:
 <3> Value type changed from `boolean` to `object`
 <4> Array is replaced
 ====
+
+NOTE: See xref:references/sync-config.adoc[Sync config reference] for more details.
