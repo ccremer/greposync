@@ -8,10 +8,10 @@ The following hierarchy of merging and inheriting values is applied.
 The last element in the list is overwriting anything defined before.
 
 . `:globals` in `{global-defaults}`
-. `directory` in `{global-defaults}`
+. `directory/` in `{global-defaults}`
 . `directory/filename` in `{global-defaults}`
 . `:globals` in `{sync-yml}`
-. `directory` in `{sync-yml}`
+. `directory/` in `{sync-yml}`
 . `directory/filename` in `{sync-yml}`
 
 .Value hierarchy
@@ -23,10 +23,10 @@ The last element in the list is overwriting anything defined before.
 :globals:
   key: 1
 
-dir:
+dir/:
   key: 2 <1>
 
-dir/subdir:
+dir/subdir/:
   key: 3
 
 dir/subdir/file:
@@ -39,7 +39,7 @@ dir/subdir/file:
 :globals:
   key: 4
 
-dir/subdir:
+dir/subdir/:
   key: 5
 
 dir/subdir/file:
@@ -47,6 +47,13 @@ dir/subdir/file:
 ----
 <1> Any file within `dir` would get the value `key=2` as there is no override in `{sync-yml}`.
 <2> The `dir/subdir/file` would get the value `key=b` since it's overriding the key in `{global-defaults}`.
+====
+
+[NOTE]
+====
+* Specifying `/` as the top dir to apply values is not supported.
+  Use `:globals` for that purpose.
+* Appending the `/` suffix to a directory is necessary, otherwise they are interpreted as files.
 ====
 
 == Special values
@@ -66,6 +73,13 @@ If this flag is set, the target file is not modified.
 
 TIP: Use this flag in `.sync.yml` if a repository maintains its own version of the file outside of {page-component-name}.
 
+`targetPath: <path>`::
+This property can override where the templated file is actually being written to.
+It is relative to the Git root directory.
+
+If the path contains the suffix `/`, the directory is changed but the file name is kept.
+Any parent directories are created as needed, with `0775` permission flags (before `umask`).
+
 .Special values usage
 [example]
 ====
@@ -77,7 +91,11 @@ TIP: Use this flag in `.sync.yml` if a repository maintains its own version of t
 
 Makefile:
   delete: true <2>
+
+subdir/.gitignore:
+  targetPath: newDir/ <3>
 ----
 <1> The repository keeps its own version of `.editorconfig`.
 <2> The repository does not need a `Makefile`.
+<3> Parse the template in `subdir/.gitignore`, but write the output to `newDir/.gitignore` in the repository root.
 ====

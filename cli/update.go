@@ -171,6 +171,7 @@ func (c *UpdateCommand) createPipeline(r *repository.Service) *pipeline.Pipeline
 			predicate.ToStep("pull", r.Pull(), r.EnabledReset()),
 		).AsNestedStep("prepare workspace"),
 		pipeline.NewStep("render templates", renderer.RenderTemplateDir()),
+		pipeline.NewStep("cleanup unwanted files", renderer.DeleteUnwantedFiles()),
 		predicate.WrapIn(pipeline.NewPipelineWithLogger(logger).WithSteps(
 			pipeline.NewStep("add", r.Add()),
 			pipeline.NewStep("commit", r.Commit()),

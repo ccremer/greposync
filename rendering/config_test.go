@@ -78,7 +78,7 @@ func TestRenderer_loadDataForFile(t *testing.T) {
 			givenFileName: "subdir/README.md",
 			givenValues: Values{
 				":globals": Values{"key": "variable"},
-				"subdir": Values{
+				"subdir/": Values{
 					"intermediate": "value",
 				},
 				"subdir/README.md": Values{
@@ -89,17 +89,36 @@ func TestRenderer_loadDataForFile(t *testing.T) {
 			expectedValues: Values{
 				"key": Values{
 					"nested": "key"},
-				"intermediate": "value"},
+				"intermediate": "value",
+			},
+		},
+		"GivenSubDirectoryInWrongSyntax_WhenBuildingVarsForFile_ThenIgnoreInvalidValues": {
+			givenFileName: "subdir/README.md",
+			givenValues: Values{
+				":globals": Values{"key": "variable"},
+				"subdir": Values{
+					"intermediate": "value",
+				},
+				"subdir/README.md": Values{
+					"key": Values{
+						"nested": "key",
+					}},
+			},
+			expectedValues: Values{
+				"key": Values{
+					"nested": "key",
+				},
+			},
 		},
 		"GivenMultipleSubDirectories_WhenBuildingVarsForFile_ThenMergeSubDirectoryValues": {
 			givenFileName: "subdir1/subdir2/README.md",
 			givenValues: Values{
 				":globals": Values{"key": "variable"},
-				"subdir1": Values{
+				"subdir1/": Values{
 					"intermediate1": "foo",
 					"override":      "to-be-overridden",
 				},
-				"subdir1/subdir2": Values{
+				"subdir1/subdir2/": Values{
 					"intermediate2": "bar",
 					"override":      "inherited",
 				},

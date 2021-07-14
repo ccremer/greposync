@@ -37,6 +37,10 @@ func (r *Renderer) loadDataForFile(fileName string) (Values, error) {
 	// Load the top-dir first (if any), then subdirs, then file-specific variables into values
 	for _, segment := range segments {
 		filePath = path.Join(filePath, segment)
+		// Values applicable for directories are in the form of "my-dir/", otherwise they could be files.
+		if filePath != fileName {
+			filePath += string(filepath.Separator)
+		}
 		err = r.k.Unmarshal(filePath, &data)
 		if err != nil {
 			return data, err

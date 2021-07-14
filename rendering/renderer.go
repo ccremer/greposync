@@ -82,15 +82,21 @@ func (r *Renderer) processTemplate(originalTemplatePath string, tpl *template.Te
 
 func (r *Renderer) applyTemplate(targetPath string, tpl *template.Template, values Values) error {
 	if values["Values"].(Values)["delete"] == true {
-		if fileExists(targetPath) {
-			r.p.DebugF("Deleting file due to 'delete' flag being set: %s", targetPath)
-			return os.Remove(targetPath)
-		}
-		return nil
+		return r.deleteFileIfExists(targetPath)
 	}
 	if values["Values"].(Values)["unmanaged"] == true {
-		r.p.DebugF("Leaving file alone due to 'unmanaged' flag being set: %s", targetPath)
+		r.p.InfoF("Leaving file alone due to 'unmanaged' flag being set: %s", targetPath)
 		return nil
+	}
+	if newTarget := values["Values"].(Values)["targetPath"]; newTarget != nil && newTarget != "" {
+		newPath := newTarget.(string)
+		if strings.HasSuffix(newPath, string(filepath.Separator)) {
+			newPath = path.Clean(path.Join(r.cfg.Git.Dir, newPath, path.Base(targetPath)))
+		} else {
+			newPath = path.Clean(path.Join(r.cfg.Git.Dir, newPath))
+		}
+		r.p.DebugF("Redefining target path from '%s' to '%s", targetPath, newPath)
+		targetPath = newPath
 	}
 	return r.writeFile(targetPath, tpl, values)
 }
