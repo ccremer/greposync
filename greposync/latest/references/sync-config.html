@@ -127,7 +127,7 @@ The last element in the list is overwriting anything defined before.</p>
 <p><code>:globals</code> in <code>config_defaults.yml</code></p>
 </li>
 <li>
-<p><code>directory</code> in <code>config_defaults.yml</code></p>
+<p><code>directory/</code> in <code>config_defaults.yml</code></p>
 </li>
 <li>
 <p><code>directory/filename</code> in <code>config_defaults.yml</code></p>
@@ -136,7 +136,7 @@ The last element in the list is overwriting anything defined before.</p>
 <p><code>:globals</code> in <code>.sync.yml</code></p>
 </li>
 <li>
-<p><code>directory</code> in <code>.sync.yml</code></p>
+<p><code>directory/</code> in <code>.sync.yml</code></p>
 </li>
 <li>
 <p><code>directory/filename</code> in <code>.sync.yml</code></p>
@@ -152,10 +152,10 @@ The last element in the list is overwriting anything defined before.</p>
 <pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">:globals:
   key: 1
 
-dir:
+dir/:
   key: 2 <i class="conum" data-value="1"></i><b>(1)</b>
 
-dir/subdir:
+dir/subdir/:
   key: 3
 
 dir/subdir/file:
@@ -168,7 +168,7 @@ dir/subdir/file:
 <pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">:globals:
   key: 4
 
-dir/subdir:
+dir/subdir/:
   key: 5
 
 dir/subdir/file:
@@ -188,6 +188,28 @@ dir/subdir/file:
 </table>
 </div>
 </div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="ulist">
+<ul>
+<li>
+<p>Specifying <code>/</code> as the top dir to apply values is not supported.
+Use <code>:globals</code> for that purpose.</p>
+</li>
+<li>
+<p>Appending the <code>/</code> suffix to a directory is necessary, otherwise they are interpreted as files.</p>
+</li>
+</ul>
+</div>
+</td>
+</tr>
+</table>
 </div>
 </div>
 </div>
@@ -244,6 +266,19 @@ Use this flag in <code>.sync.yml</code> if a repository maintains its own versio
 </tr>
 </table>
 </div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>targetPath: &lt;path&gt;</code></dt>
+<dd>
+<p>This property can override where the templated file is actually being written to.
+It is relative to the Git root directory.</p>
+</dd>
+</dl>
+</div>
+<div class="paragraph">
+<p>If the path contains the suffix <code>/</code>, the directory is changed but the file name is kept.
+Any parent directories are created as needed, with <code>0775</code> permission flags (before <code>umask</code>).</p>
+</div>
 <div class="exampleblock">
 <div class="title">Example 2. Special values usage</div>
 <div class="content">
@@ -254,7 +289,10 @@ Use this flag in <code>.sync.yml</code> if a repository maintains its own versio
   unmanaged: true <i class="conum" data-value="1"></i><b>(1)</b>
 
 Makefile:
-  delete: true <i class="conum" data-value="2"></i><b>(2)</b></code></pre>
+  delete: true <i class="conum" data-value="2"></i><b>(2)</b>
+
+subdir/.gitignore:
+  targetPath: newDir/ <i class="conum" data-value="3"></i><b>(3)</b></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -266,6 +304,10 @@ Makefile:
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
 <td>The repository does not need a <code>Makefile</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Parse the template in <code>subdir/.gitignore</code>, but write the output to <code>newDir/.gitignore</code> in the repository root.</td>
 </tr>
 </table>
 </div>
