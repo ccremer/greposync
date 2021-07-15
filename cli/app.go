@@ -54,12 +54,14 @@ func CreateCLI(version, commit, date string) {
 		},
 	}
 	updateCommand := NewUpdateCommand(config)
+	initCommand := NewInitCommand()
 	app = &cli.App{
 		Name:                 "greposync",
 		Usage:                "git-repo-sync: Shameless reimplementation of ModuleSync in Go",
 		Version:              fmt.Sprintf("%s, commit %s, date %s", version, commit[0:7], t.Format(dateLayout)),
 		EnableBashCompletion: true,
 		Commands: []*cli.Command{
+			initCommand.createInitCommand(),
 			updateCommand.createUpdateCommand(),
 		},
 		Compiled: t,

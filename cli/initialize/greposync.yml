@@ -1,0 +1,21 @@
+# This is the main config file for greposync
+# Visit the documentation at https://ccremer.github.io/greposync
+
+git:
+  # Branch name in which to make commits
+  commitBranch: greposync
+  # Commit message when updating a repository
+  commitMessage: Update from greposync
+  # Whether to use force-push. Required when using --amend
+  forcePush: false
+  # The default owner or organization name
+  namespace: ""
+pr:
+  bodyTemplate: This Pull request updates this repository with changes from a greposync template repository.
+  # Enable this flag to create and update pull requests
+  create: false
+  # Labels to attach to the pull request
+  labels:
+  - greposync
+  subject: Update from greposync
+  targetBranch: ""

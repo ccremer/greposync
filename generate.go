@@ -15,11 +15,19 @@ import (
 )
 
 func main() {
-	config := cfg.NewDefaultConfig()
+	createExampleConfig()
+}
 
-	bytes, err := yaml.Marshal(config)
+func createExampleConfig() {
+	exampleConfig := cfg.NewDefaultConfig()
+
+	bytes, err := yaml.Marshal(exampleConfig)
 	exit(err)
-	exit(ioutil.WriteFile(os.Getenv("GODOC_YAML_DEFAULTS_PATH"), bytes, 0775))
+	writeFile(os.Getenv("GODOC_YAML_DEFAULTS_PATH"), bytes)
+}
+
+func writeFile(path string, bytes []byte) {
+	exit(ioutil.WriteFile(path, bytes, 0775))
 }
 
 func exit(err error) {
