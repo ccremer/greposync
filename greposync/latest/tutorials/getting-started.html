@@ -3,8 +3,8 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Configuration deep merge :: greposync docs</title>
-    <link rel="canonical" href="http://localhost/greposync/latest/explanations/deep-merge.html">
+    <title>Getting started :: greposync docs</title>
+    <link rel="canonical" href="http://localhost/greposync/latest/tutorials/getting-started.html">
     <meta name="generator" content="Antora 2.3.4">
     <link rel="stylesheet" href="../../../_/css/site.css">
     <script>var uiRootPath = '../../../_'</script>
@@ -41,8 +41,8 @@
     <button class="nav-item-toggle"></button>
     <span class="nav-text">Tutorials</span>
 <ul class="nav-list">
-  <li class="nav-item" data-depth="1">
-    <a class="nav-link" href="../tutorials/getting-started.html">Getting started</a>
+  <li class="nav-item is-current-page" data-depth="1">
+    <a class="nav-link" href="getting-started.html">Getting started</a>
   </li>
 </ul>
   </li>
@@ -86,11 +86,11 @@
     <button class="nav-item-toggle"></button>
     <span class="nav-text">Explanation</span>
 <ul class="nav-list">
-  <li class="nav-item is-current-page" data-depth="1">
-    <a class="nav-link" href="deep-merge.html">Configuration deep merge</a>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../explanations/deep-merge.html">Configuration deep merge</a>
   </li>
   <li class="nav-item" data-depth="1">
-    <a class="nav-link" href="feature-comparison.html">Feature comparison with ModuleSync</a>
+    <a class="nav-link" href="../explanations/feature-comparison.html">Feature comparison with ModuleSync</a>
   </li>
 </ul>
   </li>
@@ -123,130 +123,159 @@
 <nav class="breadcrumbs" aria-label="breadcrumbs">
   <ul>
     <li><a href="../index.html">greposync</a></li>
-    <li>Explanation</li>
-    <li><a href="deep-merge.html">Configuration deep merge</a></li>
+    <li>Tutorials</li>
+    <li><a href="getting-started.html">Getting started</a></li>
   </ul>
 </nav>
-  <div class="edit-this-page"><a href="https://github.com/ccremer/greposync/edit/master/docs/modules/ROOT/pages/explanations/deep-merge.adoc">Edit this Page</a></div>
+  <div class="edit-this-page"><a href="https://github.com/ccremer/greposync/edit/master/docs/modules/ROOT/pages/tutorials/getting-started.adoc">Edit this Page</a></div>
   </div>
   <div class="content">
 <aside class="toc sidebar" data-title="Contents" data-levels="2">
   <div class="toc-menu"></div>
 </aside>
 <article class="doc">
-<h1 class="page">Configuration deep merge</h1>
-<div class="paragraph">
-<p>Template configuration from <code>config_defaults.yml</code> is merged with the config from <code>.sync.yml</code>.</p>
+<h1 class="page">Getting started</h1>
+<div id="preamble">
+<div class="sectionbody">
+<div class="dlist">
+<dl>
+<dt class="hdlist1">🏁 Goals</dt>
+<dd>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Set up a template repository</p>
+</li>
+<li>
+<p>Onboard a managed repository</p>
+</li>
+<li>
+<p>Commit the changes</p>
+</li>
+</ol>
+</div>
+</dd>
+</dl>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_prerequisites"><a class="anchor" href="#_prerequisites"></a>Prerequisites</h2>
+<div class="sectionbody">
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Currently, only Linux is supported.
+</td>
+</tr>
+</table>
 </div>
 <div class="paragraph">
-<p>There are a few rules of deep merging:</p>
+<p>You need the following tools installed in your <code>$PATH</code>.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>git</code></p>
+</li>
+<li>
+<p><code>gsync</code></p>
+</li>
+<li>
+<p><code>editor</code> (Your favorite text editor)</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Additionally, you need the following.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>A user account on github.com</p>
+</li>
+<li>
+<p><a href="https://github.com/settings/keys">SSH key</a> associated with your GitHub account.
+See <a href="https://docs.github.com/en/github/authenticating-to-github/connecting-to-github-with-ssh">this article</a> if you need help.</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>For the purpose of this guide, following repository names are being used:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>greposync-control</code>: The repository containing the config and templates.</p>
+</li>
+<li>
+<p><code>my-repository</code>: The test repository which we are going to be managing with greposync</p>
+</li>
+</ul>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_setup_template_repository"><a class="anchor" href="#_setup_template_repository"></a>Setup template repository</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In the first step, we&#8217;re going to initialize a Git repository that contains the template.</p>
 </div>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>Any array is being replaced entirely.</p>
+<p>Create a new repository called <code>greposync-control</code> in <a href="https://github.com/new">GitHub</a></p>
 </li>
 <li>
-<p>The value type of a key can be overwritten.</p>
+<p>Clone the new repository</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">git clone &lt;git-url&gt;</code></pre>
+</div>
+</div>
 </li>
 <li>
-<p>Keys not affected stay unchanged even in nested structures (except arrays).</p>
+<p>Initialize greposync</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">cd greposync-control
+gsync init</code></pre>
+</div>
+</div>
 </li>
 </ol>
 </div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
 <div class="paragraph">
-<p>You should at least be familiar with the behaviour, as this greatly affects template development.
-This is a major difference from ModuleSync.</p>
-</div>
-</td>
-</tr>
-</table>
-</div>
-<div class="exampleblock">
-<div class="title">Example 1. Merge behaviour example</div>
-<div class="content">
-<div class="listingblock">
-<div class="title">config_defaults.yml</div>
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">README.md:
-  title: My file name
-  features:
-    documentation: true
-    contributions: false
-  homepages:
-    - www.example.com
-    - github.com/example/project</code></pre>
-</div>
+<p>And that&#8217;s it!
+You should now see a structure similar to the following:</p>
 </div>
 <div class="listingblock">
-<div class="title">.sync.yml</div>
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">README.md:
-  title: My custom title
-  features:
-    contributions:
-      members:
-        - Alice
-        - Bob
-  homepages:
-    - gitlab.com</code></pre>
-</div>
-</div>
-<div class="listingblock">
-<div class="title">Deep merged config</div>
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">README.md:
-  title: My custom title <i class="conum" data-value="1"></i><b>(1)</b>
-  features:
-    documentation: true <i class="conum" data-value="2"></i><b>(2)</b>
-    contributions: <i class="conum" data-value="3"></i><b>(3)</b>
-      members:
-        - Alice
-        - Bob
-  homepages: <i class="conum" data-value="4"></i><b>(4)</b>
-    - gitlab.com</code></pre>
-</div>
-</div>
-<div class="colist arabic">
-<table>
-<tr>
-<td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>String is overridden</td>
-</tr>
-<tr>
-<td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>Value stays unchanged</td>
-</tr>
-<tr>
-<td><i class="conum" data-value="3"></i><b>3</b></td>
-<td>Value type changed from <code>boolean</code> to <code>object</code></td>
-</tr>
-<tr>
-<td><i class="conum" data-value="4"></i><b>4</b></td>
-<td>Array is replaced</td>
-</tr>
-</table>
+<pre class="highlightjs highlight"><code class="language-console hljs" data-lang="console">greposync-control
+├── config_defaults.yml
+├── greposync.yml
+├── managed_repos.yml
+└── template
+    ├── _helpers.tpl
+    └── README.adoc</code></pre>
 </div>
 </div>
 </div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-See <a href="../references/sync-config.html" class="page">Sync config reference</a> for more details.
-</td>
-</tr>
-</table>
 </div>
 </article>
   </div>
