@@ -9,8 +9,6 @@
 
 == Prerequisites
 
-NOTE: Currently, only Linux is supported.
-
 You need the following tools installed in your `$PATH`.
 
 * `git`
