@@ -2,6 +2,7 @@
 * https://github.com/ccremer/greposync/releases[Changelog,window=_blank]
 
 .Tutorials
+* xref:tutorials/getting-started.adoc[Getting started]
 
 .How To
 * xref:how-tos/inherit-value.adoc[Inherit values in directories]

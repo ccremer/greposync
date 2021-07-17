@@ -1,0 +1,13 @@
+# This is the config file for greposync that defines default values
+# Visit the documentation at https://ccremer.github.io/greposync
+
+:globals:
+  name: my-repository
+  comment: |
+    # This file is managed by greposync.
+    # Do not modify manually.
+    # Adjust variables in `.sync.yml`.
+
+README.adoc:
+  description: My awesome, greposync managed repository
+  commentPrefix: "// "
