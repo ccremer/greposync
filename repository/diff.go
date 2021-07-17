@@ -12,6 +12,10 @@ func (s *Service) Diff() pipeline.ActionFunc {
 	return func() pipeline.Result {
 		out, stderr, err := s.execGitCommand(s.logArgs("diff", "HEAD~1")...)
 		if err != nil {
+			if strings.Contains(stderr, "ambiguous argument 'HEAD~1': unknown revision or path not in the working tree.") {
+				s.p.InfoF("This is the first commit, no diff available.")
+				return pipeline.Result{}
+			}
 			return s.toResult(err, stderr)
 		}
 		s.prettyPrint(out)
