@@ -1,0 +1,69 @@
+= Getting started
+:control-repo: greposync-control
+:managed-repo: my-repository
+
+🏁 Goals::
+. Set up a template repository
+. Onboard a managed repository
+. Commit the changes
+
+== Prerequisites
+
+NOTE: Currently, only Linux is supported.
+
+You need the following tools installed in your `$PATH`.
+
+* `git`
+* `gsync`
+* `editor` (Your favorite text editor)
+
+Additionally, you need the following.
+
+* A user account on github.com
+* https://github.com/settings/keys[SSH key] associated with your GitHub account.
+  See https://docs.github.com/en/github/authenticating-to-github/connecting-to-github-with-ssh[this article] if you need help.
+
+[NOTE]
+====
+For the purpose of this guide, following repository names are being used:
+
+- `{control-repo}`: The repository containing the config and templates.
+- `{managed-repo}`: The test repository which we are going to be managing with {page-component-title}
+====
+
+== Setup template repository
+
+In the first step, we're going to initialize a Git repository that contains the template.
+
+. Create a new repository called `{control-repo}` in https://github.com/new[GitHub]
+
+. Clone the new repository
++
+[source,bash]
+----
+git clone <git-url>
+----
+
+. Initialize {page-component-name}
++
+[source,bash,subs="attributes+"]
+----
+cd {control-repo}
+gsync init
+----
+
+And that's it!
+You should now see a structure similar to the following:
+
+[source,console,subs="attributes+"]
+----
+{control-repo}
+├── config_defaults.yml
+├── greposync.yml
+├── managed_repos.yml
+└── template
+    ├── _helpers.tpl
+    └── README.adoc
+----
+
+// There is more to come here!
