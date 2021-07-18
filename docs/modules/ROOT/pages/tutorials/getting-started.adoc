@@ -1,11 +1,12 @@
 = Getting started
-:control-repo: greposync-control
+:control-repo: {page-component-name}-control
 :managed-repo: my-repository
 
 🏁 Goals::
 . Set up a template repository
 . Onboard a managed repository
-. Commit the changes
+. Render the templates
+. Influence templates
 
 == Prerequisites
 
@@ -34,6 +35,8 @@ For the purpose of this guide, following repository names are being used:
 In the first step, we're going to initialize a Git repository that contains the template.
 
 . Create a new repository called `{control-repo}` in https://github.com/new[GitHub]
++
+IMPORTANT: Select `Add a README file` option, as we need an initial commit in a branch.
 
 . Clone the new repository
 +
@@ -49,10 +52,9 @@ git clone <git-url>
 cd {control-repo}
 gsync init
 ----
-
-And that's it!
++
 You should now see a structure similar to the following:
-
++
 [source,console,subs="attributes+"]
 ----
 {control-repo}
@@ -64,4 +66,169 @@ You should now see a structure similar to the following:
     └── README.md
 ----
 
-// There is more to come here!
+. Add your user account name to `git.namespace` in `greposync.yml`
++
+[source,bash,subs="attributes+"]
+----
+editor greposync.yml
+----
+
+== Onboard a managed repository
+
+. Create a new repository called `{managed-repo}` in https://github.com/new[GitHub]
+
+. Configure `managed_repos.yml` _(Optional)_
++
+[source,bash,subs="attributes+"]
+----
+editor managed_repos.yml
+----
++
+[NOTE]
+====
+This step is required if you didn't name your repository `{managed-repo}`.
+`{managed-repo}` is the default in `managed_repos.yml` when doing `gsync init`.
+====
+
+== Render the templates
+
+. Run {page-component-title}
++
+[source,bash,subs="attributes+"]
+----
+gsync update --dry-run=commit
+----
++
+[NOTE]
+====
+There is a warning about a missing `.sync.yml`.
+We will add this file in a later step.
+====
+
+. Inspect the directory structure
++
+{page-component-name} has created a directory named `repos`.
+Your current directory should have the following structure:
++
+[source,console,subs="attributes+"]
+----
+{control-repo}
+├── config_defaults.yml
+├── greposync.yml
+├── managed_repos.yml
+├── repos
+│   └── github.com
+│       └── <github-namespace>
+│           └── my-repository
+│               └── README.md
+└── template
+    ├── _helpers.tpl
+    └── README.md
+----
+
+. Inspect the result
++
+[source,bash]
+----
+cat repos/github.com/*/my-repository/README.md
+----
++
+.Output
+[source,markdown]
+----
+<!--
+This file is managed by greposync.
+Do not modify manually.
+Adjust variables in `.sync.yml`.
+
+-->
+# my-repository
+
+My awesome, greposync managed repository
+----
+
+== Influence templates
+
+. Create the `.sync.yml` file and override a value.
++
+[source,bash]
+----
+pushd repos/github.com/*/my-repository &> /dev/null
+cat <<EOF > .sync.yml
+README.md:
+  description: This is my new description!
+EOF
+git add -A
+git commit -m "Add .sync.yml"
+popd &> /dev/null
+----
++
+[NOTE]
+====
+We didn't just randomly add a `description` field.
+The template in `template/README.md.tpl` actually has `{{ .Values.description }}` at the end.
+This tells the template engine to place our new value there, which in turn is coming from `config_defaults.yml` as a default value.
+Since we want to override the description for this repository, we provide it through `.sync.yml` that now lives in `{managed-repo}` itself.
+====
+
+. Run {page-component-title} again
++
+[source,bash,subs="attributes+"]
+----
+gsync update --dry-run=commit
+----
+
+== Inspect the result
+
+. Inspect the updated README
++
+[source,bash]
+----
+cat repos/github.com/*/my-repository/README.md
+----
++
+.Output
+[source,markdown]
+----
+<!--
+This file is managed by greposync.
+Do not modify manually.
+Adjust variables in `.sync.yml`.
+
+-->
+# my-repository
+
+This is my new description!
+----
+
+. Inspect the Git log
++
+[source,bash]
+----
+pushd repos/github.com/*/my-repository &> /dev/null
+GIT_PAGER=cat git log --oneline
+popd &> /dev/null
+----
++
+.Example Output
+[source]
+----
+3637433 (HEAD -> greposync) Update from greposync
+e6f6b79 Add .sync.yml
+4bb2b9f Update from greposync
+16ef4fe (origin/main, origin/HEAD, main) Initial commit
+----
+
+That's cool, right?
+
+[discrete]
+== Tutorial complete!
+
+🏆 Learnings::
+. You know how to initialize a new template repository.
+. You understand the configuration files and directory structure.
+. You know how you can affect the final rendered file of a template using the `.sync.yml` file.
+
+📌 Where to go next::
+* xref:references/sync-config.adoc[Reference: Sync configuration]
+* xref:references/template.adoc[Reference: Template]
