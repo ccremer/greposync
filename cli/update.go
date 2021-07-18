@@ -176,8 +176,8 @@ func (c *UpdateCommand) createPipeline(r *repository.Service) *pipeline.Pipeline
 			pipeline.NewStep("add", r.Add()),
 			pipeline.NewStep("commit", r.Commit()),
 			pipeline.NewStep("show diff", r.Diff()),
-			predicate.ToStep("push", r.PushToRemote(), r.EnabledPush()),
-		).AsNestedStep("push changes"), predicate.And(r.EnabledCommit(), r.Dirty())),
+		).AsNestedStep("commit changes"), predicate.And(r.EnabledCommit(), r.Dirty())),
+		predicate.ToStep("push changes", r.PushToRemote(), r.EnabledPush()),
 		predicate.WrapIn(pipeline.NewPipelineWithLogger(logger).WithSteps(
 			pipeline.NewStep("render pull request template", renderer.RenderPrTemplate()),
 			pipeline.NewStep("create or update pull request", r.CreateOrUpdatePr(config.PullRequest)),

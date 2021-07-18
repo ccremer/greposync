@@ -65,7 +65,7 @@ func NewServicesFromFile(config *cfg.Configuration) ([]*Service, error) {
 			Config: &cfg.GitConfig{
 				Dir:           path.Clean(path.Join(config.Project.RootDir, strings.ReplaceAll(u.Hostname(), ":", "-"), u.Path)),
 				Url:           u,
-				ForcePush:     true,
+				ForcePush:     config.Git.ForcePush,
 				SkipReset:     config.Git.SkipReset,
 				SkipPush:      config.Git.SkipPush,
 				SkipCommit:    config.Git.SkipCommit,
