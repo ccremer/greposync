@@ -1,5 +1,5 @@
 {{- template "comment" . -}}
 
-= {{ .Values.name }}
+# {{ .Values.name }}
 
 {{ .Values.description }}
