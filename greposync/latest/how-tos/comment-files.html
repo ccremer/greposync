@@ -3,8 +3,8 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Remove file in a specific repository :: greposync docs</title>
-    <link rel="canonical" href="http://localhost/greposync/latest/how-tos/delete-file.html">
+    <title>Add comment headers to files :: greposync docs</title>
+    <link rel="canonical" href="http://localhost/greposync/latest/how-tos/comment-files.html">
     <meta name="generator" content="Antora 2.3.4">
     <link rel="stylesheet" href="../../../_/css/site.css">
     <script>var uiRootPath = '../../../_'</script>
@@ -59,13 +59,13 @@
   <li class="nav-item" data-depth="1">
     <a class="nav-link" href="ignore-file.html">Ignore file in a repository</a>
   </li>
-  <li class="nav-item is-current-page" data-depth="1">
+  <li class="nav-item" data-depth="1">
     <a class="nav-link" href="delete-file.html">Remove file in a specific repository</a>
   </li>
   <li class="nav-item" data-depth="1">
     <a class="nav-link" href="delete-files.html">Remove files in all repositories</a>
   </li>
-  <li class="nav-item" data-depth="1">
+  <li class="nav-item is-current-page" data-depth="1">
     <a class="nav-link" href="comment-files.html">Add comment headers</a>
   </li>
   <li class="nav-item" data-depth="1">
@@ -130,28 +130,29 @@
   <ul>
     <li><a href="../index.html">greposync</a></li>
     <li>How To</li>
-    <li><a href="delete-file.html">Remove file in a specific repository</a></li>
+    <li><a href="comment-files.html">Add comment headers</a></li>
   </ul>
 </nav>
-  <div class="edit-this-page"><a href="https://github.com/ccremer/greposync/edit/master/docs/modules/ROOT/pages/how-tos/delete-file.adoc">Edit this Page</a></div>
+  <div class="edit-this-page"><a href="https://github.com/ccremer/greposync/edit/master/docs/modules/ROOT/pages/how-tos/comment-files.adoc">Edit this Page</a></div>
   </div>
   <div class="content">
 <aside class="toc sidebar" data-title="Contents" data-levels="2">
   <div class="toc-menu"></div>
 </aside>
 <article class="doc">
-<h1 class="page">Remove file in a specific repository</h1>
+<h1 class="page">Add comment headers to files</h1>
 <div class="dlist">
 <dl>
 <dt class="hdlist1">❓ Question</dt>
 <dd>
-<p>In my template, I have a file that I don&#8217;t need in a particular Git repository.
-Rendering an empty file is not sufficient.
-How can tell greposync to not create that file?</p>
+<p>For every templated file I want to add a comment header.
+Not all files have the same commenting syntax.
+How can I add such comments?</p>
 </dd>
 <dt class="hdlist1">📝 Use case</dt>
 <dd>
-<p>Normally I have <code>.github/workflows/test.yml</code> in the template but in <code>example-repository</code> that file shouldn&#8217;t exist.</p>
+<p>Files should contain comments indicating that users shouldn&#8217;t modify the file at hand.
+If greposync runs again, it would overwrite their changes.</p>
 </dd>
 </dl>
 </div>
@@ -160,38 +161,72 @@ How can tell greposync to not create that file?</p>
 <dl>
 <dt class="hdlist1">💡 Solution</dt>
 <dd>
-<p>Add the <code>delete: true</code> special value to a file.
-greposync will delete that file when updating.</p>
+<p>Add the <code>_helpers.tpl</code> file to the template directory.
+It could contain the following content:</p>
 <div class="listingblock">
-<div class="title"><code>.sync.yml</code> in <code>example-repository</code></div>
+<div class="title">template/_helpers.tpl</div>
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">.github/workflows/test.yml:
-  delete: true</code></pre>
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">{{- define "comment" -}}
+{{- if .Values.comment.text }}
+{{- with .Values.comment.open -}}
+{{ . }}
+{{ end -}}
+{{- with .Values.comment.text -}}
+{{ $.Values.comment.prefix }}{{ . | splitList "\n" | join (cat "\n" $.Values.comment.prefix | replace "\n " "\n") }}
+{{ end }}
+{{- with .Values.comment.closed -}}
+{{ . }}
+{{ end -}}
+{{- end -}}
+{{- end -}}</code></pre>
 </div>
 </div>
-<div class="admonitionblock tip">
+<div class="paragraph">
+<p>Configure the globals so that it allows flexible prefixes or enclosed comments.</p>
+</div>
+<div class="listingblock">
+<div class="title">config_defaults.yml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">:globals:
+  comment:
+    text: | <i class="conum" data-value="1"></i><b>(1)</b>
+      This file is managed by greposync.
+      Do not modify manually.
+      Adjust variables in `.sync.yml`.
+    prefix: ""
+    open: &lt;!--
+    closed: --&gt;</code></pre>
+</div>
+</div>
+<div class="colist arabic">
 <table>
 <tr>
-<td class="icon">
-<i class="fa icon-tip" title="Tip"></i>
-</td>
-<td class="content">
-<div class="paragraph">
-<p>You can delete whole directories when appending <code>/</code> to the path:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">my-dir/:
-  delete: true</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Be aware though, that it only applies to files that are in the template.
-"Foreign" files are not being deleted.</p>
-</div>
-</td>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Simply setting <code>text=""</code> will disable the comment.</td>
 </tr>
 </table>
+</div>
+<div class="listingblock">
+<div class="title">template/README.md.tpl</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-markdown hljs" data-lang="markdown">{{- template "comment" . -}}
+# managed-repository</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This results in a file rendered like this:</p>
+</div>
+<div class="listingblock">
+<div class="title">README.md</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-markdown hljs" data-lang="markdown">&lt;!--
+This file is managed by greposync.
+Do not modify manually.
+Adjust variables in `.sync.yml`.
+
+--&gt;
+# managed-repository</code></pre>
+</div>
 </div>
 </dd>
 <dt class="hdlist1">🔗 Reference</dt>
@@ -200,6 +235,9 @@ greposync will delete that file when updating.</p>
 <ul>
 <li>
 <p><a href="../references/sync-config.html" class="page">Sync config syntax</a></p>
+</li>
+<li>
+<p><a href="../references/template.html" class="page">Go template</a></p>
 </li>
 </ul>
 </div>

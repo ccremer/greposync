@@ -44,6 +44,9 @@
   <li class="nav-item is-current-page" data-depth="1">
     <a class="nav-link" href="getting-started.html">Getting started</a>
   </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="create-pr.html">Create a PR</a>
+  </li>
 </ul>
   </li>
   <li class="nav-item" data-depth="0">
@@ -61,6 +64,9 @@
   </li>
   <li class="nav-item" data-depth="1">
     <a class="nav-link" href="../how-tos/delete-files.html">Remove files in all repositories</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../how-tos/comment-files.html">Add comment headers</a>
   </li>
   <li class="nav-item" data-depth="1">
     <a class="nav-link" href="../how-tos/migrate-from-modulesync.html">Migrate from ModuleSync</a>
@@ -150,7 +156,10 @@
 <p>Onboard a managed repository</p>
 </li>
 <li>
-<p>Commit the changes</p>
+<p>Render the templates</p>
+</li>
+<li>
+<p>Influence templates</p>
 </li>
 </ol>
 </div>
@@ -228,6 +237,18 @@ See <a href="https://docs.github.com/en/github/authenticating-to-github/connecti
 <ol class="arabic">
 <li>
 <p>Create a new repository called <code>greposync-control</code> in <a href="https://github.com/new">GitHub</a></p>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+Select <code>Add a README file</code> option, as we need an initial commit in a branch.
+</td>
+</tr>
+</table>
+</div>
 </li>
 <li>
 <p>Clone the new repository</p>
@@ -245,12 +266,8 @@ See <a href="https://docs.github.com/en/github/authenticating-to-github/connecti
 gsync init</code></pre>
 </div>
 </div>
-</li>
-</ol>
-</div>
 <div class="paragraph">
-<p>And that&#8217;s it!
-You should now see a structure similar to the following:</p>
+<p>You should now see a structure similar to the following:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -262,6 +279,268 @@ You should now see a structure similar to the following:</p>
     ├── _helpers.tpl
     └── README.md</code></pre>
 </div>
+</div>
+</li>
+<li>
+<p>Add your user account name to <code>git.namespace</code> in <code>greposync.yml</code></p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">editor greposync.yml</code></pre>
+</div>
+</div>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_onboard_a_managed_repository"><a class="anchor" href="#_onboard_a_managed_repository"></a>Onboard a managed repository</h2>
+<div class="sectionbody">
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Create a new repository called <code>my-repository</code> in <a href="https://github.com/new">GitHub</a></p>
+</li>
+<li>
+<p>Configure <code>managed_repos.yml</code> <em>(Optional)</em></p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">editor managed_repos.yml</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>This step is required if you didn&#8217;t name your repository <code>my-repository</code>.
+<code>my-repository</code> is the default in <code>managed_repos.yml</code> when doing <code>gsync init</code>.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_render_the_templates"><a class="anchor" href="#_render_the_templates"></a>Render the templates</h2>
+<div class="sectionbody">
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Run greposync</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">gsync update --dry-run=commit</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>There is a warning about a missing <code>.sync.yml</code>.
+We will add this file in a later step.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</li>
+<li>
+<p>Inspect the directory structure</p>
+<div class="paragraph">
+<p>greposync has created a directory named <code>repos</code>.
+Your current directory should have the following structure:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-console hljs" data-lang="console">greposync-control
+├── config_defaults.yml
+├── greposync.yml
+├── managed_repos.yml
+├── repos
+│   └── github.com
+│       └── &lt;github-namespace&gt;
+│           └── my-repository
+│               └── README.md
+└── template
+    ├── _helpers.tpl
+    └── README.md</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>Inspect the result</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">cat repos/github.com/*/my-repository/README.md</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Output</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-markdown hljs" data-lang="markdown">&lt;!--
+This file is managed by greposync.
+Do not modify manually.
+Adjust variables in `.sync.yml`.
+
+--&gt;
+# my-repository
+
+My awesome, greposync managed repository</code></pre>
+</div>
+</div>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_influence_templates"><a class="anchor" href="#_influence_templates"></a>Influence templates</h2>
+<div class="sectionbody">
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Create the <code>.sync.yml</code> file and override a value.</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">pushd repos/github.com/*/my-repository &amp;&gt; /dev/null
+cat &lt;&lt;EOF &gt; .sync.yml
+README.md:
+  description: This is my new description!
+EOF
+git add -A
+git commit -m "Add .sync.yml"
+popd &amp;&gt; /dev/null</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>We didn&#8217;t just randomly add a <code>description</code> field.
+The template in <code>template/README.md.tpl</code> actually has <code>{{ .Values.description }}</code> at the end.
+This tells the template engine to place our new value there, which in turn is coming from <code>config_defaults.yml</code> as a default value.
+Since we want to override the description for this repository, we provide it through <code>.sync.yml</code> that now lives in <code>my-repository</code> itself.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</li>
+<li>
+<p>Run greposync again</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">gsync update --dry-run=commit</code></pre>
+</div>
+</div>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_inspect_the_result"><a class="anchor" href="#_inspect_the_result"></a>Inspect the result</h2>
+<div class="sectionbody">
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Inspect the updated README</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">cat repos/github.com/*/my-repository/README.md</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Output</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-markdown hljs" data-lang="markdown">&lt;!--
+This file is managed by greposync.
+Do not modify manually.
+Adjust variables in `.sync.yml`.
+
+--&gt;
+# my-repository
+
+This is my new description!</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>Inspect the Git log</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">pushd repos/github.com/*/my-repository &amp;&gt; /dev/null
+GIT_PAGER=cat git log --oneline
+popd &amp;&gt; /dev/null</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Example Output</div>
+<div class="content">
+<pre class="highlightjs highlight"><code>3637433 (HEAD -&gt; greposync) Update from greposync
+e6f6b79 Add .sync.yml
+4bb2b9f Update from greposync
+16ef4fe (origin/main, origin/HEAD, main) Initial commit</code></pre>
+</div>
+</div>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>That&#8217;s cool, right?</p>
+</div>
+<h2 id="_tutorial_complete" class="discrete">Tutorial complete!</h2>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">🏆 Learnings</dt>
+<dd>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>You know how to initialize a new template repository.</p>
+</li>
+<li>
+<p>You understand the configuration files and directory structure.</p>
+</li>
+<li>
+<p>You know how you can affect the final rendered file of a template using the <code>.sync.yml</code> file.</p>
+</li>
+</ol>
+</div>
+</dd>
+<dt class="hdlist1">📌 Where to go next</dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="create-pr.html" class="page">Tutorial: Create a pull request</a></p>
+</li>
+<li>
+<p><a href="../references/sync-config.html" class="page">Reference: Sync configuration</a></p>
+</li>
+<li>
+<p><a href="../references/template.html" class="page">Reference: Template</a></p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
 </div>
 </div>
 </div>
