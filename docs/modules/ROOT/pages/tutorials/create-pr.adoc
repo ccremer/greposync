@@ -1,0 +1,115 @@
+= Create a pull request
+:control-repo: {page-component-name}-control
+:managed-repo: my-repository
+
+🏁 Goals::
+. Push an update to GitHub
+. Create a new pull request
+
+[NOTE]
+====
+This tutorial continues where xref:tutorials/getting-started.adoc[Getting started] left.
+Be sure to complete that one first!
+====
+
+== Prerequisites
+
+You need the following tools installed in your `$PATH`.
+
+* `git`
+* `gsync`
+* `editor` (Your favorite text editor)
+
+Additionally, you need the following.
+
+* A user account on github.com
+* https://github.com/settings/keys[SSH key] associated with your GitHub account.
+  See https://docs.github.com/en/github/authenticating-to-github/connecting-to-github-with-ssh[this article] if you need help.
+* https://github.com/settings/tokens[Personal Access Token (PAT)] to authenticate with GitHub API.
+  Following scopes are required:
+  - repo
+  - workflow
+
+.Export the PAT
+[source,bash]
+----
+export GITHUB_TOKEN=<your-github-token>
+----
+
+[NOTE]
+====
+For the purpose of this guide, following repository names are being used:
+
+- `{control-repo}`: The repository containing the config and templates.
+- `{managed-repo}`: The test repository which we are going to be managing with {page-component-title}
+====
+
+== Push an update to GitHub
+
+. Run {page-component-name} again, but this time also push to remote
++
+[source,bash]
+----
+gsync update --dry-run=push
+----
+
+. Inspect the Git log
++
+[source,bash]
+----
+pushd repos/github.com/*/my-repository &> /dev/null
+GIT_PAGER=cat git log --oneline
+popd &> /dev/null
+----
++
+.Example Output
+[source,subs="attributes+"]
+----
+3637433 (HEAD -> {page-component-name}, origin/{page-component-name}) Update from {page-component-name} <1>
+e6f6b79 Add .sync.yml
+4bb2b9f Update from {page-component-name}
+16ef4fe (origin/main, origin/HEAD, main) Initial commit
+----
+<1> As you now can see, we have pushed the branch to origin.
+
+== Create a new pull request
+
+. Edit `greposync.yml` and set `pr.create=true`
++
+[source,bash]
+----
+editor greposync.yml
+----
+
+. Run {page-component-name} again, but this time no more dry run
++
+[source,bash]
+----
+gsync update
+----
+
+== Inspect the result
+
+The update command should have printed the URL of your new pull request.
+Visit the pull request on github.com and verify that it correctly applied the following settings:
+
+- Subject
+- Description
+- Labels
+
+[TIP]
+====
+If the commit branch and target branch stay unchanged, {page-component-name} should find and update the same pull request when you re-run the update with modifications.
+====
+
+[discrete]
+== Tutorial complete!
+
+🏆 Learnings::
+. You understand branches in {page-component-name} context.
+. You know how to push branches to remote repositories.
+. You know how to create a pull request on GitHub.
+
+📌 Where to go next::
+* xref:references/sync-config.adoc[Reference: Sync configuration]
+* xref:references/template.adoc[Reference: Template]

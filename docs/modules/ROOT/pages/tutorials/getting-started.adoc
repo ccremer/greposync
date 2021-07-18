@@ -230,5 +230,6 @@ That's cool, right?
 . You know how you can affect the final rendered file of a template using the `.sync.yml` file.
 
 📌 Where to go next::
+* xref:tutorials/create-pr.adoc[Tutorial: Create a pull request]
 * xref:references/sync-config.adoc[Reference: Sync configuration]
 * xref:references/template.adoc[Reference: Template]
