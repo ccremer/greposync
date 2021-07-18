@@ -61,7 +61,7 @@ You should now see a structure similar to the following:
 ├── managed_repos.yml
 └── template
     ├── _helpers.tpl
-    └── README.adoc
+    └── README.md
 ----
 
 // There is more to come here!

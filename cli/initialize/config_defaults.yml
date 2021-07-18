@@ -3,11 +3,14 @@
 
 :globals:
   name: my-repository
-  comment: |
-    # This file is managed by greposync.
-    # Do not modify manually.
-    # Adjust variables in `.sync.yml`.
+  comment:
+    text: |
+      This file is managed by greposync.
+      Do not modify manually.
+      Adjust variables in `.sync.yml`.
+    prefix: ""
+    open: <!--
+    closed: -->
 
-README.adoc:
+README.md:
   description: My awesome, greposync managed repository
-  commentPrefix: "// "

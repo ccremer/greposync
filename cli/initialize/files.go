@@ -10,7 +10,7 @@ import (
 var (
 	//go:embed _helpers.tpl
 	helperTpl []byte
-	//go:embed README.adoc.tpl
+	//go:embed README.md.tpl
 	readmeTpl []byte
 
 	//go:embed greposync.yml
@@ -27,7 +27,7 @@ var (
 	}
 	templateFiles = map[string][]byte{
 		"template/_helpers.tpl": helperTpl,
-		"template/README.adoc":  readmeTpl,
+		"template/README.md":    readmeTpl,
 	}
 )
 
