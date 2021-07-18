@@ -1,0 +1,49 @@
+= Add comment headers to files
+
+❓ Question::
+For every templated file I want to add a comment header.
+Not all files have the same commenting syntax.
+How can I add such comments?
+
+📝 Use case::
+Files should contain comments indicating that users shouldn't modify the file at hand.
+If {page-component-name} runs again, it would overwrite their changes.
+
+'''
+
+💡 Solution::
+Add the `_helpers.tpl` file to the template directory.
+It could contain the following content:
++
+.template/_helpers.tpl
+[source,go]
+----
+include::example$comment/helpers.tpl[]
+----
++
+Configure the globals so that it allows flexible prefixes or enclosed comments.
++
+.config_defaults.yml
+[source,yaml,subs="attributes+"]
+----
+include::example$comment/config.yaml[]
+----
+<1> Simply setting `text=""` will disable the comment.
++
+.template/README.md.tpl
+[source,markdown]
+----
+include::example$comment/template.md[]
+----
++
+This results in a file rendered like this:
++
+.README.md
+[source,markdown]
+----
+include::example$comment/result.md[]
+----
+
+🔗 Reference::
+* xref:references/sync-config.adoc[Sync config syntax]
+* xref:references/template.adoc[Go template]
