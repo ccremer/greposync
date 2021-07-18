@@ -25,6 +25,7 @@ generate: export GODOC_YAML_DEFAULTS_PATH = $(GOASCIIDOC_OUT_YAML_EXAMPLE_PATH)
 generate:
 	go generate -tags=generate generate.go
 	$(GOASCIIDOC_CMD) cfg
+	cp cli/initialize/_helpers.tpl docs/modules/ROOT/examples/comment/helpers.tpl
 
 .PHONY: fmt
 fmt: ## Run 'go fmt' against code
