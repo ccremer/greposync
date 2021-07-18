@@ -23,7 +23,7 @@ import (
 const (
 	dryRunFlagName         = "dry-run"
 	prCreateFlagName       = "pr-create"
-	prBodyFlagName         = "pr-body"
+	prBodyFlagName         = "pr-bodyTemplate"
 	amendFlagName          = "git-amend"
 	projectIncludeFlagName = "project-include"
 	projectExcludeFlagName = "project-exclude"

@@ -22,6 +22,7 @@ func (s *Service) CreateOrUpdatePr(config *cfg.PullRequestConfig) pipeline.Actio
 			CommitBranch: s.Config.CommitBranch,
 			TargetBranch: config.TargetBranch,
 			Body:         config.BodyTemplate,
+			Labels:       config.Labels,
 		}
 		gh := github.NewProvider(c)
 		return pipeline.Result{Err: gh.CreateOrUpdatePr()}

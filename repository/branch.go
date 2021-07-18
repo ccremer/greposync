@@ -22,7 +22,7 @@ func (s *Service) CheckoutBranch() pipeline.ActionFunc {
 		if localExists, err := s.localBranchExists(s.Config.CommitBranch); err != nil {
 			return pipeline.Result{Err: err}
 		} else if !localExists {
-			args = append(args, "-b")
+			args = append(args, "-t", "-b")
 		}
 		args = append(args, s.Config.CommitBranch)
 

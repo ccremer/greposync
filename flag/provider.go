@@ -2,6 +2,7 @@ package flag
 
 import (
 	"errors"
+	"strings"
 
 	"github.com/knadh/koanf"
 	"github.com/knadh/koanf/maps"
@@ -10,23 +11,26 @@ import (
 
 // Cli implements a urfave/cli command line provider.
 type Cli struct {
-	delim string
-	ko    *koanf.Koanf
-	ctx   *cli.Context
+	delim   string
+	koDelim string
+	ko      *koanf.Koanf
+	ctx     *cli.Context
 }
 
 /*
-Provider returns a commandline flags provider that returns a nested map[string]interface{} where the nesting hierarchy of keys are defined by delim.
-For instance, the delim "." will convert the flag name `parent.child.key: 1` to `{parent: {child: {key: 1}}}`.
+Provider returns a commandline flags provider that returns a nested map[string]interface{} where the nesting hierarchy of keys are defined by flagDelim.
+For instance, the flagDelim "." will convert the flag name `parent.child.key: 1` to `{parent: {child: {key: 1}}}`.
 It takes an optional (but recommended) Koanf instance to see if the the flags defined have been set from other providers, for instance, a config file.
 If they are not, then the default values of the flags are merged.
 If they do exist, the flag values are not merged but only the values that have been explicitly set in the command line are merged.
+koDelim is the delimiter passed to ko (if non-nil) and must be the same.
 */
-func Provider(ctx *cli.Context, delim string, ko *koanf.Koanf) *Cli {
+func Provider(ctx *cli.Context, flagDelim string, ko *koanf.Koanf, koDelim string) *Cli {
 	return &Cli{
-		delim: delim,
-		ko:    ko,
-		ctx:   ctx,
+		delim:   flagDelim,
+		ko:      ko,
+		koDelim: koDelim,
+		ctx:     ctx,
 	}
 }
 
@@ -44,7 +48,8 @@ func (p *Cli) Read() (map[string]interface{}, error) {
 		// it should not override the value in the conf map (if it exists in the first place).
 		if !p.ctx.IsSet(flagName) {
 			if p.ko != nil {
-				if p.ko.Exists(flagName) {
+				newFlag := strings.ReplaceAll(flagName, p.delim, p.koDelim)
+				if p.ko.Exists(newFlag) {
 					continue
 				}
 			} else {
