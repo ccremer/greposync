@@ -69,6 +69,9 @@
     <a class="nav-link" href="../how-tos/comment-files.html">Add comment headers</a>
   </li>
   <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../how-tos/sync-labels.html">Sync labels in all repositories</a>
+  </li>
+  <li class="nav-item" data-depth="1">
     <a class="nav-link" href="../how-tos/migrate-from-modulesync.html">Migrate from ModuleSync</a>
   </li>
 </ul>
@@ -166,6 +169,7 @@ pr:
 project:
   jobs: 1
   rootDir: repos
+repositoryLabels: null
 template:
   rootDir: template</code></pre>
 </div>
@@ -180,11 +184,12 @@ template:
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">type Configuration struct {
-    Project        *ProjectConfig
-    Log            *LogConfig
-    PullRequest    *PullRequestConfig
-    Template       *TemplateConfig
-    Git            *GitConfig
+    Project             *ProjectConfig
+    Log                 *LogConfig
+    PullRequest         *PullRequestConfig
+    Template            *TemplateConfig
+    Git                 *GitConfig
+    RepositoryLabels    map[string]RepositoryLabel
 }</code></pre>
 </div>
 </div>
@@ -274,6 +279,39 @@ If empty, the CommitMessage is used.</p>
 <dt class="hdlist1">Subject</dt>
 <dd>
 <p>Subject is the Pull Request title.</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_repositorylabel"><a class="anchor" href="#_repositorylabel"></a>RepositoryLabel</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">type RepositoryLabel struct {
+    Name           string
+    Description    string
+    Color          string
+    Delete         bool
+}</code></pre>
+</div>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">Name</dt>
+<dd>
+<p>Name is the label name.</p>
+</dd>
+<dt class="hdlist1">Description</dt>
+<dd>
+<p>Description is a short description of the label.</p>
+</dd>
+<dt class="hdlist1">Color</dt>
+<dd>
+<p>Color is the hexadecimal color code for the label, without the leading #.</p>
+</dd>
+<dt class="hdlist1">Delete</dt>
+<dd>
+<p>Delete will remove this label.</p>
 </dd>
 </dl>
 </div>
