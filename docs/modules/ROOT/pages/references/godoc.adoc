@@ -15,13 +15,16 @@ include::example$config.yaml[]
 [source, go]
 ----
 type Configuration struct {
-    Project        *ProjectConfig
-    Log            *LogConfig
-    PullRequest    *PullRequestConfig
-    Template       *TemplateConfig
-    Git            *GitConfig
+    Project             *ProjectConfig
+    Log                 *LogConfig
+    PullRequest         *PullRequestConfig
+    Template            *TemplateConfig
+    Git                 *GitConfig
+    RepositoryLabels    map[string]RepositoryLabel
 }
 ----
+
+
 
 
 
@@ -120,6 +123,34 @@ If empty, the CommitMessage is used.
 
 Subject::
 Subject is the Pull Request title.
+
+
+
+
+
+=== RepositoryLabel
+[source, go]
+----
+type RepositoryLabel struct {
+    Name           string
+    Description    string
+    Color          string
+    Delete         bool
+}
+----
+
+
+Name::
+Name is the label name.
+
+Description::
+Description is a short description of the label.
+
+Color::
+Color is the hexadecimal color code for the label, without the leading #.
+
+Delete::
+Delete will remove this label.
 
 
 
