@@ -21,12 +21,10 @@ import (
 )
 
 const (
-	dryRunFlagName         = "dry-run"
-	prCreateFlagName       = "pr-create"
-	prBodyFlagName         = "pr-bodyTemplate"
-	amendFlagName          = "git-amend"
-	projectIncludeFlagName = "project-include"
-	projectExcludeFlagName = "project-exclude"
+	dryRunFlagName   = "dry-run"
+	prCreateFlagName = "pr-create"
+	prBodyFlagName   = "pr-bodyTemplate"
+	amendFlagName    = "git-amend"
 )
 
 var (
@@ -61,14 +59,8 @@ func (c *UpdateCommand) createUpdateCommand() *cli.Command {
 		Action: c.runUpdateCommand,
 		Before: c.validateUpdateCommand,
 		Flags: combineWithGlobalFlags(
-			&cli.StringFlag{
-				Name:  projectIncludeFlagName,
-				Usage: "Includes only repositories in the update that match the given filter (regex).",
-			},
-			&cli.StringFlag{
-				Name:  projectExcludeFlagName,
-				Usage: "Excludes repositories from updating that match the given filter (regex). Repositories matching both include and exclude filter are still excluded.",
-			},
+			projectIncludeFlag,
+			projectExcludeFlag,
 			&cli.StringFlag{
 				Name:    dryRunFlagName,
 				Aliases: []string{"d"},
@@ -180,6 +172,7 @@ func (c *UpdateCommand) createPipeline(r *repository.Service) *pipeline.Pipeline
 		predicate.ToStep("push changes", r.PushToRemote(), r.EnabledPush()),
 		predicate.WrapIn(pipeline.NewPipelineWithLogger(logger).WithSteps(
 			pipeline.NewStep("render pull request template", renderer.RenderPrTemplate()),
+			pipeline.NewStep("prepare API", r.InitializeGitHubProvider(config.PullRequest)),
 			pipeline.NewStep("create or update pull request", r.CreateOrUpdatePr(config.PullRequest)),
 		).AsNestedStep("pull request"), predicate.Bool(sc.PullRequest.Create)),
 		pipeline.NewStep("end", func() pipeline.Result {

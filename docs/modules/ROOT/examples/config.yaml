@@ -19,5 +19,6 @@ pr:
 project:
   jobs: 1
   rootDir: repos
+repositoryLabels: null
 template:
   rootDir: template

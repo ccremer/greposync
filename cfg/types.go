@@ -7,11 +7,12 @@ import (
 type (
 	// Configuration holds a strongly-typed tree of the main configuration
 	Configuration struct {
-		Project     *ProjectConfig     `json:"project" koanf:"project"`
-		Log         *LogConfig         `json:"log" koanf:"log"`
-		PullRequest *PullRequestConfig `json:"pr" koanf:"pr"`
-		Template    *TemplateConfig    `json:"template" koanf:"template"`
-		Git         *GitConfig         `json:"git" koanf:"git"`
+		Project          *ProjectConfig             `json:"project" koanf:"project"`
+		Log              *LogConfig                 `json:"log" koanf:"log"`
+		PullRequest      *PullRequestConfig         `json:"pr" koanf:"pr"`
+		Template         *TemplateConfig            `json:"template" koanf:"template"`
+		Git              *GitConfig                 `json:"git" koanf:"git"`
+		RepositoryLabels map[string]RepositoryLabel `json:"repositoryLabels" koanf:"repositoryLabels"`
 	}
 	// ProjectConfig configures the project
 	ProjectConfig struct {
@@ -52,6 +53,17 @@ type (
 		BodyTemplate string `json:"bodyTemplate" koanf:"bodyTemplate"`
 		// Subject is the Pull Request title.
 		Subject string `json:"subject" koanf:"subject"`
+	}
+	// RepositoryLabel is a struct describing a Label on a Git hosting service like GitHub.
+	RepositoryLabel struct {
+		// Name is the label name.
+		Name string `json:"name" koanf:"name"`
+		// Description is a short description of the label.
+		Description string `json:"description" koanf:"description"`
+		// Color is the hexadecimal color code for the label, without the leading #.
+		Color string `json:"color" koanf:"color"`
+		// Delete will remove this label.
+		Delete bool `json:"delete" koanf:"delete"`
 	}
 
 	// SyncConfig configures a single repository sync

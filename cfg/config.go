@@ -36,7 +36,7 @@ func ParseConfig(configPath string, config *Configuration, ctx *cli.Context) err
 	}
 
 	// CLI flags
-	if err := koanfInstance.Load(flag.Provider(ctx, "-", koanfInstance, "."), nil); err != nil {
+	if err := koanfInstance.Load(flag.Provider(ctx, "-", koanfInstance), nil); err != nil {
 		return err
 	}
 
