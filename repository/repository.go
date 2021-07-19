@@ -10,6 +10,7 @@ import (
 
 	"github.com/ccremer/greposync/cfg"
 	"github.com/ccremer/greposync/printer"
+	"github.com/ccremer/greposync/repository/github"
 	"github.com/knadh/koanf"
 	"github.com/knadh/koanf/parsers/yaml"
 	"github.com/knadh/koanf/providers/file"
@@ -19,8 +20,9 @@ import (
 type (
 	// Service represents a git repository that comes with utility methods
 	Service struct {
-		p      printer.Printer
-		Config *cfg.GitConfig
+		p        printer.Printer
+		Config   *cfg.GitConfig
+		provider *github.Provider
 	}
 	// ManagedGitRepo is the representation of the managed git repos in the config file.
 	ManagedGitRepo struct {
