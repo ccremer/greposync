@@ -11,6 +11,7 @@
 * xref:how-tos/delete-file.adoc[Remove file in a specific repository]
 * xref:how-tos/delete-files.adoc[Remove files in all repositories]
 * xref:how-tos/comment-files.adoc[Add comment headers]
+* xref:how-tos/sync-labels.adoc[Sync labels in all repositories]
 * xref:how-tos/migrate-from-modulesync.adoc[Migrate from ModuleSync]
 
 .Technical reference

@@ -1,0 +1,46 @@
+= Sync labels in all repositories
+
+❓ Question::
+I want to apply the same set of labels on all repositories.
+How do I do that?
+
+📝 Use case::
+If all repositories have the same set of label names, colors and descriptions, it will make managing those easier.
+Especially useful in cases where a changelog is being created from pull requests that are categorized by labels.
+
+'''
+
+💡 Solution::
+Prepare config to manage repository labels:
++
+.{page-component-name}.yml
+[source,yaml]
+----
+repositoryLabels:
+  greposync:
+    name: greposync <1>
+    color: FFFFFF <2>
+    description: An update by greposync
+  goodfirstissue:
+    name: good first issue
+    delete: true <3>
+----
+<1> Required property `name`
+<2> Set a hexadecimal color without leading `#`
+<3> Delete the label by the given name (`.name` is still required)
++
+[NOTE]
+====
+The names in the `repositoryLabels` are irrelevant for {page-component-name} as they are transformed into an array.
+But they may later be useful when deep merging with overrides per repository (not implemented).
+====
++
+Run the `labels` subcommand:
++
+[source,bash]
+----
+gsync labels
+----
+
+🔗 Reference::
+* xref:references/greposync.adoc[{page-component-name}.yml]
