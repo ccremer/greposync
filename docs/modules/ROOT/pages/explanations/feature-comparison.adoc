@@ -19,6 +19,7 @@ Template Defaults, ✔️, ✔️
 Per repository template value overrides, ✔️, ✔️
 Per file path overrides, ❌, ✔️
 Per directory path overrides, ❌, ✔️
+Synchronize issue labels, ❌, ✔️
 Hooks, ✔️, ❌
 CLI help, ✔️, ✔️
 Filtering repositories, ✔️, ✔️

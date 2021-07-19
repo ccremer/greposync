@@ -13,12 +13,26 @@ image::docs/modules/ROOT/assets/images/overview.drawio.svg[]
 Documentation::
 https://ccremer.github.io/greposync[ccremer.github.io/greposync,window=_blank]
 
+== Why should you use this?
+
+This tool is for you if you have lots of Git repositories that are somewhat alike, but not quite the same.
+These days, CI/CD is almost as natural as unit tests.
+They are often part of the repository itself, as "Infrastructure as Code".
+However, it's difficult to manage those configurations.
+You will probably have many repositories that share the same config files over and over.
+
+If you are in such a situation, then `greposync` is for you.
+The heart of `greposync` is the template repository, where every file is a template ready to be applied for each Git repository.
+But it does quite a bit more than just `for each repo; do cp; done`.
+The templates can be customized with custom values.
+Either there are default parameters, or they can be coming from the repositories itself, so that each Git repo can control how the template is actually written.
+
 == Project status
 
 This project in its current status is in heavy development.
 It got triggered by the lack of deep-merging YAML in modulesync configs and limitations in ERB templates.
 It got inspired by Helm's templating mechanisms.
-Most features are untested yet ("it works on my machine").
+Though it can be used already, you should expect breaking changes.
 
 == The name
 
