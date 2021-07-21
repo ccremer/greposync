@@ -27,3 +27,10 @@ func (s *Service) EnabledPush() predicate.Predicate {
 		return !s.Config.SkipPush
 	}
 }
+
+// IfBranchHasCommits returns true if the local commit branch has at least 1 commit.
+func (s *Service) IfBranchHasCommits() predicate.Predicate {
+	return func(step pipeline.Step) bool {
+		return s.branchHasCommits()
+	}
+}

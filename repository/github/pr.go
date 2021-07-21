@@ -2,6 +2,7 @@ package github
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/google/go-github/v37/github"
 )
@@ -64,6 +65,10 @@ func (p *Provider) createPR(c *PrConfig) (err error) {
 
 	pr, resp, err := p.client.PullRequests.Create(p.ctx, p.cfg.RepoOwner, p.cfg.Repo, newPR)
 	if err != nil {
+		if strings.Contains(err.Error(), "No commits between") {
+			p.log.InfoF("No pull request created as there are no commits between '%s' and '%s'", c.TargetBranch, c.CommitBranch)
+			return nil
+		}
 		return err
 	}
 	p.setRemainingApiCalls(resp)
