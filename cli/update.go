@@ -169,12 +169,12 @@ func (c *UpdateCommand) createPipeline(r *repository.Service) *pipeline.Pipeline
 			pipeline.NewStep("commit", r.Commit()),
 			pipeline.NewStep("show diff", r.Diff()),
 		).AsNestedStep("commit changes"), predicate.And(r.EnabledCommit(), r.Dirty())),
-		predicate.ToStep("push changes", r.PushToRemote(), r.EnabledPush()),
+		predicate.ToStep("push changes", r.PushToRemote(), predicate.And(r.EnabledPush(), r.IfBranchHasCommits())),
 		predicate.WrapIn(pipeline.NewPipelineWithLogger(logger).WithSteps(
 			pipeline.NewStep("render pull request template", renderer.RenderPrTemplate()),
 			pipeline.NewStep("prepare API", r.InitializeGitHubProvider(config.PullRequest)),
 			pipeline.NewStep("create or update pull request", r.CreateOrUpdatePr(config.PullRequest)),
-		).AsNestedStep("pull request"), predicate.Bool(sc.PullRequest.Create)),
+		).AsNestedStep("pull request"), predicate.And(r.IfBranchHasCommits(), predicate.Bool(sc.PullRequest.Create))),
 		pipeline.NewStep("end", func() pipeline.Result {
 			log.InfoF("Pipeline for '%s/%s' finished", sc.Git.Namespace, sc.Git.Name)
 			return pipeline.Result{}
