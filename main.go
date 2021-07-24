@@ -13,6 +13,5 @@ var (
 )
 
 func main() {
-	cli.CreateCLI(version, commit, date)
-	cli.Run()
+	cli.NewApp(version, commit, date).Run()
 }
