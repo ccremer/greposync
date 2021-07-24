@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/ccremer/greposync/cfg"
+	"github.com/ccremer/greposync/cli/flags"
 	"github.com/ccremer/greposync/cli/initialize"
 	"github.com/ccremer/greposync/cli/labels"
 	"github.com/ccremer/greposync/cli/update"
@@ -14,12 +15,8 @@ import (
 )
 
 var (
-	app         *cli.App
-	config      *cfg.Configuration
-	// ConfigDefaultName is the fallback file name of the YAML file containing the default template values.
-	ConfigDefaultName = "config_defaults.yml"
-	// GrepoSyncFileName is the default file name of the YAML file containing the main settings.
-	GrepoSyncFileName = "greposync.yml"
+	app    *cli.App
+	config *cfg.Configuration
 )
 
 func CreateCLI(version, commit, date string) {
@@ -28,6 +25,7 @@ func CreateCLI(version, commit, date string) {
 	printer.CheckIfError(err)
 
 	config = cfg.NewDefaultConfig()
+	flags.InitGlobalFlags(config)
 	app = &cli.App{
 		Name:                 "greposync",
 		Usage:                "git-repo-sync: Shameless reimplementation of ModuleSync in Go",

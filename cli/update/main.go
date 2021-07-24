@@ -110,27 +110,32 @@ func (c *Command) createPipeline(r *repository.Service) *pipeline.Pipeline {
 	logger := printer.PipelineLogger{Logger: log}
 	p := pipeline.NewPipelineWithLogger(logger)
 	p.WithSteps(
-		pipeline.NewPipelineWithLogger(logger).WithSteps(
-			predicate.ToStep("clone repository", r.CloneGitRepository(), predicate.Bool(!gitDirExists)),
-			pipeline.NewStep("determine default branch", r.GetDefaultBranch()),
-			predicate.ToStep("fetch", r.Fetch(), r.EnabledReset()),
-			predicate.ToStep("reset repository", r.ResetRepository(), r.EnabledReset()),
-			pipeline.NewStep("checkout branch", r.CheckoutBranch()),
-			predicate.ToStep("pull", r.Pull(), r.EnabledReset()),
-		).AsNestedStep("prepare workspace"),
+		pipeline.NewPipelineWithLogger(logger).
+			WithNestedSteps("prepare workspace",
+				predicate.ToStep("clone repository", r.CloneGitRepository(), predicate.Bool(!gitDirExists)),
+				pipeline.NewStep("determine default branch", r.GetDefaultBranch()),
+				predicate.ToStep("fetch", r.Fetch(), r.EnabledReset()),
+				predicate.ToStep("reset repository", r.ResetRepository(), r.EnabledReset()),
+				pipeline.NewStep("checkout branch", r.CheckoutBranch()),
+				predicate.ToStep("pull", r.Pull(), r.EnabledReset()),
+			),
 		pipeline.NewStep("render templates", renderer.RenderTemplateDir()),
 		pipeline.NewStep("cleanup unwanted files", renderer.DeleteUnwantedFiles()),
-		predicate.WrapIn(pipeline.NewPipelineWithLogger(logger).WithSteps(
-			pipeline.NewStep("add", r.Add()),
-			pipeline.NewStep("commit", r.Commit()),
-			pipeline.NewStep("show diff", r.Diff()),
-		).AsNestedStep("commit changes"), predicate.And(r.EnabledCommit(), r.Dirty())),
+		predicate.WrapIn(pipeline.NewPipelineWithLogger(logger).
+			WithNestedSteps("commit changes",
+				pipeline.NewStep("add", r.Add()),
+				pipeline.NewStep("commit", r.Commit()),
+				pipeline.NewStep("show diff", r.Diff()),
+			),
+			predicate.And(r.EnabledCommit(), r.Dirty())),
 		predicate.ToStep("push changes", r.PushToRemote(), predicate.And(r.EnabledPush(), r.IfBranchHasCommits())),
-		predicate.WrapIn(pipeline.NewPipelineWithLogger(logger).WithSteps(
-			pipeline.NewStep("render pull request template", renderer.RenderPrTemplate()),
-			pipeline.NewStep("prepare API", r.InitializeGitHubProvider(c.cfg.PullRequest)),
-			pipeline.NewStep("create or update pull request", r.CreateOrUpdatePr(c.cfg.PullRequest)),
-		).AsNestedStep("pull request"), predicate.And(r.IfBranchHasCommits(), predicate.Bool(sc.PullRequest.Create))),
+		predicate.WrapIn(pipeline.NewPipelineWithLogger(logger).
+			WithNestedSteps("pull request",
+				pipeline.NewStep("render pull request template", renderer.RenderPrTemplate()),
+				pipeline.NewStep("prepare API", r.InitializeGitHubProvider(c.cfg.PullRequest)),
+				pipeline.NewStep("create or update pull request", r.CreateOrUpdatePr(c.cfg.PullRequest)),
+			),
+			predicate.And(r.IfBranchHasCommits(), predicate.Bool(sc.PullRequest.Create))),
 		pipeline.NewStep("end", func() pipeline.Result {
 			log.InfoF("Pipeline for '%s/%s' finished", sc.Git.Namespace, sc.Git.Name)
 			return pipeline.Result{}

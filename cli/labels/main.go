@@ -42,9 +42,9 @@ func (c *Command) createCommand() *cli.Command {
 		Usage:  "Synchronizes repository labels",
 		Before: c.validateCommand,
 		Action: c.runCommand,
-		Flags: flags.CombineWithGlobalFlags(
-			//projectIncludeFlag,
-			//projectExcludeFlag,
+		Flags:  flags.CombineWithGlobalFlags(
+		//projectIncludeFlag,
+		//projectExcludeFlag,
 		),
 	}
 }

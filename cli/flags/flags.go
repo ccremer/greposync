@@ -26,7 +26,7 @@ var (
 	globalFlags      []cli.Flag
 )
 
-func NewGlobalFlags(config *cfg.Configuration) []cli.Flag {
+func InitGlobalFlags(config *cfg.Configuration) []cli.Flag {
 
 	globalFlags = []cli.Flag{
 		&cli.BoolFlag{
