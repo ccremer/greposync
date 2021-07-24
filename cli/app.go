@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/ccremer/greposync/cfg"
+	"github.com/ccremer/greposync/cli/update"
 	"github.com/ccremer/greposync/printer"
 	"github.com/urfave/cli/v2"
 )
@@ -20,8 +21,6 @@ var (
 	GrepoSyncFileName = "greposync.yml"
 
 	logLevelFlagName    = "log-level"
-	projectRootFlagName = "project-root"
-	projectJobsFlagName = "project-jobs"
 )
 
 func CreateCLI(version, commit, date string) {
@@ -47,7 +46,7 @@ func CreateCLI(version, commit, date string) {
 			Value: config.Project.RootDir,
 		},
 		&cli.IntFlag{
-			Name:    projectJobsFlagName,
+			Name:    ProjectJobsFlagName,
 			Usage:   "Jobs is the number of parallel jobs to run. 1 basically means that jobs are run in sequence.",
 			Aliases: []string{"j"},
 			Value:   1,
@@ -60,7 +59,7 @@ func CreateCLI(version, commit, date string) {
 		EnableBashCompletion: true,
 		Commands: []*cli.Command{
 			NewInitCommand().createInitCommand(),
-			NewUpdateCommand(config).createUpdateCommand(),
+			update.NewCommand(config).GetCliCommand(),
 			NewLabelsCommand(config).createCommand(),
 		},
 		Compiled: t,
@@ -76,14 +75,14 @@ func Run() {
 	printer.CheckIfError(err)
 }
 
-func combineWithGlobalFlags(flags ...cli.Flag) []cli.Flag {
+func CombineWithGlobalFlags(flags ...cli.Flag) []cli.Flag {
 	for _, flag := range flags {
 		globalFlags = append(globalFlags, flag)
 	}
 	return globalFlags
 }
 
-func validateGlobalFlags(ctx *cli.Context) error {
+func ValidateGlobalFlags(ctx *cli.Context) error {
 	if ctx.Bool("verbose") {
 		config.Log.Level = "debug"
 		printer.DefaultLevel = printer.LevelDebug

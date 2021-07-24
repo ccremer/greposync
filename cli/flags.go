@@ -3,17 +3,27 @@ package cli
 import "github.com/urfave/cli/v2"
 
 const (
-	projectIncludeFlagName = "project-include"
-	projectExcludeFlagName = "project-exclude"
+	ProjectIncludeFlagName = "project-include"
+	ProjectExcludeFlagName = "project-exclude"
+	projectRootFlagName    = "project-root"
+	ProjectJobsFlagName    = "project-jobs"
 )
 
 var (
-	projectIncludeFlag = &cli.StringFlag{
-		Name:  projectIncludeFlagName,
+	JobsMinimumCount = 1
+	JobsMaximumCount = 8
+)
+
+func NewProjectIncludeFlag() *cli.StringFlag {
+	return &cli.StringFlag{
+		Name:  ProjectIncludeFlagName,
 		Usage: "Includes only repositories in the update that match the given filter (regex).",
 	}
-	projectExcludeFlag = &cli.StringFlag{
-		Name:  projectExcludeFlagName,
+}
+
+func NewProjectExcludeFlag() *cli.StringFlag {
+	return &cli.StringFlag{
+		Name:  ProjectExcludeFlagName,
 		Usage: "Excludes repositories from updating that match the given filter (regex). Repositories matching both include and exclude filter are still excluded.",
 	}
-)
+}

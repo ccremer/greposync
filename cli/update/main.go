@@ -1,15 +1,14 @@
-package cli
+package update
 
 import (
-	"encoding/json"
 	"fmt"
 	"os"
-	"regexp"
 
 	pipeline "github.com/ccremer/go-command-pipeline"
 	"github.com/ccremer/go-command-pipeline/parallel"
 	"github.com/ccremer/go-command-pipeline/predicate"
 	"github.com/ccremer/greposync/cfg"
+	app "github.com/ccremer/greposync/cli"
 	"github.com/ccremer/greposync/printer"
 	"github.com/ccremer/greposync/rendering"
 	"github.com/ccremer/greposync/repository"
@@ -27,14 +26,9 @@ const (
 	amendFlagName    = "git-amend"
 )
 
-var (
-	JobsMinimumCount = 1
-	JobsMaximumCount = 8
-)
-
 type (
-	// UpdateCommand is a facade service for the update command that holds all dependent services and settings.
-	UpdateCommand struct {
+	// Command is a facade service for the update command that holds all dependent services and settings.
+	Command struct {
 		cfg          *cfg.Configuration
 		cliCommand   *cli.Command
 		repoServices []*repository.Service
@@ -43,24 +37,31 @@ type (
 	}
 )
 
-// NewUpdateCommand returns a new UpdateCommand instance.
-func NewUpdateCommand(cfg *cfg.Configuration) *UpdateCommand {
-	return &UpdateCommand{
+// NewCommand returns a new Command instance.
+func NewCommand(cfg *cfg.Configuration) *Command {
+	c := &Command{
 		globalK: koanf.New("."),
 		cfg:     cfg,
 		parser:  rendering.NewParser(cfg.Template),
 	}
+	c.cliCommand = c.createCliCommand()
+	return c
 }
 
-func (c *UpdateCommand) createUpdateCommand() *cli.Command {
-	c.cliCommand = &cli.Command{
+// GetCliCommand returns the command instance for CLI library.
+func (c *Command) GetCliCommand() *cli.Command {
+	return c.cliCommand
+}
+
+func (c *Command) createCliCommand() *cli.Command {
+	return &cli.Command{
 		Name:   "update",
 		Usage:  "Update the repositories in managed_repos.yml",
-		Action: c.runUpdateCommand,
+		Action: c.runCommand,
 		Before: c.validateUpdateCommand,
-		Flags: combineWithGlobalFlags(
-			projectIncludeFlag,
-			projectExcludeFlag,
+		Flags: app.CombineWithGlobalFlags(
+			app.NewProjectIncludeFlag(),
+			app.NewProjectExcludeFlag(),
 			&cli.StringFlag{
 				Name:    dryRunFlagName,
 				Aliases: []string{"d"},
@@ -80,73 +81,28 @@ func (c *UpdateCommand) createUpdateCommand() *cli.Command {
 			},
 		),
 	}
-	return c.cliCommand
 }
 
-func (c *UpdateCommand) validateUpdateCommand(ctx *cli.Context) error {
-	if err := cfg.ParseConfig(GrepoSyncFileName, config, ctx); err != nil {
-		return err
-	}
-
-	if err := validateGlobalFlags(ctx); err != nil {
-		return err
-	}
-
-	if _, err := regexp.Compile(config.Project.Include); err != nil {
-		return fmt.Errorf("invalid flag --%s: %v", projectIncludeFlagName, err)
-	}
-	if _, err := regexp.Compile(config.Project.Exclude); err != nil {
-		return fmt.Errorf("invalid flag --%s: %v", projectExcludeFlagName, err)
-	}
-
-	if jobs := config.Project.Jobs; jobs > JobsMaximumCount || jobs < JobsMinimumCount {
-		return fmt.Errorf("--%s is required to be between %d and %d", projectJobsFlagName, JobsMinimumCount, JobsMaximumCount)
-	}
-
-	if ctx.IsSet(dryRunFlagName) {
-		dryRunMode := ctx.String(dryRunFlagName)
-		switch dryRunMode {
-		case "offline":
-			config.Git.SkipReset = true
-			config.Git.SkipCommit = true
-			config.Git.SkipPush = true
-			config.PullRequest.Create = false
-		case "commit":
-			config.Git.SkipPush = true
-			config.PullRequest.Create = false
-		case "push":
-			config.PullRequest.Create = false
-		default:
-			return fmt.Errorf("invalid flag value of %s: %s", dryRunFlagName, dryRunMode)
-		}
-	}
-
-	config.Sanitize()
-	j, _ := json.Marshal(config)
-	printer.DebugF("Using config: %s", j)
-	return nil
-}
-
-func (c *UpdateCommand) runUpdateCommand(_ *cli.Context) error {
+func (c *Command) runCommand(_ *cli.Context) error {
 
 	logger := printer.PipelineLogger{Logger: printer.New().SetName("update").SetLevel(printer.DefaultLevel)}
 	p := pipeline.NewPipelineWithLogger(logger).WithSteps(
 		pipeline.NewStep("parse config defaults", c.loadGlobalDefaults()),
 		pipeline.NewStep("parse templates", c.parser.ParseTemplateDirAction()),
 		pipeline.NewStep("parse managed repos config", c.parseServices()),
-		parallel.NewWorkerPoolStep("update repositories", config.Project.Jobs, c.updateReposInParallel(), c.errorHandler()),
+		parallel.NewWorkerPoolStep("update repositories", c.cfg.Project.Jobs, c.updateReposInParallel(), c.errorHandler()),
 	)
 	return p.Run().Err
 }
 
-func (c *UpdateCommand) createPipeline(r *repository.Service) *pipeline.Pipeline {
+func (c *Command) createPipeline(r *repository.Service) *pipeline.Pipeline {
 	log := printer.New().SetName(r.Config.Name).SetLevel(printer.DefaultLevel)
 
 	sc := &cfg.SyncConfig{
 		Git:         r.Config,
-		PullRequest: config.PullRequest,
+		PullRequest: c.cfg.PullRequest,
 		Template: &cfg.TemplateConfig{
-			RootDir: config.Template.RootDir,
+			RootDir: c.cfg.Template.RootDir,
 		},
 	}
 	renderer := rendering.NewRenderer(sc, c.globalK, c.parser)
@@ -172,8 +128,8 @@ func (c *UpdateCommand) createPipeline(r *repository.Service) *pipeline.Pipeline
 		predicate.ToStep("push changes", r.PushToRemote(), predicate.And(r.EnabledPush(), r.IfBranchHasCommits())),
 		predicate.WrapIn(pipeline.NewPipelineWithLogger(logger).WithSteps(
 			pipeline.NewStep("render pull request template", renderer.RenderPrTemplate()),
-			pipeline.NewStep("prepare API", r.InitializeGitHubProvider(config.PullRequest)),
-			pipeline.NewStep("create or update pull request", r.CreateOrUpdatePr(config.PullRequest)),
+			pipeline.NewStep("prepare API", r.InitializeGitHubProvider(c.cfg.PullRequest)),
+			pipeline.NewStep("create or update pull request", r.CreateOrUpdatePr(c.cfg.PullRequest)),
 		).AsNestedStep("pull request"), predicate.And(r.IfBranchHasCommits(), predicate.Bool(sc.PullRequest.Create))),
 		pipeline.NewStep("end", func() pipeline.Result {
 			log.InfoF("Pipeline for '%s/%s' finished", sc.Git.Namespace, sc.Git.Name)
@@ -183,27 +139,27 @@ func (c *UpdateCommand) createPipeline(r *repository.Service) *pipeline.Pipeline
 	return p
 }
 
-func (c *UpdateCommand) parseServices() func() pipeline.Result {
+func (c *Command) parseServices() func() pipeline.Result {
 	return func() pipeline.Result {
-		s, err := repository.NewServicesFromFile(config)
+		s, err := repository.NewServicesFromFile(c.cfg)
 		c.repoServices = s
 		return pipeline.Result{Err: err}
 	}
 }
 
-func (c *UpdateCommand) loadGlobalDefaults() pipeline.ActionFunc {
+func (c *Command) loadGlobalDefaults() pipeline.ActionFunc {
 	return func() pipeline.Result {
-		if info, err := os.Stat(ConfigDefaultName); err != nil || info.IsDir() {
+		if info, err := os.Stat(app.ConfigDefaultName); err != nil || info.IsDir() {
 			printer.WarnF("File %s does not exist, ignoring template defaults")
 			return pipeline.Result{}
 		}
-		printer.DebugF("Loading config %s", ConfigDefaultName)
-		err := c.globalK.Load(file.Provider(ConfigDefaultName), yaml.Parser())
+		printer.DebugF("Loading config %s", app.ConfigDefaultName)
+		err := c.globalK.Load(file.Provider(app.ConfigDefaultName), yaml.Parser())
 		return pipeline.Result{Err: err}
 	}
 }
 
-func (c *UpdateCommand) updateReposInParallel() parallel.PipelineSupplier {
+func (c *Command) updateReposInParallel() parallel.PipelineSupplier {
 	return func(pipelines chan *pipeline.Pipeline) {
 		defer close(pipelines)
 		for _, r := range c.repoServices {
@@ -213,7 +169,7 @@ func (c *UpdateCommand) updateReposInParallel() parallel.PipelineSupplier {
 	}
 }
 
-func (c *UpdateCommand) errorHandler() parallel.ResultHandler {
+func (c *Command) errorHandler() parallel.ResultHandler {
 	return func(results map[uint64]pipeline.Result) pipeline.Result {
 		var err error
 		for index, service := range c.repoServices {

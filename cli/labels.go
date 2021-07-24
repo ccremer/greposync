@@ -36,9 +36,9 @@ func (c *LabelsCommand) createCommand() *cli.Command {
 		Usage:  "Synchronizes repository labels",
 		Before: c.validateCommand,
 		Action: c.runCommand,
-		Flags:  combineWithGlobalFlags(
-		//projectIncludeFlag,
-		//projectExcludeFlag,
+		Flags: CombineWithGlobalFlags(
+			//projectIncludeFlag,
+			//projectExcludeFlag,
 		),
 	}
 	return c.cliCommand
@@ -49,19 +49,19 @@ func (c *LabelsCommand) validateCommand(ctx *cli.Context) error {
 		return err
 	}
 
-	if err := validateGlobalFlags(ctx); err != nil {
+	if err := ValidateGlobalFlags(ctx); err != nil {
 		return err
 	}
 
 	if _, err := regexp.Compile(config.Project.Include); err != nil {
-		return fmt.Errorf("invalid flag --%s: %v", projectIncludeFlagName, err)
+		return fmt.Errorf("invalid flag --%s: %v", ProjectIncludeFlagName, err)
 	}
 	if _, err := regexp.Compile(config.Project.Exclude); err != nil {
-		return fmt.Errorf("invalid flag --%s: %v", projectExcludeFlagName, err)
+		return fmt.Errorf("invalid flag --%s: %v", ProjectExcludeFlagName, err)
 	}
 
 	if jobs := config.Project.Jobs; jobs > JobsMaximumCount || jobs < JobsMinimumCount {
-		return fmt.Errorf("--%s is required to be between %d and %d", projectJobsFlagName, JobsMinimumCount, JobsMaximumCount)
+		return fmt.Errorf("--%s is required to be between %d and %d", ProjectJobsFlagName, JobsMinimumCount, JobsMaximumCount)
 	}
 
 	for key, label := range config.RepositoryLabels {
