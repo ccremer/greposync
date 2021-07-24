@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/ccremer/greposync/cfg"
+	"github.com/ccremer/greposync/cli/initialize"
 	"github.com/ccremer/greposync/cli/labels"
 	"github.com/ccremer/greposync/cli/update"
 	"github.com/ccremer/greposync/printer"
@@ -59,9 +60,9 @@ func CreateCLI(version, commit, date string) {
 		Version:              fmt.Sprintf("%s, commit %s, date %s", version, commit[0:7], t.Format(dateLayout)),
 		EnableBashCompletion: true,
 		Commands: []*cli.Command{
-			NewInitCommand().createInitCommand(),
-			update.NewCommand(config).GetCliCommand(),
+			initialize.NewCommand(config).GetCliCommand(),
 			labels.NewCommand(config).GetCliCommand(),
+			update.NewCommand(config).GetCliCommand(),
 		},
 		Compiled: t,
 		ExitErrHandler: func(context *cli.Context, err error) {

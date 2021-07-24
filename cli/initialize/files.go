@@ -19,31 +19,21 @@ var (
 	configDefaultsYml []byte
 	//go:embed managed_repos.yml
 	managedReposYml []byte
-
-	configFiles = map[string][]byte{
-		"greposync.yml":       grepoSyncYml,
-		"config_defaults.yml": configDefaultsYml,
-		"managed_repos.yml":   managedReposYml,
-	}
-	templateFiles = map[string][]byte{
-		"template/_helpers.tpl": helperTpl,
-		"template/README.md":    readmeTpl,
-	}
 )
 
-// CreateMainConfigFiles creates the main configuration files.
+// createMainConfigFiles creates the main configuration files.
 // Each pre existing file is skipped.
-func CreateMainConfigFiles() pipeline.ActionFunc {
+func (c *Command) createMainConfigFiles() pipeline.ActionFunc {
 	return func() pipeline.Result {
-		return pipeline.Result{Err: writeFiles(configFiles)}
+		return pipeline.Result{Err: writeFiles(c.configFiles)}
 	}
 }
 
-// CreateTemplateFiles creates the example files in the template directory.
+// createTemplateFiles creates the example files in the template directory.
 // The dir has to exist.
-func CreateTemplateFiles() pipeline.ActionFunc {
+func (c *Command) createTemplateFiles() pipeline.ActionFunc {
 	return func() pipeline.Result {
-		return pipeline.Result{Err: writeFiles(templateFiles)}
+		return pipeline.Result{Err: writeFiles(c.templateFiles)}
 	}
 }
 
@@ -64,8 +54,8 @@ func writeFile(file string, content []byte) error {
 	return nil
 }
 
-// CreateTemplateDir creates the template directory if it doesn't exist.
-func CreateTemplateDir() pipeline.ActionFunc {
+// createTemplateDir creates the template directory if it doesn't exist.
+func (c *Command) createTemplateDir() pipeline.ActionFunc {
 	return func() pipeline.Result {
 		return pipeline.Result{Err: createDir("template")}
 	}
