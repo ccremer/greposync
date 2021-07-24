@@ -2,10 +2,10 @@ package update
 
 import (
 	"encoding/json"
-	"fmt"
 	"regexp"
 
 	"github.com/ccremer/greposync/cfg"
+	"github.com/ccremer/greposync/cli/clierror"
 	"github.com/ccremer/greposync/cli/flags"
 	"github.com/ccremer/greposync/printer"
 	"github.com/urfave/cli/v2"
@@ -13,22 +13,22 @@ import (
 
 func (c *Command) validateUpdateCommand(ctx *cli.Context) error {
 	if err := cfg.ParseConfig(c.cfg.Project.MainConfigFileName, c.cfg, ctx); err != nil {
-		return err
+		return clierror.AsUsageError(err)
 	}
 
 	if err := flags.ValidateGlobalFlags(ctx, c.cfg); err != nil {
-		return err
+		return clierror.AsUsageError(err)
 	}
 
 	if _, err := regexp.Compile(c.cfg.Project.Include); err != nil {
-		return fmt.Errorf("invalid flag --%s: %v", flags.ProjectIncludeFlagName, err)
+		return clierror.AsFlagUsageError(flags.ProjectIncludeFlagName, err)
 	}
 	if _, err := regexp.Compile(c.cfg.Project.Exclude); err != nil {
-		return fmt.Errorf("invalid flag --%s: %v", flags.ProjectExcludeFlagName, err)
+		return clierror.AsFlagUsageError(flags.ProjectExcludeFlagName, err)
 	}
 
 	if jobs := c.cfg.Project.Jobs; jobs > flags.JobsMaximumCount || jobs < flags.JobsMinimumCount {
-		return fmt.Errorf("--%s is required to be between %d and %d", flags.ProjectJobsFlagName, flags.JobsMinimumCount, flags.JobsMaximumCount)
+		return clierror.AsFlagUsageErrorf(flags.ProjectJobsFlagName, "value is not between %d and %d", flags.JobsMinimumCount, flags.JobsMaximumCount)
 	}
 
 	if ctx.IsSet(dryRunFlagName) {
@@ -45,7 +45,7 @@ func (c *Command) validateUpdateCommand(ctx *cli.Context) error {
 		case "push":
 			c.cfg.PullRequest.Create = false
 		default:
-			return fmt.Errorf("invalid flag value of %s: %s", dryRunFlagName, dryRunMode)
+			return clierror.AsFlagUsageErrorf(dryRunFlagName, "unrecognized: %s", dryRunMode)
 		}
 	}
 

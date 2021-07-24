@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/ccremer/greposync/cfg"
+	"github.com/ccremer/greposync/cli/clierror"
 	"github.com/ccremer/greposync/cli/flags"
 	"github.com/ccremer/greposync/cli/initialize"
 	"github.com/ccremer/greposync/cli/labels"
@@ -42,10 +43,8 @@ func NewApp(version, commit, date string) *App {
 			labels.NewCommand(config).GetCliCommand(),
 			update.NewCommand(config).GetCliCommand(),
 		},
-		Compiled: t,
-		ExitErrHandler: func(context *cli.Context, err error) {
-			_ = cli.ShowCommandHelp(context, context.Command.Name)
-		},
+		Compiled:       t,
+		ExitErrHandler: clierror.ErrorHandler,
 	}
 	return &App{
 		app:    a,
