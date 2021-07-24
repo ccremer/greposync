@@ -3,7 +3,7 @@ package cfg
 import (
 	"strings"
 
-	"github.com/ccremer/greposync/flag"
+	"github.com/ccremer/greposync/cfg/flag"
 	"github.com/ccremer/greposync/printer"
 	"github.com/knadh/koanf"
 	"github.com/knadh/koanf/parsers/yaml"
