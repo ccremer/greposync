@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/ccremer/greposync/cfg"
+	"github.com/ccremer/greposync/cli/labels"
 	"github.com/ccremer/greposync/cli/update"
 	"github.com/ccremer/greposync/printer"
 	"github.com/urfave/cli/v2"
@@ -60,7 +61,7 @@ func CreateCLI(version, commit, date string) {
 		Commands: []*cli.Command{
 			NewInitCommand().createInitCommand(),
 			update.NewCommand(config).GetCliCommand(),
-			NewLabelsCommand(config).createCommand(),
+			labels.NewCommand(config).GetCliCommand(),
 		},
 		Compiled: t,
 		ExitErrHandler: func(context *cli.Context, err error) {
