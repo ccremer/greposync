@@ -6,7 +6,7 @@ import (
 	pipeline "github.com/ccremer/go-command-pipeline"
 	"github.com/ccremer/go-command-pipeline/parallel"
 	"github.com/ccremer/greposync/cfg"
-	cli2 "github.com/ccremer/greposync/cli"
+	"github.com/ccremer/greposync/cli/flags"
 	"github.com/ccremer/greposync/printer"
 	"github.com/ccremer/greposync/repository"
 	"github.com/hashicorp/go-multierror"
@@ -42,7 +42,7 @@ func (c *Command) createCommand() *cli.Command {
 		Usage:  "Synchronizes repository labels",
 		Before: c.validateCommand,
 		Action: c.runCommand,
-		Flags: cli2.CombineWithGlobalFlags(
+		Flags: flags.CombineWithGlobalFlags(
 			//projectIncludeFlag,
 			//projectExcludeFlag,
 		),

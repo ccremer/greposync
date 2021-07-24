@@ -46,12 +46,18 @@ type Configuration struct {
 [source, go]
 ----
 type ProjectConfig struct {
-    RootDir    string
-    Jobs       int
-    Include    string
-    Exclude    string
+    MainConfigFileName       string
+    ConfigDefaultFileName    string
+    RootDir                  string
+    Jobs                     int
+    Include                  string
+    Exclude                  string
 }
 ----
+
+
+
+
 
 
 RootDir::
@@ -250,6 +256,35 @@ type TemplateConfig struct {
 
 RootDir::
 RootDir is the path relative to the current workdir where the template files are located.
+
+
+
+
+
+
+
+= package flag
+
+
+
+[source,yaml]
+----
+include::example$config.yaml[]
+----
+
+== Structs
+
+=== Cli
+[source, go]
+----
+type Cli struct {
+}
+----
+
+Cli implements a urfave/cli command line provider.
+
+
+
 
 
 

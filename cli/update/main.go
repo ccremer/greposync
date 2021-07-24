@@ -8,7 +8,7 @@ import (
 	"github.com/ccremer/go-command-pipeline/parallel"
 	"github.com/ccremer/go-command-pipeline/predicate"
 	"github.com/ccremer/greposync/cfg"
-	app "github.com/ccremer/greposync/cli"
+	"github.com/ccremer/greposync/cli/flags"
 	"github.com/ccremer/greposync/printer"
 	"github.com/ccremer/greposync/rendering"
 	"github.com/ccremer/greposync/repository"
@@ -59,9 +59,9 @@ func (c *Command) createCliCommand() *cli.Command {
 		Usage:  "Update the repositories in managed_repos.yml",
 		Action: c.runCommand,
 		Before: c.validateUpdateCommand,
-		Flags: app.CombineWithGlobalFlags(
-			app.NewProjectIncludeFlag(),
-			app.NewProjectExcludeFlag(),
+		Flags: flags.CombineWithGlobalFlags(
+			flags.NewProjectIncludeFlag(),
+			flags.NewProjectExcludeFlag(),
 			&cli.StringFlag{
 				Name:    dryRunFlagName,
 				Aliases: []string{"d"},
@@ -149,12 +149,12 @@ func (c *Command) parseServices() func() pipeline.Result {
 
 func (c *Command) loadGlobalDefaults() pipeline.ActionFunc {
 	return func() pipeline.Result {
-		if info, err := os.Stat(app.ConfigDefaultName); err != nil || info.IsDir() {
+		if info, err := os.Stat(c.cfg.Project.ConfigDefaultFileName); err != nil || info.IsDir() {
 			printer.WarnF("File %s does not exist, ignoring template defaults")
 			return pipeline.Result{}
 		}
-		printer.DebugF("Loading config %s", app.ConfigDefaultName)
-		err := c.globalK.Load(file.Provider(app.ConfigDefaultName), yaml.Parser())
+		printer.DebugF("Loading config %s", c.cfg.Project.ConfigDefaultFileName)
+		err := c.globalK.Load(file.Provider(c.cfg.Project.ConfigDefaultFileName), yaml.Parser())
 		return pipeline.Result{Err: err}
 	}
 }
