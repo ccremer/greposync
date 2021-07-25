@@ -14,8 +14,11 @@ type (
 		Git              *GitConfig                 `json:"git" koanf:"git"`
 		RepositoryLabels map[string]RepositoryLabel `json:"repositoryLabels" koanf:"repositoryLabels"`
 	}
-	// ProjectConfig configures the project
+	// ProjectConfig configures the main config settings
 	ProjectConfig struct {
+		MainConfigFileName    string `json:"-"`
+		ConfigDefaultFileName string `json:"-"`
+
 		// RootDir is the local directory where the Git repositories are cloned into.
 		RootDir string `json:"rootDir" koanf:"rootDir"`
 		// Jobs is the number of parallel jobs to run.
@@ -114,8 +117,10 @@ type (
 func NewDefaultConfig() *Configuration {
 	return &Configuration{
 		Project: &ProjectConfig{
-			RootDir: "repos",
-			Jobs:    1,
+			RootDir:               "repos",
+			Jobs:                  1,
+			MainConfigFileName:    "greposync.yml",
+			ConfigDefaultFileName: "config_defaults.yml",
 		},
 		Log: &LogConfig{
 			Level: "info",
