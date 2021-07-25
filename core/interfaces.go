@@ -10,6 +10,7 @@ type CoreService interface {
 }
 
 // ManagedRepoProvider is a core service that is responsible for providing services for managing Git repositories.
+//counterfeiter:generate . ManagedRepoProvider
 type ManagedRepoProvider interface {
 	// LoadManagedRepositories will load the managed repositories from a config store and returns an array of GitRepositoryFacade for each Git repository.
 	LoadManagedRepositories() ([]GitRepositoryFacade, error)
@@ -18,7 +19,7 @@ type ManagedRepoProvider interface {
 }
 
 // GitRepositoryFacade is a core service enabling interaction with a local Git repository.
-	GitRepositoryFacade interface {
+//counterfeiter:generate . GitRepositoryFacade
 type GitRepositoryFacade interface {
 	// GetLabels returns a list of repository labels to be managed.
 	GetLabels() []GitRepositoryLabel
@@ -27,7 +28,7 @@ type GitRepositoryFacade interface {
 }
 
 // GitHostingFacade is a core service providing interaction with remote Git hosting services.
-	GitHostingFacade interface {
+//counterfeiter:generate . GitHostingFacade
 type GitHostingFacade interface {
 	// Initialize will initialize this service as required by the underlying provider.
 	// An error shall be returned when it's not safe to continue interacting with the provider.
@@ -49,7 +50,7 @@ type GitHostingFacade interface {
 
 // GitRepositoryLabel is a label that is attached to a remote Git repository on a supported Git hosting provider.
 // The implementation may contain additional provider-specific properties.
-	GitRepositoryLabel interface {
+//counterfeiter:generate . GitRepositoryLabel
 type GitRepositoryLabel interface {
 	// GetName returns the name of the label.
 	// Used for internal identification, may not the be label name that is actually in the remote repository.

@@ -10,6 +10,7 @@ require (
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/knadh/koanf v1.2.0
 	github.com/mariotoffia/goasciidoc v0.4.5
+	github.com/maxbrunsfeld/counterfeiter/v6 v6.4.1
 	github.com/stretchr/testify v1.7.0
 	github.com/urfave/cli/v2 v2.3.0
 	github.com/whilp/git-urls v1.0.0
