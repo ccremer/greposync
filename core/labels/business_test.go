@@ -21,7 +21,7 @@ func TestLabelService_createOrUpdateLabels(t *testing.T) {
 		"NoLabels": {},
 		"ActiveLabel": {
 			givenLabels: []core.GitRepositoryLabel{
-				newFakeLabel("active", false),
+				newFakeLabel(false),
 			},
 			expectedCalls: 1,
 		},
@@ -61,7 +61,7 @@ func TestLabelService_deleteLabels(t *testing.T) {
 		"NoLabels": {},
 		"DeadLabel": {
 			givenLabels: []core.GitRepositoryLabel{
-				newFakeLabel("dead", true),
+				newFakeLabel(true),
 			},
 			expectedCalls: 1,
 		},
@@ -107,18 +107,18 @@ var filterLabelTests = map[string]struct {
 	},
 	"GivenActiveLabel": {
 		givenLabels: []core.GitRepositoryLabel{
-			newFakeLabel("fake", false),
+			newFakeLabel(false),
 		},
 		expectedActiveLabels: []core.GitRepositoryLabel{
-			newFakeLabel("fake", false),
+			newFakeLabel(false),
 		},
 	},
 	"GivenDeadLabel": {
 		givenLabels: []core.GitRepositoryLabel{
-			newFakeLabel("fake", true),
+			newFakeLabel(true),
 		},
 		expectedDeadLabels: []core.GitRepositoryLabel{
-			newFakeLabel("fake", true),
+			newFakeLabel(true),
 		},
 	},
 }
@@ -129,7 +129,7 @@ func TestLabelService_filterActiveLabels(t *testing.T) {
 			result := filterActiveLabels(tt.givenLabels)
 			assert.Len(t, result, len(tt.expectedActiveLabels))
 			for i, expectedLabel := range tt.expectedActiveLabels {
-				assert.Equal(t, expectedLabel.GetName(), result[i].GetName())
+				assert.Equal(t, expectedLabel.IsBoundForDeletion(), result[i].IsBoundForDeletion())
 			}
 		})
 	}
@@ -141,7 +141,7 @@ func TestLabelService_filterDeadLabels(t *testing.T) {
 			result := filterDeadLabels(tt.givenLabels)
 			assert.Len(t, result, len(tt.expectedDeadLabels))
 			for i, expectedLabel := range tt.expectedDeadLabels {
-				assert.Equal(t, expectedLabel.GetName(), result[i].GetName())
+				assert.Equal(t, expectedLabel.IsBoundForDeletion(), result[i].IsBoundForDeletion())
 			}
 		})
 	}
@@ -172,11 +172,8 @@ func createRepoFake(cfg core.GitRepositoryConfig, labels []core.GitRepositoryLab
 	}
 }
 
-func newFakeLabel(name string, delete bool) core.GitRepositoryLabel {
+func newFakeLabel(delete bool) core.GitRepositoryLabel {
 	return &corefakes.FakeGitRepositoryLabel{
-		GetNameStub: func() string {
-			return name
-		},
 		IsBoundForDeletionStub: func() bool {
 			return delete
 		},

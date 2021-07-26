@@ -52,9 +52,6 @@ type GitHostingFacade interface {
 // The implementation may contain additional provider-specific properties.
 //counterfeiter:generate . GitRepositoryLabel
 type GitRepositoryLabel interface {
-	// GetName returns the name of the label.
-	// Used for internal identification, may not the be label name that is actually in the remote repository.
-	GetName() string
 	// IsBoundForDeletion returns true if the label is bound for removal from a remote repository.
 	IsBoundForDeletion() bool
 }
