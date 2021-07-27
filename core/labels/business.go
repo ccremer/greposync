@@ -24,7 +24,7 @@ func NewService(repoProvider core.ManagedRepoProvider) *LabelService {
 func (s *LabelService) createOrUpdateLabels(r core.GitRepositoryFacade, h core.GitHostingFacade) error {
 	labels := filterActiveLabels(r.GetLabels())
 	if len(labels) > 0 {
-		return h.CreateOrUpdateLabelsForRepo(r.GetConfig().Url, labels)
+		return h.CreateOrUpdateLabelsForRepo(r.GetConfig().URL, labels)
 	}
 	return nil
 }
@@ -42,7 +42,7 @@ func filterActiveLabels(labels []core.GitRepositoryLabel) []core.GitRepositoryLa
 func (s *LabelService) deleteLabels(r core.GitRepositoryFacade, h core.GitHostingFacade) error {
 	labels := filterDeadLabels(r.GetLabels())
 	if len(labels) > 0 {
-		return h.DeleteLabelsForRepo(r.GetConfig().Url, labels)
+		return h.DeleteLabelsForRepo(r.GetConfig().URL, labels)
 	}
 	return nil
 }

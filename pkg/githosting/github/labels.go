@@ -8,7 +8,7 @@ import (
 	"github.com/google/go-github/v37/github"
 )
 
-func (p *Facade) CreateOrUpdateLabelsForRepo(url *core.GitUrl, labels []core.GitRepositoryLabel) error {
+func (p *Facade) CreateOrUpdateLabelsForRepo(url *core.GitURL, labels []core.GitRepositoryLabel) error {
 	converted := LabelConverter{}.convertFromEntity(labels)
 	p.log.SetName(url.GetRepositoryName())
 
@@ -40,7 +40,7 @@ func (p *Facade) CreateOrUpdateLabelsForRepo(url *core.GitUrl, labels []core.Git
 	return nil
 }
 
-func (p *Facade) DeleteLabelsForRepo(url *core.GitUrl, labels []core.GitRepositoryLabel) error {
+func (p *Facade) DeleteLabelsForRepo(url *core.GitURL, labels []core.GitRepositoryLabel) error {
 	p.log.SetName(url.GetRepositoryName())
 	converted := LabelConverter{}.convertFromEntity(labels)
 	for _, label := range converted {
@@ -58,7 +58,7 @@ func (p *Facade) DeleteLabelsForRepo(url *core.GitUrl, labels []core.GitReposito
 	return nil
 }
 
-func (p *Facade) createLabel(url *core.GitUrl, label *cfg.RepositoryLabel) error {
+func (p *Facade) createLabel(url *core.GitURL, label *cfg.RepositoryLabel) error {
 	_, _, err := p.client.Issues.CreateLabel(p.ctx, url.GetNamespace(), url.GetRepositoryName(), &github.Label{
 		Name:        &label.Name,
 		Color:       &label.Color,
@@ -67,7 +67,7 @@ func (p *Facade) createLabel(url *core.GitUrl, label *cfg.RepositoryLabel) error
 	return err
 }
 
-func (p *Facade) updateLabel(url *core.GitUrl, ghLabel *github.Label, label *cfg.RepositoryLabel) error {
+func (p *Facade) updateLabel(url *core.GitURL, ghLabel *github.Label, label *cfg.RepositoryLabel) error {
 	// TODO: Without a new_name property we cannot rename a label yet.
 	ghLabel.Description = &label.Description
 	ghLabel.Color = &label.Color
@@ -75,12 +75,12 @@ func (p *Facade) updateLabel(url *core.GitUrl, ghLabel *github.Label, label *cfg
 	return err
 }
 
-func (p *Facade) deleteLabel(url *core.GitUrl, label *cfg.RepositoryLabel) error {
+func (p *Facade) deleteLabel(url *core.GitURL, label *cfg.RepositoryLabel) error {
 	_, err := p.client.Issues.DeleteLabel(p.ctx, url.GetNamespace(), url.GetRepositoryName(), label.Name)
 	return err
 }
 
-func (p *Facade) fetchAllLabels(url *core.GitUrl) ([]*github.Label, error) {
+func (p *Facade) fetchAllLabels(url *core.GitURL) ([]*github.Label, error) {
 	nextPage := 1
 	lastPage := 1
 	var allLabels []*github.Label

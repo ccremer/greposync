@@ -34,7 +34,7 @@ func TestLabelService_createOrUpdateLabels(t *testing.T) {
 				log: printer.New(),
 			}
 
-			repoFake := createRepoFake(core.GitRepositoryConfig{Url: gu}, tt.givenLabels)
+			repoFake := createRepoFake(core.GitRepositoryConfig{URL: gu}, tt.givenLabels)
 			hostingFake := createHostingFake(nil)
 			err := s.createOrUpdateLabels(repoFake, hostingFake)
 			if tt.expectedErr {
@@ -75,7 +75,7 @@ func TestLabelService_deleteLabels(t *testing.T) {
 				log: printer.New(),
 			}
 
-			repoFake := createRepoFake(core.GitRepositoryConfig{Url: gu}, tt.givenLabels)
+			repoFake := createRepoFake(core.GitRepositoryConfig{URL: gu}, tt.givenLabels)
 			hostingFake := createHostingFake(nil)
 			err := s.deleteLabels(repoFake, hostingFake)
 			if tt.expectedErr {
@@ -149,10 +149,10 @@ func TestLabelService_filterDeadLabels(t *testing.T) {
 
 func createHostingFake(returnErr error) *corefakes.FakeGitHostingFacade {
 	return &corefakes.FakeGitHostingFacade{
-		CreateOrUpdateLabelsForRepoStub: func(gu *core.GitUrl, labels []core.GitRepositoryLabel) error {
+		CreateOrUpdateLabelsForRepoStub: func(gu *core.GitURL, labels []core.GitRepositoryLabel) error {
 			return returnErr
 		},
-		DeleteLabelsForRepoStub: func(gu *core.GitUrl, labels []core.GitRepositoryLabel) error {
+		DeleteLabelsForRepoStub: func(gu *core.GitURL, labels []core.GitRepositoryLabel) error {
 			return returnErr
 		},
 		InitializeStub: func() error {
@@ -180,10 +180,10 @@ func newFakeLabel(delete bool) core.GitRepositoryLabel {
 	}
 }
 
-func createURl(t *testing.T) *core.GitUrl {
+func createURl(t *testing.T) *core.GitURL {
 	u, err := url.Parse("https://github.com/ccremer/greposync")
 	require.NoError(t, err)
-	gu := core.GitUrl(*u)
+	gu := core.GitURL(*u)
 	return &gu
 }
 

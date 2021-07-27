@@ -40,12 +40,12 @@ type GitHostingFacade interface {
 		This method only mutates the given labels without deletions.
 		Other labels are left ignored.
 	*/
-	CreateOrUpdateLabelsForRepo(url *GitUrl, labels []GitRepositoryLabel) error
+	CreateOrUpdateLabelsForRepo(url *GitURL, labels []GitRepositoryLabel) error
 	/*
 		DeleteLabelsForRepo deletes the given labels from the given remote repository.
 		An error may be returned on first deletion failure, but non-existing labels are not errors.
 	*/
-	DeleteLabelsForRepo(url *GitUrl, labels []GitRepositoryLabel) error
+	DeleteLabelsForRepo(url *GitURL, labels []GitRepositoryLabel) error
 }
 
 // GitRepositoryLabel is a label that is attached to a remote Git repository on a supported Git hosting provider.

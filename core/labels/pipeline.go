@@ -41,7 +41,7 @@ func (s *LabelService) updateReposInParallel() parallel.PipelineSupplier {
 }
 
 func (s *LabelService) createPipelineForUpdatingLabels(rf core.GitRepositoryFacade, hf core.GitHostingFacade) *pipeline.Pipeline {
-	log := printer.New().SetName(rf.GetConfig().Url.GetRepositoryName())
+	log := printer.New().SetName(rf.GetConfig().URL.GetRepositoryName())
 	logger := printer.PipelineLogger{Logger: log}
 
 	p := pipeline.NewPipelineWithLogger(logger)
@@ -57,7 +57,7 @@ func (s *LabelService) errorHandler() parallel.ResultHandler {
 		var err error
 		for index, service := range s.repoFacades {
 			if result := results[uint64(index)]; result.Err != nil {
-				err = multierror.Append(err, fmt.Errorf("%s: %w", service.GetConfig().Url.GetRepositoryName(), result.Err))
+				err = multierror.Append(err, fmt.Errorf("%s: %w", service.GetConfig().URL.GetRepositoryName(), result.Err))
 			}
 		}
 		return pipeline.Result{Err: err}

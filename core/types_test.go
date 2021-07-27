@@ -30,7 +30,7 @@ func TestGitUrl_GetRepositoryName(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			u, err := url.Parse(tt.rawUrl)
 			require.NoError(t, err)
-			gitUrl := GitUrl(*u)
+			gitUrl := GitURL(*u)
 			result := gitUrl.GetRepositoryName()
 			assert.Equal(t, tt.expectedRepoName, result)
 		})
@@ -42,7 +42,7 @@ func TestGitUrl_GetNamespace(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			u, err := url.Parse(tt.rawUrl)
 			require.NoError(t, err)
-			gitUrl := GitUrl(*u)
+			gitUrl := GitURL(*u)
 			result := gitUrl.GetNamespace()
 			assert.Equal(t, tt.expectedNamespace, result)
 		})
