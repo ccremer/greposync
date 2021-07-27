@@ -17,7 +17,7 @@ help: ## Show this help
 
 .PHONY: build
 build: export GOOS = linux
-build: fmt vet ## Build the Go binary
+build: generate fmt vet ## Build the Go binary
 	@go build -o gsync .
 
 .PHONY: generate
@@ -36,7 +36,7 @@ vet: ## Run 'go vet' against code
 	go vet ./...
 
 .PHONY: lint
-lint: fmt vet generate ## Invokes the fmt and vet targets
+lint: generate fmt vet ## Invokes the fmt and vet targets
 	@echo 'Check for uncommitted changes ...'
 	git diff --exit-code
 

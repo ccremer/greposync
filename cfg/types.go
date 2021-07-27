@@ -137,3 +137,7 @@ func NewDefaultConfig() *Configuration {
 		},
 	}
 }
+
+func (l *RepositoryLabel) IsBoundForDeletion() bool {
+	return l.Delete
+}

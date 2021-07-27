@@ -5,6 +5,9 @@ package main
 // Run this file itself
 //go:generate go run generate.go
 
+// Generate fakes
+//go:generate go generate ./core
+
 import (
 	"fmt"
 	"io/ioutil"
