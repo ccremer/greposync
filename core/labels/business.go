@@ -6,6 +6,7 @@ import (
 )
 
 type (
+	// LabelService contains the business logic to interact with labels on supported core.GitHostingProvider.
 	LabelService struct {
 		repoProvider core.ManagedRepoProvider
 		repoFacades  []core.GitRepositoryFacade
@@ -62,7 +63,7 @@ func (s *LabelService) initHostingAPIs() error {
 	for _, facade := range s.repoFacades {
 		occurringProviders[facade.GetConfig().Provider] = true
 	}
-	for provider, _ := range occurringProviders {
+	for provider := range occurringProviders {
 		if hostingFacade, isSupported := s.repoProvider.GetSupportedGitHostingProviders()[provider]; isSupported {
 			if err := hostingFacade.Initialize(); err != nil {
 				return err

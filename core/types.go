@@ -9,7 +9,7 @@ import (
 type (
 	// GitURL is the same as url.URL but with additional helper methods.
 	GitURL url.URL
-	// GitHostingProvider is the provider
+	// GitHostingProvider is the identification key for a Git hosting service.
 	GitHostingProvider string
 	// GitRepositoryConfig holds all the relevant Git properties.
 	GitRepositoryConfig struct {
