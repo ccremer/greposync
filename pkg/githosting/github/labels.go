@@ -9,7 +9,7 @@ import (
 )
 
 func (p *Facade) CreateOrUpdateLabelsForRepo(url *core.GitURL, labels []core.GitRepositoryLabel) error {
-	converted := LabelConverter{}.convertFromEntity(labels)
+	converted := LabelConverter{}.ConvertFromEntity(labels)
 	p.log.SetName(url.GetRepositoryName())
 
 	allLabels, err := p.fetchAllLabels(url)
@@ -20,11 +20,12 @@ func (p *Facade) CreateOrUpdateLabelsForRepo(url *core.GitURL, labels []core.Git
 	for _, label := range converted {
 		ghLabel := p.findMatchingGhLabel(allLabels, label)
 		if ghLabel == nil {
-			createErr := p.createLabel(url, label)
-			if createErr == nil {
-				p.log.InfoF("Label '%s' created", label.Name)
+			if err := p.createLabel(url, label); err != nil {
+				return err
 			}
-			return createErr
+			p.log.InfoF("Label '%s' created", label.Name)
+			p.delay()
+			continue
 		}
 		if !p.hasLabelChanged(ghLabel, label) {
 			p.log.InfoF("Label '%s' unchanged", label.Name)
@@ -35,6 +36,7 @@ func (p *Facade) CreateOrUpdateLabelsForRepo(url *core.GitURL, labels []core.Git
 			return err
 		}
 		p.log.InfoF("Label '%s' updated", label.Name)
+		p.delay()
 	}
 
 	return nil
@@ -42,18 +44,14 @@ func (p *Facade) CreateOrUpdateLabelsForRepo(url *core.GitURL, labels []core.Git
 
 func (p *Facade) DeleteLabelsForRepo(url *core.GitURL, labels []core.GitRepositoryLabel) error {
 	p.log.SetName(url.GetRepositoryName())
-	converted := LabelConverter{}.convertFromEntity(labels)
+	converted := LabelConverter{}.ConvertFromEntity(labels)
 	for _, label := range converted {
 		err := p.deleteLabel(url, label)
 		if err != nil {
 			return err
 		}
 		p.log.InfoF("Label '%s' deleted", label.Name)
-		/*
-			https://docs.github.com/en/rest/guides/best-practices-for-integrators#dealing-with-abuse-rate-limits
-			"If you're making a large number of POST, PATCH, PUT, or DELETE requests for a single user or client ID, wait at least one second between each request."
-		*/
-		time.Sleep(1 * time.Second)
+		p.delay()
 	}
 	return nil
 }
@@ -76,7 +74,11 @@ func (p *Facade) updateLabel(url *core.GitURL, ghLabel *github.Label, label *cfg
 }
 
 func (p *Facade) deleteLabel(url *core.GitURL, label *cfg.RepositoryLabel) error {
-	_, err := p.client.Issues.DeleteLabel(p.ctx, url.GetNamespace(), url.GetRepositoryName(), label.Name)
+	resp, err := p.client.Issues.DeleteLabel(p.ctx, url.GetNamespace(), url.GetRepositoryName(), label.Name)
+	if resp != nil && resp.StatusCode == 404 {
+		// Not an error
+		return nil
+	}
 	return err
 }
 
@@ -110,4 +112,12 @@ func (p *Facade) findMatchingGhLabel(ghLabels []*github.Label, toFind *cfg.Repos
 
 func (p *Facade) hasLabelChanged(ghLabel *github.Label, repoLabel *cfg.RepositoryLabel) bool {
 	return ghLabel.GetDescription() != repoLabel.Description || ghLabel.GetColor() != repoLabel.Color
+}
+
+// delay sleeps one second for abuse rate limit best-practice.
+//
+// https://docs.github.com/en/rest/guides/best-practices-for-integrators#dealing-with-abuse-rate-limits
+// "If you're making a large number of POST, PATCH, PUT, or DELETE requests for a single user or client ID, wait at least one second between each request."
+func (p *Facade) delay() {
+	time.Sleep(1 * time.Second)
 }

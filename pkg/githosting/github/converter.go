@@ -10,7 +10,7 @@ type (
 	LabelConverter struct{}
 )
 
-func (LabelConverter) convertToEntity(labels []*cfg.RepositoryLabel) []core.GitRepositoryLabel {
+func (LabelConverter) ConvertToEntity(labels []*cfg.RepositoryLabel) []core.GitRepositoryLabel {
 	if labels == nil || len(labels) == 0 {
 		return []core.GitRepositoryLabel{}
 	}
@@ -21,7 +21,7 @@ func (LabelConverter) convertToEntity(labels []*cfg.RepositoryLabel) []core.GitR
 	return converted
 }
 
-func (LabelConverter) convertFromEntity(labels []core.GitRepositoryLabel) []*cfg.RepositoryLabel {
+func (LabelConverter) ConvertFromEntity(labels []core.GitRepositoryLabel) []*cfg.RepositoryLabel {
 	if labels == nil || len(labels) == 0 {
 		return []*cfg.RepositoryLabel{}
 	}

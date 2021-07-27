@@ -4,6 +4,7 @@ import (
 	"context"
 	"os"
 
+	"github.com/ccremer/greposync/core"
 	"github.com/ccremer/greposync/printer"
 	"github.com/google/go-github/v37/github"
 	"golang.org/x/oauth2"
@@ -17,6 +18,8 @@ type (
 		log    printer.Printer
 	}
 )
+
+const GitHubProviderKey core.GitHostingProvider = "github"
 
 // NewFacade returns a new GitHub provider instance.
 func NewFacade() *Facade {

@@ -37,12 +37,12 @@ func TestLabelConverter_convertEntity(t *testing.T) {
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
 			converter := LabelConverter{}
-			asEntities := converter.convertToEntity(tt.givenLabels)
+			asEntities := converter.ConvertToEntity(tt.givenLabels)
 			assert.Len(t, asEntities, len(tt.givenLabels))
 			for i := range asEntities {
 				assert.Equal(t, tt.givenLabels[i], asEntities[i])
 			}
-			asConcrete := converter.convertFromEntity(asEntities)
+			asConcrete := converter.ConvertFromEntity(asEntities)
 			if tt.givenLabels == nil {
 				// Keep same starting situation
 				asConcrete = nil

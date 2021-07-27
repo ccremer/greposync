@@ -13,8 +13,10 @@ type CoreService interface {
 //counterfeiter:generate . ManagedRepoProvider
 type ManagedRepoProvider interface {
 	// LoadManagedRepositories will load the managed repositories from a config store and returns an array of GitRepositoryFacade for each Git repository.
+	// A non-nil empty slice is returned if there are none existing.
 	LoadManagedRepositories() ([]GitRepositoryFacade, error)
 	// GetSupportedGitHostingProviders returns a map of supported GitHostingFacade.
+	// A non-nil empty map is returned if there are none.
 	GetSupportedGitHostingProviders() map[GitHostingProvider]GitHostingFacade
 }
 
