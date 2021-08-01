@@ -123,6 +123,11 @@ func (s *GoTemplateService) writeTemplate(output core.Output, t *template.Templa
 	defer unix.Umask(originalUmask)
 
 	fileName := path.Join(output.Git.RootDir, output.TargetPath)
+	if fileExists(fileName) {
+		if err := os.Remove(fileName); err != nil {
+			return err
+		}
+	}
 	f, err := os.OpenFile(fileName, os.O_RDWR|os.O_CREATE|os.O_TRUNC, output.Template.FileMode)
 	if err != nil {
 		return err
