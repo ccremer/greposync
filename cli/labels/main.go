@@ -36,10 +36,7 @@ func (c *Command) createCommand() *cli.Command {
 		Usage:  "Synchronizes repository labels",
 		Before: c.validateCommand,
 		Action: c.runCommand,
-		Flags: flags.CombineWithGlobalFlags(
-			flags.NewProjectIncludeFlag(),
-			flags.NewProjectExcludeFlag(),
-		),
+		Flags:  flags.CombineWithGlobalFlags(),
 	}
 }
 

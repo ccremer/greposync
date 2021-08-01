@@ -50,6 +50,8 @@ func InitGlobalFlags(config *cfg.Configuration) []cli.Flag {
 			Aliases: []string{"j"},
 			Value:   1,
 		},
+		NewProjectIncludeFlag(),
+		NewProjectExcludeFlag(),
 	}
 	return globalFlags
 }

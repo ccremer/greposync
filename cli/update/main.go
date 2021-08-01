@@ -58,8 +58,6 @@ func (c *Command) createCliCommand() *cli.Command {
 		Action: c.runCommand,
 		Before: c.validateUpdateCommand,
 		Flags: flags.CombineWithGlobalFlags(
-			flags.NewProjectIncludeFlag(),
-			flags.NewProjectExcludeFlag(),
 			&cli.StringFlag{
 				Name:    dryRunFlagName,
 				Aliases: []string{"d"},
