@@ -10,6 +10,7 @@ import (
 	"github.com/hashicorp/go-multierror"
 )
 
+// RunPipeline implements core.CoreService.
 func (s *LabelService) RunPipeline() error {
 	logger := printer.PipelineLogger{Logger: s.log}
 	result := pipeline.NewPipelineWithLogger(logger).WithSteps(

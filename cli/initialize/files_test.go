@@ -98,7 +98,7 @@ func Test_writeFiles(t *testing.T) {
 				return
 			}
 			assert.NoError(t, err)
-			for file, _ := range tt.givenFiles {
+			for file := range tt.givenFiles {
 				assert.FileExists(t, file)
 				require.NoError(t, os.Remove(file))
 			}

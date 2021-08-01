@@ -10,6 +10,8 @@ type (
 	LabelConverter struct{}
 )
 
+// ConvertToEntity converts the given object to another.
+// Returns a non-nil empty list if labels is empty or nil.
 func (LabelConverter) ConvertToEntity(labels []*cfg.RepositoryLabel) []core.GitRepositoryLabel {
 	if labels == nil || len(labels) == 0 {
 		return []core.GitRepositoryLabel{}
@@ -21,6 +23,8 @@ func (LabelConverter) ConvertToEntity(labels []*cfg.RepositoryLabel) []core.GitR
 	return converted
 }
 
+// ConvertFromEntity converts the given object to another.
+// Returns a non-nil empty list if labels is empty or nil.
 func (LabelConverter) ConvertFromEntity(labels []core.GitRepositoryLabel) []*cfg.RepositoryLabel {
 	if labels == nil || len(labels) == 0 {
 		return []*cfg.RepositoryLabel{}

@@ -52,7 +52,7 @@ clean: ## Clean the project
 
 .PHONY: test
 test: ## Run unit tests
-	@go test -race -coverprofile cover.out -covermode atomic -count 1 -v ./...
+	@go test -race -coverprofile cover.out -covermode atomic -count 1 ./...
 
 .PHONY: run
 run: ## Run locally

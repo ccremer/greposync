@@ -1,0 +1,2 @@
+{{ template "variable" . }}
+{{ .data | toJson }}

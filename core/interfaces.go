@@ -57,3 +57,25 @@ type GitRepositoryLabel interface {
 	// IsBoundForDeletion returns true if the label is bound for removal from a remote repository.
 	IsBoundForDeletion() bool
 }
+
+// TemplateFacade is a service responsible for fetching and rendering templates.
+type TemplateFacade interface {
+	// FetchTemplates retrieves the templates or an error if one failed.
+	FetchTemplates() ([]Template, error)
+	// RenderTemplate writes the template with the given output.
+	RenderTemplate(output Output) error
+}
+
+// ValueStoreFacade is a service centered around configuration values fetching and configuring templates.
+type ValueStoreFacade interface {
+	// FetchValuesForTemplate retrieves the Values for the given template.
+	FetchValuesForTemplate(template Template, config *GitRepositoryConfig) (Values, error)
+	// FetchUnmanagedFlag returns true if the given template should not be rendered.
+	FetchUnmanagedFlag(template Template, config *GitRepositoryConfig) bool
+	// FetchTargetPath returns an alternative output path for the given template relative to the Git repository.
+	// An empty string indicates that there is no alternative path configured.
+	FetchTargetPath(template Template, config *GitRepositoryConfig) string
+	// FetchFilesToDelete returns a slice of paths that should be deleted in the Git repository.
+	// The paths are relative to the Git directory.
+	FetchFilesToDelete(config *GitRepositoryConfig) ([]string, error)
+}

@@ -33,7 +33,7 @@ func (r *Renderer) searchOrphanedFiles() []string {
 	for filePath, values := range allKeys {
 		// If the filename is already handled by the template renderer, ignore it.
 		// Otherwise, add files that have deletion flag, but ignore directories
-		if _, found := r.parser.templates[filePath]; !found && pathIsFile(filePath) {
+		if _, found := r.instance.GetTemplateInstances()[filePath]; !found && pathIsFile(filePath) {
 			if val, ok := values.(map[string]interface{}); ok {
 				if filePath == ":globals" {
 					// can't delete file named ':globals' anyway

@@ -28,10 +28,12 @@ func newGitRepositoryFacade(cfg *cfg.GitConfig, labels []core.GitRepositoryLabel
 	}
 }
 
+// GetLabels implements core.GitRepositoryFacade.
 func (g *GitRepository) GetLabels() []core.GitRepositoryLabel {
 	return g.labels
 }
 
+// GetConfig implements core.GitRepositoryFacade.
 func (g *GitRepository) GetConfig() core.GitRepositoryConfig {
 	return g.coreConfig
 }

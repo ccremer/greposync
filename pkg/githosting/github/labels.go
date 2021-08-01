@@ -8,6 +8,7 @@ import (
 	"github.com/google/go-github/v37/github"
 )
 
+// CreateOrUpdateLabelsForRepo implements core.GitHostingFacade.
 func (p *Facade) CreateOrUpdateLabelsForRepo(url *core.GitURL, labels []core.GitRepositoryLabel) error {
 	converted := LabelConverter{}.ConvertFromEntity(labels)
 	p.log.SetName(url.GetRepositoryName())
@@ -42,15 +43,20 @@ func (p *Facade) CreateOrUpdateLabelsForRepo(url *core.GitURL, labels []core.Git
 	return nil
 }
 
+// DeleteLabelsForRepo implements core.GitHostingFacade.
 func (p *Facade) DeleteLabelsForRepo(url *core.GitURL, labels []core.GitRepositoryLabel) error {
 	p.log.SetName(url.GetRepositoryName())
 	converted := LabelConverter{}.ConvertFromEntity(labels)
 	for _, label := range converted {
-		err := p.deleteLabel(url, label)
+		deleted, err := p.deleteLabel(url, label)
 		if err != nil {
 			return err
 		}
-		p.log.InfoF("Label '%s' deleted", label.Name)
+		if deleted {
+			p.log.InfoF("Label '%s' deleted", label.Name)
+		} else {
+			p.log.InfoF("Label '%s' not deleted (not existing)", label.Name)
+		}
 		p.delay()
 	}
 	return nil
@@ -73,29 +79,28 @@ func (p *Facade) updateLabel(url *core.GitURL, ghLabel *github.Label, label *cfg
 	return err
 }
 
-func (p *Facade) deleteLabel(url *core.GitURL, label *cfg.RepositoryLabel) error {
+func (p *Facade) deleteLabel(url *core.GitURL, label *cfg.RepositoryLabel) (bool, error) {
 	resp, err := p.client.Issues.DeleteLabel(p.ctx, url.GetNamespace(), url.GetRepositoryName(), label.Name)
 	if resp != nil && resp.StatusCode == 404 {
 		// Not an error
-		return nil
+		return false, nil
 	}
-	return err
+	return err == nil, err
 }
 
 func (p *Facade) fetchAllLabels(url *core.GitURL) ([]*github.Label, error) {
 	nextPage := 1
-	lastPage := 1
 	var allLabels []*github.Label
-	for repeat := true; repeat; repeat = nextPage < lastPage {
+	for repeat := true; repeat; repeat = nextPage > 0 {
 		labels, resp, err := p.client.Issues.ListLabels(p.ctx, url.GetNamespace(), url.GetRepositoryName(), &github.ListOptions{
-			Page:    1,
+			Page:    nextPage,
 			PerPage: 100,
 		})
 		if err != nil {
 			return nil, err
 		}
 		allLabels = append(allLabels, labels...)
-		lastPage = resp.LastPage
+		// On the last page, the NextPage is 0 again, we can use that to exit the loop
 		nextPage = resp.NextPage
 	}
 	return allLabels, nil

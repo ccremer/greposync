@@ -1,15 +1,14 @@
 package rendering
 
 import (
-	"bufio"
-	"os"
 	"path"
-	"path/filepath"
 	"strings"
-	"text/template"
 
 	pipeline "github.com/ccremer/go-command-pipeline"
 	"github.com/ccremer/greposync/cfg"
+	"github.com/ccremer/greposync/core"
+	"github.com/ccremer/greposync/pkg/githosting/github"
+	"github.com/ccremer/greposync/pkg/rendering"
 	"github.com/ccremer/greposync/printer"
 	"github.com/knadh/koanf"
 )
@@ -20,25 +19,24 @@ type (
 		cfg            *cfg.SyncConfig
 		k              *koanf.Koanf
 		globalDefaults *koanf.Koanf
-		parser         *Parser
+		instance       *rendering.GoTemplateService
 	}
 	Values     map[string]interface{}
 	FileAction func(targetPath string, data Values) error
 )
 
 var (
-	templateFunctions  = funcMap()
 	SyncConfigFileName = ".sync.yml"
 )
 
 // NewRenderer returns a new instance of a renderer.
-func NewRenderer(c *cfg.SyncConfig, globalDefaults *koanf.Koanf, parser *Parser) *Renderer {
+func NewRenderer(c *cfg.SyncConfig, globalDefaults *koanf.Koanf) *Renderer {
 	return &Renderer{
 		p:              printer.New().SetLevel(printer.DefaultLevel).MapColorToLevel(printer.Magenta, printer.LevelInfo).SetName(c.Git.Name),
 		k:              koanf.New("."),
 		globalDefaults: globalDefaults,
 		cfg:            c,
-		parser:         parser,
+		instance:       rendering.NewTemplateInstance(c.Template),
 	}
 }
 
@@ -52,8 +50,12 @@ func (r *Renderer) RenderTemplateDir() pipeline.ActionFunc {
 			return pipeline.Result{Err: err}
 		}
 
-		for file, tpl := range r.parser.templates {
-			if err = r.processTemplate(file, tpl); err != nil {
+		templates, err := r.instance.FetchTemplates()
+		if err != nil {
+			return pipeline.Result{Err: err}
+		}
+		for _, tpl := range templates {
+			if err = r.processTemplate(tpl); err != nil {
 				return pipeline.Result{Err: err}
 			}
 		}
@@ -61,13 +63,8 @@ func (r *Renderer) RenderTemplateDir() pipeline.ActionFunc {
 	}
 }
 
-func (r *Renderer) processTemplate(originalTemplatePath string, tpl *template.Template) error {
-	relativePath, err := filepath.Rel(r.cfg.Template.RootDir, cleanTargetPath(originalTemplatePath))
-	if err != nil {
-		return err
-	}
-
-	values, err := r.loadDataForFile(relativePath)
+func (r *Renderer) processTemplate(tpl core.Template) error {
+	values, err := r.loadDataForFile(cleanTargetPath(tpl.RelativePath))
 	if err != nil {
 		return err
 	}
@@ -76,11 +73,11 @@ func (r *Renderer) processTemplate(originalTemplatePath string, tpl *template.Te
 		"Metadata": r.ConstructMetadata(),
 	}
 
-	targetPath := path.Join(r.cfg.Git.Dir, relativePath)
+	targetPath := tpl.RelativePath
 	return r.applyTemplate(targetPath, tpl, data)
 }
 
-func (r *Renderer) applyTemplate(targetPath string, tpl *template.Template, values Values) error {
+func (r *Renderer) applyTemplate(targetPath string, tpl core.Template, values core.Values) error {
 	if values["Values"].(Values)["delete"] == true {
 		return r.deleteFileIfExists(targetPath)
 	}
@@ -90,34 +87,25 @@ func (r *Renderer) applyTemplate(targetPath string, tpl *template.Template, valu
 	}
 	if newTarget := values["Values"].(Values)["targetPath"]; newTarget != nil && newTarget != "" {
 		newPath := newTarget.(string)
-		if strings.HasSuffix(newPath, string(filepath.Separator)) {
-			newPath = path.Clean(path.Join(r.cfg.Git.Dir, newPath, path.Base(targetPath)))
+		if strings.HasSuffix(newPath, "/") {
+			newPath = path.Clean(path.Join(newPath, path.Base(targetPath)))
 		} else {
-			newPath = path.Clean(path.Join(r.cfg.Git.Dir, newPath))
+			newPath = path.Clean(path.Join(newPath))
 		}
 		r.p.DebugF("Redefining target path from '%s' to '%s", targetPath, newPath)
 		targetPath = newPath
 	}
-	return r.writeFile(targetPath, tpl, values)
-}
-
-func (r *Renderer) writeFile(targetPath string, tpl *template.Template, data Values) error {
-	r.p.InfoF("Writing file from template: %s", path.Base(targetPath))
-	dir := path.Dir(targetPath)
-	if err := os.MkdirAll(dir, 0775); err != nil {
-		return err
-	}
-	f, err := os.Create(targetPath)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-	w := bufio.NewWriter(f)
-	err = tpl.Execute(w, data)
-	if err != nil {
-		return err
-	}
-	return w.Flush()
+	targetPath = cleanTargetPath(targetPath)
+	return r.instance.RenderTemplate(core.Output{
+		TargetPath: targetPath,
+		Template:   tpl,
+		Values:     values,
+		Git: core.GitRepositoryConfig{
+			URL:      core.FromURL(r.cfg.Git.Url),
+			Provider: github.GitHubProviderKey,
+			RootDir:  r.cfg.Git.Dir,
+		},
+	})
 }
 
 func cleanTargetPath(targetPath string) string {

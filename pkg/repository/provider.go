@@ -23,10 +23,12 @@ func NewGitRepositoryProvider(config *cfg.Configuration) *GitRepositoryProvider 
 	}
 }
 
+// GetSupportedGitHostingProviders implements core.ManagedRepoProvider.
 func (r *GitRepositoryProvider) GetSupportedGitHostingProviders() map[core.GitHostingProvider]core.GitHostingFacade {
 	return r.providers
 }
 
+// LoadManagedRepositories implements core.ManagedRepoProvider.
 func (r *GitRepositoryProvider) LoadManagedRepositories() ([]core.GitRepositoryFacade, error) {
 	services, err := repository.NewServicesFromFile(r.config)
 	if err != nil || len(services) == 0 {

@@ -19,6 +19,7 @@ type (
 	}
 )
 
+// GitHubProviderKey is the identifier for the GitHub core.GitHostingProvider.
 const GitHubProviderKey core.GitHostingProvider = "github"
 
 // NewFacade returns a new GitHub provider instance.
@@ -29,6 +30,7 @@ func NewFacade() *Facade {
 	return provider
 }
 
+// Initialize implements core.GitHostingFacade.
 func (p *Facade) Initialize() error {
 	ctx, client := createClient(os.Getenv("GITHUB_TOKEN"))
 	p.client = client
