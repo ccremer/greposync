@@ -6,7 +6,7 @@ import (
 	"text/template"
 
 	"github.com/ccremer/greposync/cfg"
-	"github.com/ccremer/greposync/printer"
+	"github.com/ccremer/greposync/pkg/rendering"
 	"github.com/knadh/koanf"
 	"github.com/knadh/koanf/providers/confmap"
 	"github.com/stretchr/testify/assert"
@@ -49,11 +49,12 @@ func TestRenderer_searchOrphanedFiles(t *testing.T) {
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
 			r := &Renderer{
-				k: koanf.New(""),
-				parser: &Parser{templates: map[string]*template.Template{
-					"Readme.md": nil,
-				}},
+				k:        koanf.New(""),
+				instance: rendering.NewTemplateInstance(nil),
 			}
+			r.instance.SetTemplateInstances(map[string]*template.Template{
+				"Readme.md": nil,
+			})
 			require.NoError(t, r.k.Load(confmap.Provider(tt.givenValues, ""), nil))
 			files := r.searchOrphanedFiles()
 			assert.Equal(t, tt.expectedFileNames, files)
@@ -62,16 +63,11 @@ func TestRenderer_searchOrphanedFiles(t *testing.T) {
 }
 
 func (s *TemplateTestSuite) TestDeleteUnwantedFiles() {
-	r := &Renderer{
-		k:      koanf.New(""),
-		parser: &Parser{templates: map[string]*template.Template{}},
-		cfg: &cfg.SyncConfig{
-			Git: &cfg.GitConfig{
-				Dir: s.SeedTargetDir,
-			},
+	r := NewRenderer(&cfg.SyncConfig{
+		Git: &cfg.GitConfig{
+			Dir: s.SeedTargetDir,
 		},
-		p: printer.New(),
-	}
+	}, koanf.New(""))
 	s.Require().NoError(r.k.Load(confmap.Provider(Values{
 		"readme.md": map[string]interface{}{
 			"delete": true,

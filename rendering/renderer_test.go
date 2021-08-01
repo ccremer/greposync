@@ -2,6 +2,7 @@ package rendering
 
 import (
 	"io"
+	"net/url"
 	"os"
 	"path"
 	"path/filepath"
@@ -9,6 +10,8 @@ import (
 	"text/template"
 
 	"github.com/ccremer/greposync/cfg"
+	"github.com/ccremer/greposync/core"
+	"github.com/ccremer/greposync/pkg/rendering"
 	"github.com/ccremer/greposync/printer"
 	"github.com/knadh/koanf"
 	"github.com/knadh/koanf/providers/confmap"
@@ -83,20 +86,25 @@ func (s *TemplateTestSuite) TestProcessTemplate() {
 	}
 	for name, tt := range tests {
 		s.T().Run(name, func(t *testing.T) {
-			r := &Renderer{
-				p: printer.New(),
-				cfg: &cfg.SyncConfig{
-					Template: &cfg.TemplateConfig{RootDir: "testdata/template-1"},
-					Git: &cfg.GitConfig{
-						Dir:  s.TestGitDir,
-						Name: "example-repository",
-					},
-				},
-				k: s.K,
-			}
-			tpl, err := template.New("").Funcs(funcMap()).Parse("{{ .Metadata.Repository.Name | upper }}")
+			u, err := url.Parse("https://github.com/example/example-repository")
 			require.NoError(t, err)
-			err = r.processTemplate(path.Join(r.cfg.Template.RootDir, tt.givenTemplate), tpl)
+			r := NewRenderer(&cfg.SyncConfig{
+				Template: &cfg.TemplateConfig{RootDir: "testdata/template-1"},
+				Git: &cfg.GitConfig{
+					Dir:  s.TestGitDir,
+					Name: "example-repository",
+					Url:  u,
+				},
+			}, s.K)
+			tpl, err := template.New("").Funcs(rendering.GoTemplateFuncMap()).Parse("{{ .Metadata.Repository.Name | upper }}")
+			require.NoError(t, err)
+			r.instance.SetTemplateInstances(map[string]*template.Template{
+				tt.givenTemplate: tpl,
+			})
+			err = r.processTemplate(core.Template{
+				RelativePath: tt.givenTemplate,
+				FileMode:     0644,
+			})
 			if tt.expectErr {
 				require.Error(t, err)
 				return
@@ -112,21 +120,23 @@ func (s *TemplateTestSuite) TestProcessTemplate() {
 }
 
 func (s *TemplateTestSuite) TestRenderer_RenderTemplateDir() {
-	r := &Renderer{
-		p: printer.New(),
-		cfg: &cfg.SyncConfig{
-			Git: &cfg.GitConfig{
-				Dir: s.TestGitDir,
-			},
-			Template: &cfg.TemplateConfig{
-				RootDir: "testdata/template-1",
-			},
+	u, err := url.Parse("https://github.com/example/irrelevant")
+	require.NoError(s.T(), err)
+	r := NewRenderer(&cfg.SyncConfig{
+		Git: &cfg.GitConfig{
+			Dir: s.TestGitDir,
+			Url: u,
 		},
-		k:              koanf.New("."),
-		globalDefaults: s.K,
-	}
-	r.parser = NewParser(r.cfg.Template)
-	s.Require().NoError(r.parser.ParseTemplateDir())
+		Template: &cfg.TemplateConfig{
+			RootDir: "testdata/template-1",
+		},
+	}, s.K)
+	err = s.K.Load(confmap.Provider(map[string]interface{}{
+		"readme.md": core.Values{
+			"custom": "value",
+		},
+	}, ""), nil)
+	s.Require().NoError(err)
 	result := r.RenderTemplateDir()()
 	s.Require().NoError(result.Err)
 	s.Assert().NoFileExists(path.Join(s.TestGitDir, "_helpers.tpl"))
@@ -139,7 +149,7 @@ func (s *TemplateTestSuite) TestRenderer_GivenUnmanagedFlag_WhenApplyingTemplate
 		p: printer.New(),
 	}
 	targetPath := path.Join(s.SeedTargetDir, "readme.md")
-	err := r.applyTemplate(targetPath, nil, Values{
+	err := r.applyTemplate(targetPath, core.Template{}, core.Values{
 		"Values": Values{
 			"unmanaged": true,
 		}})
@@ -152,7 +162,7 @@ func (s *TemplateTestSuite) TestRenderer_GivenDeleteFlag_WhenApplyingTemplate_Th
 		p: printer.New(),
 	}
 	targetPath := path.Join(s.SeedTargetDir, "readme.md")
-	err := r.applyTemplate(targetPath, nil, Values{
+	err := r.applyTemplate(targetPath, core.Template{}, core.Values{
 		"Values": Values{
 			"delete": true,
 		}})
@@ -163,35 +173,33 @@ func (s *TemplateTestSuite) TestRenderer_GivenDeleteFlag_WhenApplyingTemplate_Th
 func (s *TemplateTestSuite) TestRenderer_GivenTargetPath() {
 	tests := map[string]struct {
 		givenTargetDir              string
-		givenOriginalPath           string
 		expectedEffectiveTargetFile string
 	}{
 		"GivenTargetDir_WhenApplyingTemplate_ThenChangeDirectoryButNotFileName": {
 			givenTargetDir:              "dir/",
-			givenOriginalPath:           path.Join(s.TestGitDir, "readme.md"),
 			expectedEffectiveTargetFile: path.Join(s.SeedTargetDir, "dir", "readme.md"),
 		},
 		"GivenTargetPath_WhenApplyingTemplate_ThenChangeFileName": {
 			givenTargetDir:              "dir/newFile.ext",
-			givenOriginalPath:           path.Join(s.TestGitDir, "readme.md"),
 			expectedEffectiveTargetFile: path.Join(s.SeedTargetDir, "dir", "newFile.ext"),
 		},
 	}
 
 	for name, tt := range tests {
 		s.T().Run(name, func(t *testing.T) {
-			r := &Renderer{
-				p: printer.New(),
-				cfg: &cfg.SyncConfig{
-					Git: &cfg.GitConfig{
-						Dir: s.SeedTargetDir,
-					},
-				},
-			}
-			targetPath := path.Join(s.SeedTargetDir, "readme.md")
-			tpl, err := template.New("readme.md").Parse("")
+			u, err := url.Parse("https://github.com/example/irrelevant")
 			require.NoError(t, err)
-			err = r.applyTemplate(targetPath, tpl, Values{
+			r := NewRenderer(&cfg.SyncConfig{
+				Template: &cfg.TemplateConfig{RootDir: s.SeedSourceDir},
+				Git: &cfg.GitConfig{
+					Dir: s.SeedTargetDir,
+					Url: u,
+				},
+			}, koanf.New("."))
+			targetPath := "readme.md"
+			templates, err := r.instance.FetchTemplates()
+			require.NoError(t, err)
+			err = r.applyTemplate(targetPath, templates[0], core.Values{
 				"Values": Values{
 					"targetPath": tt.givenTargetDir,
 				}})

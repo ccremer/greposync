@@ -32,7 +32,6 @@ type (
 		cfg          *cfg.Configuration
 		cliCommand   *cli.Command
 		repoServices []*repository.Service
-		parser       *rendering.Parser
 		globalK      *koanf.Koanf
 	}
 )
@@ -42,7 +41,6 @@ func NewCommand(cfg *cfg.Configuration) *Command {
 	c := &Command{
 		globalK: koanf.New("."),
 		cfg:     cfg,
-		parser:  rendering.NewParser(cfg.Template),
 	}
 	c.cliCommand = c.createCliCommand()
 	return c
@@ -88,7 +86,6 @@ func (c *Command) runCommand(_ *cli.Context) error {
 	logger := printer.PipelineLogger{Logger: printer.New().SetName("update").SetLevel(printer.DefaultLevel)}
 	p := pipeline.NewPipelineWithLogger(logger).WithSteps(
 		pipeline.NewStep("parse config defaults", c.loadGlobalDefaults()),
-		pipeline.NewStep("parse templates", c.parser.ParseTemplateDirAction()),
 		pipeline.NewStep("parse managed repos config", c.parseServices()),
 		parallel.NewWorkerPoolStep("update repositories", c.cfg.Project.Jobs, c.updateReposInParallel(), c.errorHandler()),
 	)
@@ -105,7 +102,7 @@ func (c *Command) createPipeline(r *repository.Service) *pipeline.Pipeline {
 			RootDir: c.cfg.Template.RootDir,
 		},
 	}
-	renderer := rendering.NewRenderer(sc, c.globalK, c.parser)
+	renderer := rendering.NewRenderer(sc, c.globalK)
 	gitDirExists := r.DirExists(r.Config.Dir)
 	logger := printer.PipelineLogger{Logger: log}
 	p := pipeline.NewPipelineWithLogger(logger)

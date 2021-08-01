@@ -6,6 +6,7 @@ import (
 	"text/template"
 
 	pipeline "github.com/ccremer/go-command-pipeline"
+	"github.com/ccremer/greposync/pkg/rendering"
 )
 
 // RenderPrTemplate renders the PR template.
@@ -43,8 +44,8 @@ func (r *Renderer) renderString(data interface{}, content string) (string, error
 	r.p.DebugF("Parsing template from string")
 	tpl, err := template.
 		New("").
-		Option(errorOnMissingKey).
-		Funcs(templateFunctions).
+		Option(rendering.ErrorOnMissingKey).
+		Funcs(rendering.GoTemplateFuncMap()).
 		Parse(content)
 	if err != nil {
 		return "", err
@@ -62,8 +63,8 @@ func (r *Renderer) renderTemplateFile(data interface{}, filePath string) (string
 	fileName := path.Base(filePath)
 	tpl, err := template.
 		New(fileName).
-		Option(errorOnMissingKey).
-		Funcs(templateFunctions).
+		Option(rendering.ErrorOnMissingKey).
+		Funcs(rendering.GoTemplateFuncMap()).
 		ParseFiles(filePath)
 	if err != nil {
 		return "", err
