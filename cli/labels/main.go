@@ -41,6 +41,6 @@ func (c *Command) createCommand() *cli.Command {
 }
 
 func (c *Command) runCommand(ctx *cli.Context) error {
-	labelService := labels.NewService(repository.NewGitRepositoryProvider(c.cfg))
+	labelService := labels.NewService(repository.NewRepositoryStore(c.cfg))
 	return labelService.RunPipeline()
 }

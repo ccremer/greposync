@@ -50,7 +50,7 @@ func TestRenderer_searchOrphanedFiles(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			r := &Renderer{
 				k:        koanf.New(""),
-				instance: rendering.NewTemplateInstance(nil),
+				instance: rendering.NewGoTemplateStore(nil),
 			}
 			r.instance.SetTemplateInstances(map[string]*template.Template{
 				"Readme.md": nil,

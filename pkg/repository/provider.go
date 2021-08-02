@@ -8,36 +8,36 @@ import (
 )
 
 type (
-	// GitRepositoryProvider is the implementation of core.ManagedRepoProvider.
-	GitRepositoryProvider struct {
+	// RepositoryStore is the implementation of core.GitRepositoryStore.
+	RepositoryStore struct {
 		providers map[core.GitHostingProvider]core.GitHostingFacade
 		config    *cfg.Configuration
 	}
 )
 
-// NewGitRepositoryProvider creates a new instance.
-func NewGitRepositoryProvider(config *cfg.Configuration) *GitRepositoryProvider {
-	return &GitRepositoryProvider{
+// NewRepositoryStore creates a new instance.
+func NewRepositoryStore(config *cfg.Configuration) *RepositoryStore {
+	return &RepositoryStore{
 		providers: getProviders(),
 		config:    config,
 	}
 }
 
-// GetSupportedGitHostingProviders implements core.ManagedRepoProvider.
-func (r *GitRepositoryProvider) GetSupportedGitHostingProviders() map[core.GitHostingProvider]core.GitHostingFacade {
+// GetSupportedGitHostingProviders implements core.GitRepositoryStore.
+func (r *RepositoryStore) GetSupportedGitHostingProviders() map[core.GitHostingProvider]core.GitHostingFacade {
 	return r.providers
 }
 
-// LoadManagedRepositories implements core.ManagedRepoProvider.
-func (r *GitRepositoryProvider) LoadManagedRepositories() ([]core.GitRepositoryFacade, error) {
+// FetchGitRepositories implements core.GitRepositoryStore.
+func (r *RepositoryStore) FetchGitRepositories() ([]core.GitRepository, error) {
 	services, err := repository.NewServicesFromFile(r.config)
 	if err != nil || len(services) == 0 {
-		return []core.GitRepositoryFacade{}, err
+		return []core.GitRepository{}, err
 	}
 	labels := convertLabels(r.config.RepositoryLabels)
-	facades := make([]core.GitRepositoryFacade, len(services))
+	facades := make([]core.GitRepository, len(services))
 	for i, service := range services {
-		facade := newGitRepositoryFacade(service.Config, labels)
+		facade := NewGitRepository(service.Config, labels)
 		facades[i] = facade
 	}
 	return facades, err
@@ -49,7 +49,7 @@ func getProviders() map[core.GitHostingProvider]core.GitHostingFacade {
 	}
 }
 
-func convertLabels(labels map[string]cfg.RepositoryLabel) []core.GitRepositoryLabel {
+func convertLabels(labels map[string]cfg.RepositoryLabel) []core.Label {
 	values := make([]*cfg.RepositoryLabel, 0)
 	for _, label := range labels {
 		values = append(values, &label)

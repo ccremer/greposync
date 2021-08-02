@@ -23,7 +23,7 @@ func (s *LabelService) RunPipeline() error {
 
 func (s *LabelService) loadManagedReposAction() pipeline.ActionFunc {
 	return func() pipeline.Result {
-		repos, err := s.repoProvider.LoadManagedRepositories()
+		repos, err := s.repoProvider.FetchGitRepositories()
 		s.repoFacades = repos
 		return pipeline.Result{Err: err}
 	}
@@ -41,7 +41,7 @@ func (s *LabelService) updateReposInParallel() parallel.PipelineSupplier {
 	}
 }
 
-func (s *LabelService) createPipelineForUpdatingLabels(rf core.GitRepositoryFacade, hf core.GitHostingFacade) *pipeline.Pipeline {
+func (s *LabelService) createPipelineForUpdatingLabels(rf core.GitRepository, hf core.GitHostingFacade) *pipeline.Pipeline {
 	log := printer.New().SetName(rf.GetConfig().URL.GetRepositoryName())
 	logger := printer.PipelineLogger{Logger: log}
 
@@ -71,13 +71,13 @@ func (s *LabelService) initHostingAPIAction() pipeline.ActionFunc {
 	}
 }
 
-func (s *LabelService) createOrUpdateLabelAction(r core.GitRepositoryFacade, h core.GitHostingFacade) pipeline.ActionFunc {
+func (s *LabelService) createOrUpdateLabelAction(r core.GitRepository, h core.GitHostingFacade) pipeline.ActionFunc {
 	return func() pipeline.Result {
 		return pipeline.Result{Err: s.createOrUpdateLabels(r, h)}
 	}
 }
 
-func (s *LabelService) deleteLabelAction(r core.GitRepositoryFacade, h core.GitHostingFacade) pipeline.ActionFunc {
+func (s *LabelService) deleteLabelAction(r core.GitRepository, h core.GitHostingFacade) pipeline.ActionFunc {
 	return func() pipeline.Result {
 		return pipeline.Result{Err: s.deleteLabels(r, h)}
 	}

@@ -1,7 +1,6 @@
 package core
 
 import (
-	"io/fs"
 	"net/url"
 	"path"
 	"strings"
@@ -21,29 +20,6 @@ type (
 		Provider GitHostingProvider
 		// RootDir is the local root path to the Git repository.
 		RootDir string
-	}
-	// Values is a key-value construct with arbitrary hierarchy.
-	Values map[string]interface{}
-	// Template contains meta information about the source template.
-	Template struct {
-		// RelativePath is the path to a template file relative to the template root directory.
-		// The path is delimited with a forward slash ("/") and not OS-specific.
-		RelativePath string
-		// FileMode is the mode of the RelativePath.
-		// When rendering the template in a Git repository, the implementation must write the file with these file permissions.
-		FileMode fs.FileMode
-	}
-	// Output contains meta information how the template should be processed.
-	Output struct {
-		// TargetPath is the actual file path relative to the Git repository where the resulting template should be written to.
-		// The file permissions are copied from the Template property.
-		TargetPath string
-		// Template contains the information about the source template file.
-		Template Template
-		// Values contains the variables and parameters which the template should replace placeholders with.
-		Values Values
-		// Git contains the settings for the Git repository.
-		Git GitRepositoryConfig
 	}
 )
 

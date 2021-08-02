@@ -8,11 +8,11 @@ import (
 )
 
 type FakeGitHostingFacade struct {
-	CreateOrUpdateLabelsForRepoStub        func(*core.GitURL, []core.GitRepositoryLabel) error
+	CreateOrUpdateLabelsForRepoStub        func(*core.GitURL, []core.Label) error
 	createOrUpdateLabelsForRepoMutex       sync.RWMutex
 	createOrUpdateLabelsForRepoArgsForCall []struct {
 		arg1 *core.GitURL
-		arg2 []core.GitRepositoryLabel
+		arg2 []core.Label
 	}
 	createOrUpdateLabelsForRepoReturns struct {
 		result1 error
@@ -20,11 +20,11 @@ type FakeGitHostingFacade struct {
 	createOrUpdateLabelsForRepoReturnsOnCall map[int]struct {
 		result1 error
 	}
-	DeleteLabelsForRepoStub        func(*core.GitURL, []core.GitRepositoryLabel) error
+	DeleteLabelsForRepoStub        func(*core.GitURL, []core.Label) error
 	deleteLabelsForRepoMutex       sync.RWMutex
 	deleteLabelsForRepoArgsForCall []struct {
 		arg1 *core.GitURL
-		arg2 []core.GitRepositoryLabel
+		arg2 []core.Label
 	}
 	deleteLabelsForRepoReturns struct {
 		result1 error
@@ -46,17 +46,17 @@ type FakeGitHostingFacade struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeGitHostingFacade) CreateOrUpdateLabelsForRepo(arg1 *core.GitURL, arg2 []core.GitRepositoryLabel) error {
-	var arg2Copy []core.GitRepositoryLabel
+func (fake *FakeGitHostingFacade) CreateOrUpdateLabelsForRepo(arg1 *core.GitURL, arg2 []core.Label) error {
+	var arg2Copy []core.Label
 	if arg2 != nil {
-		arg2Copy = make([]core.GitRepositoryLabel, len(arg2))
+		arg2Copy = make([]core.Label, len(arg2))
 		copy(arg2Copy, arg2)
 	}
 	fake.createOrUpdateLabelsForRepoMutex.Lock()
 	ret, specificReturn := fake.createOrUpdateLabelsForRepoReturnsOnCall[len(fake.createOrUpdateLabelsForRepoArgsForCall)]
 	fake.createOrUpdateLabelsForRepoArgsForCall = append(fake.createOrUpdateLabelsForRepoArgsForCall, struct {
 		arg1 *core.GitURL
-		arg2 []core.GitRepositoryLabel
+		arg2 []core.Label
 	}{arg1, arg2Copy})
 	stub := fake.CreateOrUpdateLabelsForRepoStub
 	fakeReturns := fake.createOrUpdateLabelsForRepoReturns
@@ -77,13 +77,13 @@ func (fake *FakeGitHostingFacade) CreateOrUpdateLabelsForRepoCallCount() int {
 	return len(fake.createOrUpdateLabelsForRepoArgsForCall)
 }
 
-func (fake *FakeGitHostingFacade) CreateOrUpdateLabelsForRepoCalls(stub func(*core.GitURL, []core.GitRepositoryLabel) error) {
+func (fake *FakeGitHostingFacade) CreateOrUpdateLabelsForRepoCalls(stub func(*core.GitURL, []core.Label) error) {
 	fake.createOrUpdateLabelsForRepoMutex.Lock()
 	defer fake.createOrUpdateLabelsForRepoMutex.Unlock()
 	fake.CreateOrUpdateLabelsForRepoStub = stub
 }
 
-func (fake *FakeGitHostingFacade) CreateOrUpdateLabelsForRepoArgsForCall(i int) (*core.GitURL, []core.GitRepositoryLabel) {
+func (fake *FakeGitHostingFacade) CreateOrUpdateLabelsForRepoArgsForCall(i int) (*core.GitURL, []core.Label) {
 	fake.createOrUpdateLabelsForRepoMutex.RLock()
 	defer fake.createOrUpdateLabelsForRepoMutex.RUnlock()
 	argsForCall := fake.createOrUpdateLabelsForRepoArgsForCall[i]
@@ -113,17 +113,17 @@ func (fake *FakeGitHostingFacade) CreateOrUpdateLabelsForRepoReturnsOnCall(i int
 	}{result1}
 }
 
-func (fake *FakeGitHostingFacade) DeleteLabelsForRepo(arg1 *core.GitURL, arg2 []core.GitRepositoryLabel) error {
-	var arg2Copy []core.GitRepositoryLabel
+func (fake *FakeGitHostingFacade) DeleteLabelsForRepo(arg1 *core.GitURL, arg2 []core.Label) error {
+	var arg2Copy []core.Label
 	if arg2 != nil {
-		arg2Copy = make([]core.GitRepositoryLabel, len(arg2))
+		arg2Copy = make([]core.Label, len(arg2))
 		copy(arg2Copy, arg2)
 	}
 	fake.deleteLabelsForRepoMutex.Lock()
 	ret, specificReturn := fake.deleteLabelsForRepoReturnsOnCall[len(fake.deleteLabelsForRepoArgsForCall)]
 	fake.deleteLabelsForRepoArgsForCall = append(fake.deleteLabelsForRepoArgsForCall, struct {
 		arg1 *core.GitURL
-		arg2 []core.GitRepositoryLabel
+		arg2 []core.Label
 	}{arg1, arg2Copy})
 	stub := fake.DeleteLabelsForRepoStub
 	fakeReturns := fake.deleteLabelsForRepoReturns
@@ -144,13 +144,13 @@ func (fake *FakeGitHostingFacade) DeleteLabelsForRepoCallCount() int {
 	return len(fake.deleteLabelsForRepoArgsForCall)
 }
 
-func (fake *FakeGitHostingFacade) DeleteLabelsForRepoCalls(stub func(*core.GitURL, []core.GitRepositoryLabel) error) {
+func (fake *FakeGitHostingFacade) DeleteLabelsForRepoCalls(stub func(*core.GitURL, []core.Label) error) {
 	fake.deleteLabelsForRepoMutex.Lock()
 	defer fake.deleteLabelsForRepoMutex.Unlock()
 	fake.DeleteLabelsForRepoStub = stub
 }
 
-func (fake *FakeGitHostingFacade) DeleteLabelsForRepoArgsForCall(i int) (*core.GitURL, []core.GitRepositoryLabel) {
+func (fake *FakeGitHostingFacade) DeleteLabelsForRepoArgsForCall(i int) (*core.GitURL, []core.Label) {
 	fake.deleteLabelsForRepoMutex.RLock()
 	defer fake.deleteLabelsForRepoMutex.RUnlock()
 	argsForCall := fake.deleteLabelsForRepoArgsForCall[i]

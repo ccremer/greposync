@@ -8,21 +8,21 @@ import (
 type (
 	// LabelService contains the business logic to interact with labels on supported core.GitHostingProvider.
 	LabelService struct {
-		repoProvider core.ManagedRepoProvider
-		repoFacades  []core.GitRepositoryFacade
+		repoProvider core.GitRepositoryStore
+		repoFacades  []core.GitRepository
 		log          printer.Printer
 	}
 )
 
 // NewService returns a new core LabelService instance.
-func NewService(repoProvider core.ManagedRepoProvider) *LabelService {
+func NewService(repoProvider core.GitRepositoryStore) *LabelService {
 	return &LabelService{
 		repoProvider: repoProvider,
 		log:          printer.New().SetName("labels"),
 	}
 }
 
-func (s *LabelService) createOrUpdateLabels(r core.GitRepositoryFacade, h core.GitHostingFacade) error {
+func (s *LabelService) createOrUpdateLabels(r core.GitRepository, h core.GitHostingFacade) error {
 	labels := filterActiveLabels(r.GetLabels())
 	if len(labels) > 0 {
 		return h.CreateOrUpdateLabelsForRepo(r.GetConfig().URL, labels)
@@ -30,8 +30,8 @@ func (s *LabelService) createOrUpdateLabels(r core.GitRepositoryFacade, h core.G
 	return nil
 }
 
-func filterActiveLabels(labels []core.GitRepositoryLabel) []core.GitRepositoryLabel {
-	filtered := make([]core.GitRepositoryLabel, 0)
+func filterActiveLabels(labels []core.Label) []core.Label {
+	filtered := make([]core.Label, 0)
 	for _, label := range labels {
 		if !label.IsBoundForDeletion() {
 			filtered = append(filtered, label)
@@ -40,7 +40,7 @@ func filterActiveLabels(labels []core.GitRepositoryLabel) []core.GitRepositoryLa
 	return filtered
 }
 
-func (s *LabelService) deleteLabels(r core.GitRepositoryFacade, h core.GitHostingFacade) error {
+func (s *LabelService) deleteLabels(r core.GitRepository, h core.GitHostingFacade) error {
 	labels := filterDeadLabels(r.GetLabels())
 	if len(labels) > 0 {
 		return h.DeleteLabelsForRepo(r.GetConfig().URL, labels)
@@ -48,8 +48,8 @@ func (s *LabelService) deleteLabels(r core.GitRepositoryFacade, h core.GitHostin
 	return nil
 }
 
-func filterDeadLabels(labels []core.GitRepositoryLabel) []core.GitRepositoryLabel {
-	var filtered []core.GitRepositoryLabel
+func filterDeadLabels(labels []core.Label) []core.Label {
+	var filtered []core.Label
 	for _, label := range labels {
 		if label.IsBoundForDeletion() {
 			filtered = append(filtered, label)

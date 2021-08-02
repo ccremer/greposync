@@ -7,7 +7,6 @@ import (
 	"path"
 	"path/filepath"
 	"testing"
-	"text/template"
 
 	"github.com/ccremer/greposync/cfg"
 	"github.com/ccremer/greposync/core"
@@ -96,12 +95,8 @@ func (s *TemplateTestSuite) TestProcessTemplate() {
 					Url:  u,
 				},
 			}, s.K)
-			tpl, err := template.New("").Funcs(rendering.GoTemplateFuncMap()).Parse("{{ .Metadata.Repository.Name | upper }}")
 			require.NoError(t, err)
-			r.instance.SetTemplateInstances(map[string]*template.Template{
-				tt.givenTemplate: tpl,
-			})
-			err = r.processTemplate(core.Template{
+			err = r.processTemplate(&rendering.GoTemplate{
 				RelativePath: tt.givenTemplate,
 				FileMode:     0644,
 			})
@@ -149,7 +144,7 @@ func (s *TemplateTestSuite) TestRenderer_GivenUnmanagedFlag_WhenApplyingTemplate
 		p: printer.New(),
 	}
 	targetPath := path.Join(s.SeedTargetDir, "readme.md")
-	err := r.applyTemplate(targetPath, core.Template{}, core.Values{
+	err := r.applyTemplate(targetPath, &rendering.GoTemplate{}, core.Values{
 		"Values": Values{
 			"unmanaged": true,
 		}})
@@ -162,7 +157,7 @@ func (s *TemplateTestSuite) TestRenderer_GivenDeleteFlag_WhenApplyingTemplate_Th
 		p: printer.New(),
 	}
 	targetPath := path.Join(s.SeedTargetDir, "readme.md")
-	err := r.applyTemplate(targetPath, core.Template{}, core.Values{
+	err := r.applyTemplate(targetPath, &rendering.GoTemplate{}, core.Values{
 		"Values": Values{
 			"delete": true,
 		}})
@@ -205,36 +200,6 @@ func (s *TemplateTestSuite) TestRenderer_GivenTargetPath() {
 				}})
 			require.NoError(t, err)
 			assert.FileExists(t, tt.expectedEffectiveTargetFile)
-		})
-	}
-}
-
-func Test_cleanTargetPath(t *testing.T) {
-	tests := map[string]struct {
-		givenPath    string
-		expectedPath string
-	}{
-		"GivenFileWithoutDir_WhenSanitizing_ThenReturnSamePath": {
-			givenPath:    "fileName",
-			expectedPath: "fileName",
-		},
-		"GivenFileInDir_WhenSanitizing_ThenReturnSamePath": {
-			givenPath:    "dir/fileName",
-			expectedPath: "dir/fileName",
-		},
-		"GivenFileWithTplExtension_WhenSanitizing_ThenReturnStripped": {
-			givenPath:    "dir/fileName.tpl",
-			expectedPath: "dir/fileName",
-		},
-		"GivenFileWithTplExtensionTwice_WhenSanitizing_ThenReturnStrippedOnce": {
-			givenPath:    "fileName.tpl.tpl",
-			expectedPath: "fileName.tpl",
-		},
-	}
-	for name, tt := range tests {
-		t.Run(name, func(t *testing.T) {
-			result := cleanTargetPath(tt.givenPath)
-			assert.Equal(t, tt.expectedPath, result)
 		})
 	}
 }

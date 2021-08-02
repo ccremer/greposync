@@ -7,8 +7,8 @@ import (
 	pipeline "github.com/ccremer/go-command-pipeline"
 	"github.com/ccremer/greposync/cfg"
 	"github.com/ccremer/greposync/core"
-	"github.com/ccremer/greposync/pkg/githosting/github"
 	"github.com/ccremer/greposync/pkg/rendering"
+	"github.com/ccremer/greposync/pkg/repository"
 	"github.com/ccremer/greposync/printer"
 	"github.com/knadh/koanf"
 )
@@ -19,7 +19,7 @@ type (
 		cfg            *cfg.SyncConfig
 		k              *koanf.Koanf
 		globalDefaults *koanf.Koanf
-		instance       *rendering.GoTemplateService
+		instance       *rendering.GoTemplateStore
 	}
 	Values     map[string]interface{}
 	FileAction func(targetPath string, data Values) error
@@ -36,7 +36,7 @@ func NewRenderer(c *cfg.SyncConfig, globalDefaults *koanf.Koanf) *Renderer {
 		k:              koanf.New("."),
 		globalDefaults: globalDefaults,
 		cfg:            c,
-		instance:       rendering.NewTemplateInstance(c.Template),
+		instance:       rendering.NewGoTemplateStore(c.Template),
 	}
 }
 
@@ -64,7 +64,7 @@ func (r *Renderer) RenderTemplateDir() pipeline.ActionFunc {
 }
 
 func (r *Renderer) processTemplate(tpl core.Template) error {
-	values, err := r.loadDataForFile(cleanTargetPath(tpl.RelativePath))
+	values, err := r.loadDataForFile(tpl.GetRelativePath())
 	if err != nil {
 		return err
 	}
@@ -73,7 +73,7 @@ func (r *Renderer) processTemplate(tpl core.Template) error {
 		"Metadata": r.ConstructMetadata(),
 	}
 
-	targetPath := tpl.RelativePath
+	targetPath := tpl.GetRelativePath()
 	return r.applyTemplate(targetPath, tpl, data)
 }
 
@@ -95,22 +95,11 @@ func (r *Renderer) applyTemplate(targetPath string, tpl core.Template, values co
 		r.p.DebugF("Redefining target path from '%s' to '%s", targetPath, newPath)
 		targetPath = newPath
 	}
-	targetPath = cleanTargetPath(targetPath)
-	return r.instance.RenderTemplate(core.Output{
-		TargetPath: targetPath,
-		Template:   tpl,
-		Values:     values,
-		Git: core.GitRepositoryConfig{
-			URL:      core.FromURL(r.cfg.Git.Url),
-			Provider: github.GitHubProviderKey,
-			RootDir:  r.cfg.Git.Dir,
-		},
-	})
-}
-
-func cleanTargetPath(targetPath string) string {
-	dirName := path.Dir(targetPath)
-	baseName := path.Base(targetPath)
-	newName := strings.Replace(baseName, ".tpl", "", 1)
-	return path.Clean(path.Join(dirName, newName))
+	result, err := tpl.Render(values)
+	if err != nil {
+		return err
+	}
+	tpl.(*rendering.GoTemplate).RelativePath = targetPath
+	g := repository.NewGitRepository(r.cfg.Git, nil)
+	return g.EnsureFile(tpl.GetRelativePath(), result, tpl.GetFileMode())
 }

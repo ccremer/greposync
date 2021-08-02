@@ -9,24 +9,15 @@ type CoreService interface {
 	RunPipeline() error
 }
 
-// ManagedRepoProvider is a core service that is responsible for providing services for managing Git repositories.
-//counterfeiter:generate . ManagedRepoProvider
-type ManagedRepoProvider interface {
-	// LoadManagedRepositories will load the managed repositories from a config store and returns an array of GitRepositoryFacade for each Git repository.
+// GitRepositoryStore is a core service that is responsible for providing services for managing Git repositories.
+//counterfeiter:generate . GitRepositoryStore
+type GitRepositoryStore interface {
+	// FetchGitRepositories will load the managed repositories from a config store and returns an array of GitRepository for each Git repository.
 	// A non-nil empty slice is returned if there are none existing.
-	LoadManagedRepositories() ([]GitRepositoryFacade, error)
+	FetchGitRepositories() ([]GitRepository, error)
 	// GetSupportedGitHostingProviders returns a map of supported GitHostingFacade.
 	// A non-nil empty map is returned if there are none.
 	GetSupportedGitHostingProviders() map[GitHostingProvider]GitHostingFacade
-}
-
-// GitRepositoryFacade is a core service enabling interaction with a local Git repository.
-//counterfeiter:generate . GitRepositoryFacade
-type GitRepositoryFacade interface {
-	// GetLabels returns a list of repository labels to be managed.
-	GetLabels() []GitRepositoryLabel
-	// GetConfig returns the GitRepositoryConfig instance associated for this particular repository.
-	GetConfig() GitRepositoryConfig
 }
 
 // GitHostingFacade is a core service providing interaction with remote Git hosting services.
@@ -42,32 +33,36 @@ type GitHostingFacade interface {
 		This method only mutates the given labels without deletions.
 		Other labels are left ignored.
 	*/
-	CreateOrUpdateLabelsForRepo(url *GitURL, labels []GitRepositoryLabel) error
+	CreateOrUpdateLabelsForRepo(url *GitURL, labels []Label) error
 	/*
 		DeleteLabelsForRepo deletes the given labels from the given remote repository.
 		An error may be returned on first deletion failure, but non-existing labels are not errors.
 	*/
-	DeleteLabelsForRepo(url *GitURL, labels []GitRepositoryLabel) error
+	DeleteLabelsForRepo(url *GitURL, labels []Label) error
 }
 
-// GitRepositoryLabel is a label that is attached to a remote Git repository on a supported Git hosting provider.
+// Label is attached to a remote Git repository on a supported Git hosting provider.
 // The implementation may contain additional provider-specific properties.
-//counterfeiter:generate . GitRepositoryLabel
-type GitRepositoryLabel interface {
+//counterfeiter:generate . Label
+type Label interface {
 	// IsBoundForDeletion returns true if the label is bound for removal from a remote repository.
 	IsBoundForDeletion() bool
+
+	// Delete removes the label from the remote repository.
+	//Delete() error
+	// Ensure creates the label in the remote repository if it doesn't exist.
+	// If the label already exists, it will be updated if the properties are different.
+	//Ensure() error
 }
 
-// TemplateFacade is a service responsible for fetching and rendering templates.
-type TemplateFacade interface {
+// TemplateStore is a service responsible for fetching templates.
+type TemplateStore interface {
 	// FetchTemplates retrieves the templates or an error if one failed.
 	FetchTemplates() ([]Template, error)
-	// RenderTemplate writes the template with the given output.
-	RenderTemplate(output Output) error
 }
 
-// ValueStoreFacade is a service centered around configuration values fetching and configuring templates.
-type ValueStoreFacade interface {
+// ValueStore is a service centered around configuration values fetching and configuring templates.
+type ValueStore interface {
 	// FetchValuesForTemplate retrieves the Values for the given template.
 	FetchValuesForTemplate(template Template, config *GitRepositoryConfig) (Values, error)
 	// FetchUnmanagedFlag returns true if the given template should not be rendered.

@@ -99,4 +99,4 @@ func (fake *FakeGitRepositoryLabel) recordInvocation(key string, args []interfac
 	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
-var _ core.GitRepositoryLabel = new(FakeGitRepositoryLabel)
+var _ core.Label = new(FakeGitRepositoryLabel)

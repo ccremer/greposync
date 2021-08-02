@@ -9,16 +9,16 @@ import (
 )
 
 type (
-	// GitRepository is the implementation for core.GitRepositoryFacade.
-	GitRepository struct {
+	// Repository is the implementation for core.GitRepository.
+	Repository struct {
 		Config     *cfg.GitConfig
 		coreConfig core.GitRepositoryConfig
-		labels     []core.GitRepositoryLabel
+		labels     []core.Label
 	}
 )
 
-func newGitRepositoryFacade(cfg *cfg.GitConfig, labels []core.GitRepositoryLabel) *GitRepository {
-	return &GitRepository{
+func NewGitRepository(cfg *cfg.GitConfig, labels []core.Label) *Repository {
+	return &Repository{
 		Config: cfg,
 		coreConfig: core.GitRepositoryConfig{
 			Provider: getProvider(cfg.Url),
@@ -28,14 +28,9 @@ func newGitRepositoryFacade(cfg *cfg.GitConfig, labels []core.GitRepositoryLabel
 	}
 }
 
-// GetLabels implements core.GitRepositoryFacade.
-func (g *GitRepository) GetLabels() []core.GitRepositoryLabel {
+// GetLabels implements core.GitRepository.
+func (g *Repository) GetLabels() []core.Label {
 	return g.labels
-}
-
-// GetConfig implements core.GitRepositoryFacade.
-func (g *GitRepository) GetConfig() core.GitRepositoryConfig {
-	return g.coreConfig
 }
 
 func getProvider(url *url.URL) core.GitHostingProvider {

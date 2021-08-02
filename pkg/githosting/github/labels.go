@@ -9,7 +9,7 @@ import (
 )
 
 // CreateOrUpdateLabelsForRepo implements core.GitHostingFacade.
-func (p *Facade) CreateOrUpdateLabelsForRepo(url *core.GitURL, labels []core.GitRepositoryLabel) error {
+func (p *Facade) CreateOrUpdateLabelsForRepo(url *core.GitURL, labels []core.Label) error {
 	converted := LabelConverter{}.ConvertFromEntity(labels)
 	p.log.SetName(url.GetRepositoryName())
 
@@ -44,7 +44,7 @@ func (p *Facade) CreateOrUpdateLabelsForRepo(url *core.GitURL, labels []core.Git
 }
 
 // DeleteLabelsForRepo implements core.GitHostingFacade.
-func (p *Facade) DeleteLabelsForRepo(url *core.GitURL, labels []core.GitRepositoryLabel) error {
+func (p *Facade) DeleteLabelsForRepo(url *core.GitURL, labels []core.Label) error {
 	p.log.SetName(url.GetRepositoryName())
 	converted := LabelConverter{}.ConvertFromEntity(labels)
 	for _, label := range converted {

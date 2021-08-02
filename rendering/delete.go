@@ -2,7 +2,6 @@ package rendering
 
 import (
 	"os"
-	"path"
 	"path/filepath"
 	"strings"
 
@@ -14,19 +13,19 @@ import (
 // Only files are deleted, not directories.
 func (r *Renderer) DeleteUnwantedFiles() pipeline.ActionFunc {
 	return func() pipeline.Result {
-		files := r.searchOrphanedFiles()
+/*		files := r.searchOrphanedFiles()
 		for _, relativePath := range files {
 			targetPath := path.Clean(path.Join(r.cfg.Git.Dir, relativePath))
 			err := r.deleteFileIfExists(targetPath)
 			if err != nil {
 				return pipeline.Result{Err: err}
 			}
-		}
+		}*/
 		return pipeline.Result{}
 	}
 }
 
-func (r *Renderer) searchOrphanedFiles() []string {
+/*func (r *Renderer) searchOrphanedFiles() []string {
 	filePaths := make([]string, 0)
 	allKeys := r.k.Raw()
 	// Go through all top-level keys, which are the file names
@@ -46,7 +45,7 @@ func (r *Renderer) searchOrphanedFiles() []string {
 		}
 	}
 	return filePaths
-}
+}*/
 
 func pathIsFile(filePath string) bool {
 	return !strings.HasSuffix(filePath, string(filepath.Separator))

@@ -14,13 +14,13 @@ import (
 
 func TestLabelService_createOrUpdateLabels(t *testing.T) {
 	labelTests := map[string]struct {
-		givenLabels   []core.GitRepositoryLabel
+		givenLabels   []core.Label
 		expectedErr   bool
 		expectedCalls int
 	}{
 		"NoLabels": {},
 		"ActiveLabel": {
-			givenLabels: []core.GitRepositoryLabel{
+			givenLabels: []core.Label{
 				newFakeLabel(false),
 			},
 			expectedCalls: 1,
@@ -54,13 +54,13 @@ func TestLabelService_createOrUpdateLabels(t *testing.T) {
 
 func TestLabelService_deleteLabels(t *testing.T) {
 	labelTests := map[string]struct {
-		givenLabels   []core.GitRepositoryLabel
+		givenLabels   []core.Label
 		expectedErr   bool
 		expectedCalls int
 	}{
 		"NoLabels": {},
 		"DeadLabel": {
-			givenLabels: []core.GitRepositoryLabel{
+			givenLabels: []core.Label{
 				newFakeLabel(true),
 			},
 			expectedCalls: 1,
@@ -94,30 +94,30 @@ func TestLabelService_deleteLabels(t *testing.T) {
 }
 
 var filterLabelTests = map[string]struct {
-	givenLabels          []core.GitRepositoryLabel
-	expectedActiveLabels []core.GitRepositoryLabel
-	expectedDeadLabels   []core.GitRepositoryLabel
+	givenLabels          []core.Label
+	expectedActiveLabels []core.Label
+	expectedDeadLabels   []core.Label
 }{
 	"GivenEmptyList": {
-		givenLabels:          []core.GitRepositoryLabel{},
-		expectedActiveLabels: []core.GitRepositoryLabel{},
+		givenLabels:          []core.Label{},
+		expectedActiveLabels: []core.Label{},
 	},
 	"GivenNilList": {
-		expectedActiveLabels: []core.GitRepositoryLabel{},
+		expectedActiveLabels: []core.Label{},
 	},
 	"GivenActiveLabel": {
-		givenLabels: []core.GitRepositoryLabel{
+		givenLabels: []core.Label{
 			newFakeLabel(false),
 		},
-		expectedActiveLabels: []core.GitRepositoryLabel{
+		expectedActiveLabels: []core.Label{
 			newFakeLabel(false),
 		},
 	},
 	"GivenDeadLabel": {
-		givenLabels: []core.GitRepositoryLabel{
+		givenLabels: []core.Label{
 			newFakeLabel(true),
 		},
-		expectedDeadLabels: []core.GitRepositoryLabel{
+		expectedDeadLabels: []core.Label{
 			newFakeLabel(true),
 		},
 	},
@@ -149,10 +149,10 @@ func TestLabelService_filterDeadLabels(t *testing.T) {
 
 func createHostingFake(returnErr error) *corefakes.FakeGitHostingFacade {
 	return &corefakes.FakeGitHostingFacade{
-		CreateOrUpdateLabelsForRepoStub: func(gu *core.GitURL, labels []core.GitRepositoryLabel) error {
+		CreateOrUpdateLabelsForRepoStub: func(gu *core.GitURL, labels []core.Label) error {
 			return returnErr
 		},
-		DeleteLabelsForRepoStub: func(gu *core.GitURL, labels []core.GitRepositoryLabel) error {
+		DeleteLabelsForRepoStub: func(gu *core.GitURL, labels []core.Label) error {
 			return returnErr
 		},
 		InitializeStub: func() error {
@@ -161,18 +161,18 @@ func createHostingFake(returnErr error) *corefakes.FakeGitHostingFacade {
 	}
 }
 
-func createRepoFake(cfg core.GitRepositoryConfig, labels []core.GitRepositoryLabel) *corefakes.FakeGitRepositoryFacade {
-	return &corefakes.FakeGitRepositoryFacade{
+func createRepoFake(cfg core.GitRepositoryConfig, labels []core.Label) *corefakes.FakeGitRepository {
+	return &corefakes.FakeGitRepository{
 		GetConfigStub: func() core.GitRepositoryConfig {
 			return cfg
 		},
-		GetLabelsStub: func() []core.GitRepositoryLabel {
+		GetLabelsStub: func() []core.Label {
 			return labels
 		},
 	}
 }
 
-func newFakeLabel(delete bool) core.GitRepositoryLabel {
+func newFakeLabel(delete bool) core.Label {
 	return &corefakes.FakeGitRepositoryLabel{
 		IsBoundForDeletionStub: func() bool {
 			return delete
@@ -216,7 +216,7 @@ func TestLabelService_initHostingAPIs(t *testing.T) {
 			hostingFake := createHostingFake(returnErr)
 
 			s := &LabelService{
-				repoFacades: []core.GitRepositoryFacade{
+				repoFacades: []core.GitRepository{
 					createRepoFake(core.GitRepositoryConfig{
 						Provider: tt.givenProvider,
 					}, nil),
