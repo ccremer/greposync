@@ -1,0 +1,15 @@
+:globals:
+  key: value
+
+.github/:
+  title: Hello World
+  array:
+    - foo
+
+.github/workflows/release.yaml:
+  key: specific
+  array: overridden
+
+# This property should not be included, as it doesn't end with /
+.github:
+  ignored: true
