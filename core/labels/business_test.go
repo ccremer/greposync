@@ -221,7 +221,7 @@ func TestLabelService_initHostingAPIs(t *testing.T) {
 						Provider: tt.givenProvider,
 					}, nil),
 				},
-				repoProvider: &corefakes.FakeManagedRepoProvider{
+				repoProvider: &corefakes.FakeGitRepositoryStore{
 					GetSupportedGitHostingProvidersStub: func() map[core.GitHostingProvider]core.GitHostingFacade {
 						providers := map[core.GitHostingProvider]core.GitHostingFacade{
 							"provider": hostingFake,

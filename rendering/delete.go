@@ -2,10 +2,11 @@ package rendering
 
 import (
 	"os"
-	"path/filepath"
-	"strings"
+	"path"
 
 	pipeline "github.com/ccremer/go-command-pipeline"
+	"github.com/ccremer/greposync/core"
+	"github.com/ccremer/greposync/pkg/githosting/github"
 )
 
 // DeleteUnwantedFiles goes through the sync config and deletes files from repositories that aren't targeted by the templates.
@@ -13,42 +14,22 @@ import (
 // Only files are deleted, not directories.
 func (r *Renderer) DeleteUnwantedFiles() pipeline.ActionFunc {
 	return func() pipeline.Result {
-/*		files := r.searchOrphanedFiles()
-		for _, relativePath := range files {
-			targetPath := path.Clean(path.Join(r.cfg.Git.Dir, relativePath))
-			err := r.deleteFileIfExists(targetPath)
+		files, err := r.valueStore.FetchFilesToDelete(&core.GitRepositoryConfig{
+			URL:      core.FromURL(r.cfg.Git.Url),
+			Provider: github.GitHubProviderKey,
+			RootDir:  r.cfg.Git.Dir,
+		})
+		if err != nil {
+			return pipeline.Result{Err: err}
+		}
+		for _, file := range files {
+			err := r.deleteFileIfExists(path.Join(r.cfg.Git.Dir, file))
 			if err != nil {
 				return pipeline.Result{Err: err}
 			}
-		}*/
+		}
 		return pipeline.Result{}
 	}
-}
-
-/*func (r *Renderer) searchOrphanedFiles() []string {
-	filePaths := make([]string, 0)
-	allKeys := r.k.Raw()
-	// Go through all top-level keys, which are the file names
-	for filePath, values := range allKeys {
-		// If the filename is already handled by the template renderer, ignore it.
-		// Otherwise, add files that have deletion flag, but ignore directories
-		if _, found := r.instance.GetTemplateInstances()[filePath]; !found && pathIsFile(filePath) {
-			if val, ok := values.(map[string]interface{}); ok {
-				if filePath == ":globals" {
-					// can't delete file named ':globals' anyway
-					continue
-				}
-				if val["delete"] == true {
-					filePaths = append(filePaths, filePath)
-				}
-			}
-		}
-	}
-	return filePaths
-}*/
-
-func pathIsFile(filePath string) bool {
-	return !strings.HasSuffix(filePath, string(filepath.Separator))
 }
 
 func (r *Renderer) deleteFileIfExists(targetPath string) error {

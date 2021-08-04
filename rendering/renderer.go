@@ -1,14 +1,15 @@
 package rendering
 
 import (
-	"path"
-	"strings"
+	"errors"
 
 	pipeline "github.com/ccremer/go-command-pipeline"
 	"github.com/ccremer/greposync/cfg"
 	"github.com/ccremer/greposync/core"
+	"github.com/ccremer/greposync/pkg/githosting/github"
 	"github.com/ccremer/greposync/pkg/rendering"
 	"github.com/ccremer/greposync/pkg/repository"
+	"github.com/ccremer/greposync/pkg/valuestore"
 	"github.com/ccremer/greposync/printer"
 	"github.com/knadh/koanf"
 )
@@ -20,6 +21,7 @@ type (
 		k              *koanf.Koanf
 		globalDefaults *koanf.Koanf
 		instance       *rendering.GoTemplateStore
+		valueStore     *valuestore.KoanfValueStore
 	}
 	Values     map[string]interface{}
 	FileAction func(targetPath string, data Values) error
@@ -37,6 +39,7 @@ func NewRenderer(c *cfg.SyncConfig, globalDefaults *koanf.Koanf) *Renderer {
 		globalDefaults: globalDefaults,
 		cfg:            c,
 		instance:       rendering.NewGoTemplateStore(c.Template),
+		valueStore:     valuestore.NewValueStore(globalDefaults),
 	}
 }
 
@@ -45,11 +48,6 @@ func NewRenderer(c *cfg.SyncConfig, globalDefaults *koanf.Koanf) *Renderer {
 // Files are written to git target directory, although special Values may override that behaviour.
 func (r *Renderer) RenderTemplateDir() pipeline.ActionFunc {
 	return func() pipeline.Result {
-		err := r.loadVariables(path.Join(r.cfg.Git.Dir, SyncConfigFileName))
-		if err != nil {
-			return pipeline.Result{Err: err}
-		}
-
 		templates, err := r.instance.FetchTemplates()
 		if err != nil {
 			return pipeline.Result{Err: err}
@@ -64,7 +62,11 @@ func (r *Renderer) RenderTemplateDir() pipeline.ActionFunc {
 }
 
 func (r *Renderer) processTemplate(tpl core.Template) error {
-	values, err := r.loadDataForFile(tpl.GetRelativePath())
+	values, err := r.valueStore.FetchValuesForTemplate(tpl, &core.GitRepositoryConfig{
+		URL:      core.FromURL(r.cfg.Git.Url),
+		Provider: github.GitHubProviderKey,
+		RootDir:  r.cfg.Git.Dir,
+	})
 	if err != nil {
 		return err
 	}
@@ -78,20 +80,29 @@ func (r *Renderer) processTemplate(tpl core.Template) error {
 }
 
 func (r *Renderer) applyTemplate(targetPath string, tpl core.Template, values core.Values) error {
-	if values["Values"].(Values)["delete"] == true {
-		return r.deleteFileIfExists(targetPath)
+	if values["Values"].(core.Values)["delete"] == true {
+		// files are deleted in a separate step
+		return nil
 	}
-	if values["Values"].(Values)["unmanaged"] == true {
+	gitCfg := core.GitRepositoryConfig{
+		URL:      core.FromURL(r.cfg.Git.Url),
+		Provider: github.GitHubProviderKey,
+		RootDir:  r.cfg.Git.Dir,
+	}
+	unmanaged, err := r.valueStore.FetchUnmanagedFlag(tpl, &gitCfg)
+	if err != nil && !errors.Is(err, core.ErrKeyNotFound) {
+		return err
+	}
+	if unmanaged {
 		r.p.InfoF("Leaving file alone due to 'unmanaged' flag being set: %s", targetPath)
 		return nil
 	}
-	if newTarget := values["Values"].(Values)["targetPath"]; newTarget != nil && newTarget != "" {
-		newPath := newTarget.(string)
-		if strings.HasSuffix(newPath, "/") {
-			newPath = path.Clean(path.Join(newPath, path.Base(targetPath)))
-		} else {
-			newPath = path.Clean(path.Join(newPath))
-		}
+
+	newPath, err := r.valueStore.FetchTargetPath(tpl, &gitCfg)
+	if err != nil && !errors.Is(err, core.ErrKeyNotFound) {
+		return err
+	}
+	if newPath != "" {
 		r.p.DebugF("Redefining target path from '%s' to '%s", targetPath, newPath)
 		targetPath = newPath
 	}
