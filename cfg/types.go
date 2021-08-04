@@ -138,6 +138,7 @@ func NewDefaultConfig() *Configuration {
 	}
 }
 
-func (l *RepositoryLabel) IsBoundForDeletion() bool {
+// IsInactive implements core.Label.
+func (l *RepositoryLabel) IsInactive() bool {
 	return l.Delete
 }

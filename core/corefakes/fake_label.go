@@ -8,29 +8,29 @@ import (
 )
 
 type FakeLabel struct {
-	IsBoundForDeletionStub        func() bool
-	isBoundForDeletionMutex       sync.RWMutex
-	isBoundForDeletionArgsForCall []struct {
+	IsInactiveStub        func() bool
+	isInactiveMutex       sync.RWMutex
+	isInactiveArgsForCall []struct {
 	}
-	isBoundForDeletionReturns struct {
+	isInactiveReturns struct {
 		result1 bool
 	}
-	isBoundForDeletionReturnsOnCall map[int]struct {
+	isInactiveReturnsOnCall map[int]struct {
 		result1 bool
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeLabel) IsBoundForDeletion() bool {
-	fake.isBoundForDeletionMutex.Lock()
-	ret, specificReturn := fake.isBoundForDeletionReturnsOnCall[len(fake.isBoundForDeletionArgsForCall)]
-	fake.isBoundForDeletionArgsForCall = append(fake.isBoundForDeletionArgsForCall, struct {
+func (fake *FakeLabel) IsInactive() bool {
+	fake.isInactiveMutex.Lock()
+	ret, specificReturn := fake.isInactiveReturnsOnCall[len(fake.isInactiveArgsForCall)]
+	fake.isInactiveArgsForCall = append(fake.isInactiveArgsForCall, struct {
 	}{})
-	stub := fake.IsBoundForDeletionStub
-	fakeReturns := fake.isBoundForDeletionReturns
-	fake.recordInvocation("IsBoundForDeletion", []interface{}{})
-	fake.isBoundForDeletionMutex.Unlock()
+	stub := fake.IsInactiveStub
+	fakeReturns := fake.isInactiveReturns
+	fake.recordInvocation("IsInactive", []interface{}{})
+	fake.isInactiveMutex.Unlock()
 	if stub != nil {
 		return stub()
 	}
@@ -40,37 +40,37 @@ func (fake *FakeLabel) IsBoundForDeletion() bool {
 	return fakeReturns.result1
 }
 
-func (fake *FakeLabel) IsBoundForDeletionCallCount() int {
-	fake.isBoundForDeletionMutex.RLock()
-	defer fake.isBoundForDeletionMutex.RUnlock()
-	return len(fake.isBoundForDeletionArgsForCall)
+func (fake *FakeLabel) IsInactiveCallCount() int {
+	fake.isInactiveMutex.RLock()
+	defer fake.isInactiveMutex.RUnlock()
+	return len(fake.isInactiveArgsForCall)
 }
 
-func (fake *FakeLabel) IsBoundForDeletionCalls(stub func() bool) {
-	fake.isBoundForDeletionMutex.Lock()
-	defer fake.isBoundForDeletionMutex.Unlock()
-	fake.IsBoundForDeletionStub = stub
+func (fake *FakeLabel) IsInactiveCalls(stub func() bool) {
+	fake.isInactiveMutex.Lock()
+	defer fake.isInactiveMutex.Unlock()
+	fake.IsInactiveStub = stub
 }
 
-func (fake *FakeLabel) IsBoundForDeletionReturns(result1 bool) {
-	fake.isBoundForDeletionMutex.Lock()
-	defer fake.isBoundForDeletionMutex.Unlock()
-	fake.IsBoundForDeletionStub = nil
-	fake.isBoundForDeletionReturns = struct {
+func (fake *FakeLabel) IsInactiveReturns(result1 bool) {
+	fake.isInactiveMutex.Lock()
+	defer fake.isInactiveMutex.Unlock()
+	fake.IsInactiveStub = nil
+	fake.isInactiveReturns = struct {
 		result1 bool
 	}{result1}
 }
 
-func (fake *FakeLabel) IsBoundForDeletionReturnsOnCall(i int, result1 bool) {
-	fake.isBoundForDeletionMutex.Lock()
-	defer fake.isBoundForDeletionMutex.Unlock()
-	fake.IsBoundForDeletionStub = nil
-	if fake.isBoundForDeletionReturnsOnCall == nil {
-		fake.isBoundForDeletionReturnsOnCall = make(map[int]struct {
+func (fake *FakeLabel) IsInactiveReturnsOnCall(i int, result1 bool) {
+	fake.isInactiveMutex.Lock()
+	defer fake.isInactiveMutex.Unlock()
+	fake.IsInactiveStub = nil
+	if fake.isInactiveReturnsOnCall == nil {
+		fake.isInactiveReturnsOnCall = make(map[int]struct {
 			result1 bool
 		})
 	}
-	fake.isBoundForDeletionReturnsOnCall[i] = struct {
+	fake.isInactiveReturnsOnCall[i] = struct {
 		result1 bool
 	}{result1}
 }
@@ -78,8 +78,8 @@ func (fake *FakeLabel) IsBoundForDeletionReturnsOnCall(i int, result1 bool) {
 func (fake *FakeLabel) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.isBoundForDeletionMutex.RLock()
-	defer fake.isBoundForDeletionMutex.RUnlock()
+	fake.isInactiveMutex.RLock()
+	defer fake.isInactiveMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

@@ -129,7 +129,7 @@ func TestLabelService_filterActiveLabels(t *testing.T) {
 			result := filterActiveLabels(tt.givenLabels)
 			assert.Len(t, result, len(tt.expectedActiveLabels))
 			for i, expectedLabel := range tt.expectedActiveLabels {
-				assert.Equal(t, expectedLabel.IsBoundForDeletion(), result[i].IsBoundForDeletion())
+				assert.Equal(t, expectedLabel.IsInactive(), result[i].IsInactive())
 			}
 		})
 	}
@@ -141,7 +141,7 @@ func TestLabelService_filterDeadLabels(t *testing.T) {
 			result := filterDeadLabels(tt.givenLabels)
 			assert.Len(t, result, len(tt.expectedDeadLabels))
 			for i, expectedLabel := range tt.expectedDeadLabels {
-				assert.Equal(t, expectedLabel.IsBoundForDeletion(), result[i].IsBoundForDeletion())
+				assert.Equal(t, expectedLabel.IsInactive(), result[i].IsInactive())
 			}
 		})
 	}
@@ -166,15 +166,15 @@ func createRepoFake(cfg core.GitRepositoryConfig, labels []core.Label) *corefake
 		GetConfigStub: func() core.GitRepositoryConfig {
 			return cfg
 		},
-		GetLabelsStub: func() []core.Label {
+		FetchLabelsStub: func() []core.Label {
 			return labels
 		},
 	}
 }
 
 func newFakeLabel(delete bool) core.Label {
-	return &corefakes.FakeGitRepositoryLabel{
-		IsBoundForDeletionStub: func() bool {
+	return &corefakes.FakeLabel{
+		IsInactiveStub: func() bool {
 			return delete
 		},
 	}

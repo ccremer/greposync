@@ -2,6 +2,7 @@ package core
 
 import "errors"
 
+//go:generate rm -r corefakes
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -generate
 
 //CoreService is a representation of a core feature or process.
@@ -47,8 +48,8 @@ type GitHostingFacade interface {
 // The implementation may contain additional provider-specific properties.
 //counterfeiter:generate . Label
 type Label interface {
-	// IsBoundForDeletion returns true if the label is bound for removal from a remote repository.
-	IsBoundForDeletion() bool
+	// IsInactive returns true if the label is bound for removal from a remote repository.
+	IsInactive() bool
 
 	// Delete removes the label from the remote repository.
 	//Delete() error

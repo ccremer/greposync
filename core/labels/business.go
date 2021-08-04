@@ -23,7 +23,7 @@ func NewService(repoProvider core.GitRepositoryStore) *LabelService {
 }
 
 func (s *LabelService) createOrUpdateLabels(r core.GitRepository, h core.GitHostingFacade) error {
-	labels := filterActiveLabels(r.GetLabels())
+	labels := filterActiveLabels(r.FetchLabels())
 	if len(labels) > 0 {
 		return h.CreateOrUpdateLabelsForRepo(r.GetConfig().URL, labels)
 	}
@@ -33,7 +33,7 @@ func (s *LabelService) createOrUpdateLabels(r core.GitRepository, h core.GitHost
 func filterActiveLabels(labels []core.Label) []core.Label {
 	filtered := make([]core.Label, 0)
 	for _, label := range labels {
-		if !label.IsBoundForDeletion() {
+		if !label.IsInactive() {
 			filtered = append(filtered, label)
 		}
 	}
@@ -41,7 +41,7 @@ func filterActiveLabels(labels []core.Label) []core.Label {
 }
 
 func (s *LabelService) deleteLabels(r core.GitRepository, h core.GitHostingFacade) error {
-	labels := filterDeadLabels(r.GetLabels())
+	labels := filterDeadLabels(r.FetchLabels())
 	if len(labels) > 0 {
 		return h.DeleteLabelsForRepo(r.GetConfig().URL, labels)
 	}
@@ -51,7 +51,7 @@ func (s *LabelService) deleteLabels(r core.GitRepository, h core.GitHostingFacad
 func filterDeadLabels(labels []core.Label) []core.Label {
 	var filtered []core.Label
 	for _, label := range labels {
-		if label.IsBoundForDeletion() {
+		if label.IsInactive() {
 			filtered = append(filtered, label)
 		}
 	}

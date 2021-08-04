@@ -5,8 +5,8 @@ import "io/fs"
 // GitRepository is a domain entity enabling interaction with a local Git repository.
 //counterfeiter:generate . GitRepository
 type GitRepository interface {
-	// GetLabels returns a list of repository labels to be managed.
-	GetLabels() []Label
+	// FetchLabels returns a list of repository labels to be managed.
+	FetchLabels() []Label
 	// GetConfig returns the GitRepositoryConfig instance associated for this particular repository.
 	GetConfig() GitRepositoryConfig
 

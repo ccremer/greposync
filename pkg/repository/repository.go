@@ -28,8 +28,8 @@ func NewGitRepository(cfg *cfg.GitConfig, labels []core.Label) *Repository {
 	}
 }
 
-// GetLabels implements core.GitRepository.
-func (g *Repository) GetLabels() []core.Label {
+// FetchLabels implements core.GitRepository.
+func (g *Repository) FetchLabels() []core.Label {
 	return g.labels
 }
 
