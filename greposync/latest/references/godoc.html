@@ -348,6 +348,7 @@ If empty, the CommitMessage is used.</p>
     DefaultBranch    string
     Name             string
     Namespace        string
+    Provider         core.GitHostingProvider
 }</code></pre>
 </div>
 </div>
@@ -387,6 +388,10 @@ It can contain newlines, for example to pass a long description.</p>
 <dd>
 <p>Namespace is the repository owner without the repository name.
 This is often a user or organization name in GitHub.com or GitLab.com.</p>
+</dd>
+<dt class="hdlist1">Provider</dt>
+<dd>
+<p>Provider is the Git remote hosting identifier.</p>
 </dd>
 </dl>
 </div>
