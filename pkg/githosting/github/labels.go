@@ -3,66 +3,50 @@ package github
 import (
 	"time"
 
-	"github.com/ccremer/greposync/cfg"
 	"github.com/ccremer/greposync/core"
 	"github.com/google/go-github/v37/github"
 )
 
-// CreateOrUpdateLabelsForRepo implements core.GitHostingFacade.
-func (p *Facade) CreateOrUpdateLabelsForRepo(url *core.GitURL, labels []core.GitRepositoryLabel) error {
-	converted := LabelConverter{}.ConvertFromEntity(labels)
-	p.log.SetName(url.GetRepositoryName())
+type LabelImpl struct {
+	// Name is the label name.
+	Name string `json:"name" koanf:"name"`
+	// Description is a short description of the label.
+	Description string `json:"description" koanf:"description"`
+	// Color is the hexadecimal color code for the label, without the leading #.
+	Color string `json:"color" koanf:"color"`
+	// Inactive will remove this label.
+	Inactive bool `json:"delete" koanf:"delete"`
 
-	allLabels, err := p.fetchAllLabels(url)
-	if err != nil {
-		return err
-	}
-
-	for _, label := range converted {
-		ghLabel := p.findMatchingGhLabel(allLabels, label)
-		if ghLabel == nil {
-			if err := p.createLabel(url, label); err != nil {
-				return err
-			}
-			p.log.InfoF("Label '%s' created", label.Name)
-			p.delay()
-			continue
-		}
-		if !p.hasLabelChanged(ghLabel, label) {
-			p.log.InfoF("Label '%s' unchanged", label.Name)
-			continue
-		}
-		err = p.updateLabel(url, ghLabel, label)
-		if err != nil {
-			return err
-		}
-		p.log.InfoF("Label '%s' updated", label.Name)
-		p.delay()
-	}
-
-	return nil
+	remote  *Remote
+	repo    *core.GitURL
+	ghLabel *github.Label
 }
 
-// DeleteLabelsForRepo implements core.GitHostingFacade.
-func (p *Facade) DeleteLabelsForRepo(url *core.GitURL, labels []core.GitRepositoryLabel) error {
-	p.log.SetName(url.GetRepositoryName())
-	converted := LabelConverter{}.ConvertFromEntity(labels)
-	for _, label := range converted {
-		deleted, err := p.deleteLabel(url, label)
-		if err != nil {
-			return err
-		}
-		if deleted {
-			p.log.InfoF("Label '%s' deleted", label.Name)
-		} else {
-			p.log.InfoF("Label '%s' not deleted (not existing)", label.Name)
-		}
-		p.delay()
-	}
-	return nil
+func (l *LabelImpl) IsInactive() bool {
+	return l.Inactive
 }
 
-func (p *Facade) createLabel(url *core.GitURL, label *cfg.RepositoryLabel) error {
+func (l *LabelImpl) GetName() string {
+	return l.Name
+}
+
+func (l *LabelImpl) Delete() (bool, error) {
+	return l.remote.deleteLabel(l.repo, l.Name)
+}
+
+func (l *LabelImpl) Ensure() (bool, error) {
+	if l.ghLabel == nil {
+		return true, l.remote.createLabel(l.repo, l)
+	}
+	if !l.remote.hasLabelChanged(l.ghLabel, l) {
+		return false, nil
+	}
+	return true, l.remote.updateLabel(l.repo, l.ghLabel, l)
+}
+
+func (p *Remote) createLabel(url *core.GitURL, label *LabelImpl) error {
+	p.m.Lock()
+	defer p.delay()
 	_, _, err := p.client.Issues.CreateLabel(p.ctx, url.GetNamespace(), url.GetRepositoryName(), &github.Label{
 		Name:        &label.Name,
 		Color:       &label.Color,
@@ -71,7 +55,9 @@ func (p *Facade) createLabel(url *core.GitURL, label *cfg.RepositoryLabel) error
 	return err
 }
 
-func (p *Facade) updateLabel(url *core.GitURL, ghLabel *github.Label, label *cfg.RepositoryLabel) error {
+func (p *Remote) updateLabel(url *core.GitURL, ghLabel *github.Label, label *LabelImpl) error {
+	p.m.Lock()
+	defer p.delay()
 	// TODO: Without a new_name property we cannot rename a label yet.
 	ghLabel.Description = &label.Description
 	ghLabel.Color = &label.Color
@@ -79,8 +65,10 @@ func (p *Facade) updateLabel(url *core.GitURL, ghLabel *github.Label, label *cfg
 	return err
 }
 
-func (p *Facade) deleteLabel(url *core.GitURL, label *cfg.RepositoryLabel) (bool, error) {
-	resp, err := p.client.Issues.DeleteLabel(p.ctx, url.GetNamespace(), url.GetRepositoryName(), label.Name)
+func (p *Remote) deleteLabel(url *core.GitURL, name string) (bool, error) {
+	p.m.Lock()
+	defer p.delay()
+	resp, err := p.client.Issues.DeleteLabel(p.ctx, url.GetNamespace(), url.GetRepositoryName(), name)
 	if resp != nil && resp.StatusCode == 404 {
 		// Not an error
 		return false, nil
@@ -88,7 +76,9 @@ func (p *Facade) deleteLabel(url *core.GitURL, label *cfg.RepositoryLabel) (bool
 	return err == nil, err
 }
 
-func (p *Facade) fetchAllLabels(url *core.GitURL) ([]*github.Label, error) {
+func (p *Remote) fetchAllLabels(url *core.GitURL) ([]*github.Label, error) {
+	p.m.Lock()
+	defer p.delay()
 	nextPage := 1
 	var allLabels []*github.Label
 	for repeat := true; repeat; repeat = nextPage > 0 {
@@ -106,7 +96,7 @@ func (p *Facade) fetchAllLabels(url *core.GitURL) ([]*github.Label, error) {
 	return allLabels, nil
 }
 
-func (p *Facade) findMatchingGhLabel(ghLabels []*github.Label, toFind *cfg.RepositoryLabel) *github.Label {
+func (p *Remote) findMatchingGhLabel(ghLabels []*github.Label, toFind *LabelImpl) *github.Label {
 	for _, label := range ghLabels {
 		if label.GetName() == toFind.Name {
 			return label
@@ -115,7 +105,7 @@ func (p *Facade) findMatchingGhLabel(ghLabels []*github.Label, toFind *cfg.Repos
 	return nil
 }
 
-func (p *Facade) hasLabelChanged(ghLabel *github.Label, repoLabel *cfg.RepositoryLabel) bool {
+func (p *Remote) hasLabelChanged(ghLabel *github.Label, repoLabel *LabelImpl) bool {
 	return ghLabel.GetDescription() != repoLabel.Description || ghLabel.GetColor() != repoLabel.Color
 }
 
@@ -123,6 +113,7 @@ func (p *Facade) hasLabelChanged(ghLabel *github.Label, repoLabel *cfg.Repositor
 //
 // https://docs.github.com/en/rest/guides/best-practices-for-integrators#dealing-with-abuse-rate-limits
 // "If you're making a large number of POST, PATCH, PUT, or DELETE requests for a single user or client ID, wait at least one second between each request."
-func (p *Facade) delay() {
+func (p *Remote) delay() {
 	time.Sleep(1 * time.Second)
+	p.m.Unlock()
 }

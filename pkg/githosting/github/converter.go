@@ -1,22 +1,21 @@
 package github
 
 import (
-	"github.com/ccremer/greposync/cfg"
 	"github.com/ccremer/greposync/core"
 )
 
 type (
-	// LabelConverter converts core.GitRepositoryLabel to cfg.RepositoryLabel and vice-versa
+	// LabelConverter converts core.Label to cfg.RepositoryLabel and vice-versa
 	LabelConverter struct{}
 )
 
 // ConvertToEntity converts the given object to another.
 // Returns a non-nil empty list if labels is empty or nil.
-func (LabelConverter) ConvertToEntity(labels []*cfg.RepositoryLabel) []core.GitRepositoryLabel {
+func (LabelConverter) ConvertToEntity(labels []*LabelImpl) []core.Label {
 	if labels == nil || len(labels) == 0 {
-		return []core.GitRepositoryLabel{}
+		return []core.Label{}
 	}
-	converted := make([]core.GitRepositoryLabel, len(labels))
+	converted := make([]core.Label, len(labels))
 	for i := range labels {
 		converted[i] = labels[i]
 	}
@@ -25,13 +24,13 @@ func (LabelConverter) ConvertToEntity(labels []*cfg.RepositoryLabel) []core.GitR
 
 // ConvertFromEntity converts the given object to another.
 // Returns a non-nil empty list if labels is empty or nil.
-func (LabelConverter) ConvertFromEntity(labels []core.GitRepositoryLabel) []*cfg.RepositoryLabel {
+func (LabelConverter) ConvertFromEntity(labels []core.Label) []*LabelImpl {
 	if labels == nil || len(labels) == 0 {
-		return []*cfg.RepositoryLabel{}
+		return []*LabelImpl{}
 	}
-	converted := make([]*cfg.RepositoryLabel, len(labels))
+	converted := make([]*LabelImpl, len(labels))
 	for i := range labels {
-		converted[i] = labels[i].(*cfg.RepositoryLabel)
+		converted[i] = labels[i].(*LabelImpl)
 	}
 	return converted
 }

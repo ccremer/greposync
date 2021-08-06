@@ -2,6 +2,8 @@ package cfg
 
 import (
 	"net/url"
+
+	"github.com/ccremer/greposync/core"
 )
 
 type (
@@ -105,6 +107,8 @@ type (
 		// Namespace is the repository owner without the repository name.
 		// This is often a user or organization name in GitHub.com or GitLab.com.
 		Namespace string `json:"namespace"`
+		// Provider is the Git remote hosting identifier.
+		Provider core.GitHostingProvider `json:"-"`
 	}
 	// TemplateConfig configures template settings
 	TemplateConfig struct {
@@ -136,8 +140,4 @@ func NewDefaultConfig() *Configuration {
 			RootDir: "template",
 		},
 	}
-}
-
-func (l *RepositoryLabel) IsBoundForDeletion() bool {
-	return l.Delete
 }

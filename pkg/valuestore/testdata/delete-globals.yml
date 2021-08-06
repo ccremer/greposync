@@ -1,0 +1,18 @@
+:globals:
+  delete: true
+
+topLevelFileTrue: {}
+
+topLevelFileFalse:
+  delete: false
+
+subdir/:
+  delete: false
+
+subdir/fileFalse:
+  # this file should still exist even if subdir/ defaults to false
+
+subdir/fileTrue:
+  delete: true
+# this file should be deleted, as it's overridden by :globals
+

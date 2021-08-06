@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/ccremer/greposync/cfg"
+	ghHosting "github.com/ccremer/greposync/pkg/githosting/github"
 	"github.com/ccremer/greposync/printer"
 	"github.com/ccremer/greposync/repository/github"
 	"github.com/knadh/koanf"
@@ -76,6 +77,7 @@ func NewServicesFromFile(config *cfg.Configuration) ([]*Service, error) {
 				CommitBranch:  config.Git.CommitBranch,
 				Namespace:     config.Git.Namespace,
 				Name:          repoName,
+				Provider:      ghHosting.GitHubProviderKey,
 			},
 		}
 		list = append(list, s)

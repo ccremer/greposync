@@ -7,12 +7,9 @@ import (
 	"path"
 	"path/filepath"
 	"testing"
-	"text/template"
 
 	"github.com/ccremer/greposync/cfg"
 	"github.com/ccremer/greposync/core"
-	"github.com/ccremer/greposync/pkg/rendering"
-	"github.com/ccremer/greposync/printer"
 	"github.com/knadh/koanf"
 	"github.com/knadh/koanf/providers/confmap"
 	"github.com/stretchr/testify/assert"
@@ -64,61 +61,6 @@ func (s *TemplateTestSuite) TearDownTest() {
 	}
 }
 
-func (s *TemplateTestSuite) TestProcessTemplate() {
-	tests := map[string]struct {
-		givenTemplate        string
-		givenValues          Values
-		expectedFileContents map[string]string
-		expectErr            bool
-	}{
-		"GivenTemplateFile_WhenProcessing_ThenWriteFile": {
-			givenTemplate: "readme.tpl.md",
-			expectedFileContents: map[string]string{
-				"readme.md": "EXAMPLE-REPOSITORY",
-			},
-		},
-		"GivenTemplateFileInSubDir_WhenProcessing_ThenWriteFileToCorrectDir": {
-			givenTemplate: "ci/pipeline.yml",
-			expectedFileContents: map[string]string{
-				"ci/pipeline.yml": "EXAMPLE-REPOSITORY",
-			},
-		},
-	}
-	for name, tt := range tests {
-		s.T().Run(name, func(t *testing.T) {
-			u, err := url.Parse("https://github.com/example/example-repository")
-			require.NoError(t, err)
-			r := NewRenderer(&cfg.SyncConfig{
-				Template: &cfg.TemplateConfig{RootDir: "testdata/template-1"},
-				Git: &cfg.GitConfig{
-					Dir:  s.TestGitDir,
-					Name: "example-repository",
-					Url:  u,
-				},
-			}, s.K)
-			tpl, err := template.New("").Funcs(rendering.GoTemplateFuncMap()).Parse("{{ .Metadata.Repository.Name | upper }}")
-			require.NoError(t, err)
-			r.instance.SetTemplateInstances(map[string]*template.Template{
-				tt.givenTemplate: tpl,
-			})
-			err = r.processTemplate(core.Template{
-				RelativePath: tt.givenTemplate,
-				FileMode:     0644,
-			})
-			if tt.expectErr {
-				require.Error(t, err)
-				return
-			}
-			require.NoError(t, err)
-			for fileName, expectedContent := range tt.expectedFileContents {
-				content, readErr := os.ReadFile(path.Join(s.TestGitDir, fileName))
-				require.NoError(t, readErr)
-				assert.Equal(t, expectedContent, string(content))
-			}
-		})
-	}
-}
-
 func (s *TemplateTestSuite) TestRenderer_RenderTemplateDir() {
 	u, err := url.Parse("https://github.com/example/irrelevant")
 	require.NoError(s.T(), err)
@@ -142,101 +84,6 @@ func (s *TemplateTestSuite) TestRenderer_RenderTemplateDir() {
 	s.Assert().NoFileExists(path.Join(s.TestGitDir, "_helpers.tpl"))
 	s.Assert().FileExists(path.Join(s.TestGitDir, "readme.md"))
 	s.Assert().FileExists(path.Join(s.TestGitDir, "ci", "pipeline.yml"))
-}
-
-func (s *TemplateTestSuite) TestRenderer_GivenUnmanagedFlag_WhenApplyingTemplate_ThenLeaveFileAlone() {
-	r := &Renderer{
-		p: printer.New(),
-	}
-	targetPath := path.Join(s.SeedTargetDir, "readme.md")
-	err := r.applyTemplate(targetPath, core.Template{}, core.Values{
-		"Values": Values{
-			"unmanaged": true,
-		}})
-	s.Require().NoError(err)
-	s.Assert().FileExists(targetPath)
-}
-
-func (s *TemplateTestSuite) TestRenderer_GivenDeleteFlag_WhenApplyingTemplate_ThenRemoveTargetFileInstead() {
-	r := &Renderer{
-		p: printer.New(),
-	}
-	targetPath := path.Join(s.SeedTargetDir, "readme.md")
-	err := r.applyTemplate(targetPath, core.Template{}, core.Values{
-		"Values": Values{
-			"delete": true,
-		}})
-	s.Require().NoError(err)
-	s.Assert().NoFileExists(targetPath)
-}
-
-func (s *TemplateTestSuite) TestRenderer_GivenTargetPath() {
-	tests := map[string]struct {
-		givenTargetDir              string
-		expectedEffectiveTargetFile string
-	}{
-		"GivenTargetDir_WhenApplyingTemplate_ThenChangeDirectoryButNotFileName": {
-			givenTargetDir:              "dir/",
-			expectedEffectiveTargetFile: path.Join(s.SeedTargetDir, "dir", "readme.md"),
-		},
-		"GivenTargetPath_WhenApplyingTemplate_ThenChangeFileName": {
-			givenTargetDir:              "dir/newFile.ext",
-			expectedEffectiveTargetFile: path.Join(s.SeedTargetDir, "dir", "newFile.ext"),
-		},
-	}
-
-	for name, tt := range tests {
-		s.T().Run(name, func(t *testing.T) {
-			u, err := url.Parse("https://github.com/example/irrelevant")
-			require.NoError(t, err)
-			r := NewRenderer(&cfg.SyncConfig{
-				Template: &cfg.TemplateConfig{RootDir: s.SeedSourceDir},
-				Git: &cfg.GitConfig{
-					Dir: s.SeedTargetDir,
-					Url: u,
-				},
-			}, koanf.New("."))
-			targetPath := "readme.md"
-			templates, err := r.instance.FetchTemplates()
-			require.NoError(t, err)
-			err = r.applyTemplate(targetPath, templates[0], core.Values{
-				"Values": Values{
-					"targetPath": tt.givenTargetDir,
-				}})
-			require.NoError(t, err)
-			assert.FileExists(t, tt.expectedEffectiveTargetFile)
-		})
-	}
-}
-
-func Test_cleanTargetPath(t *testing.T) {
-	tests := map[string]struct {
-		givenPath    string
-		expectedPath string
-	}{
-		"GivenFileWithoutDir_WhenSanitizing_ThenReturnSamePath": {
-			givenPath:    "fileName",
-			expectedPath: "fileName",
-		},
-		"GivenFileInDir_WhenSanitizing_ThenReturnSamePath": {
-			givenPath:    "dir/fileName",
-			expectedPath: "dir/fileName",
-		},
-		"GivenFileWithTplExtension_WhenSanitizing_ThenReturnStripped": {
-			givenPath:    "dir/fileName.tpl",
-			expectedPath: "dir/fileName",
-		},
-		"GivenFileWithTplExtensionTwice_WhenSanitizing_ThenReturnStrippedOnce": {
-			givenPath:    "fileName.tpl.tpl",
-			expectedPath: "fileName.tpl",
-		},
-	}
-	for name, tt := range tests {
-		t.Run(name, func(t *testing.T) {
-			result := cleanTargetPath(tt.givenPath)
-			assert.Equal(t, tt.expectedPath, result)
-		})
-	}
 }
 
 func (s *TemplateTestSuite) copyFiles() {

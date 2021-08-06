@@ -1,0 +1,29 @@
+topLevelFileTrue:
+  delete: true
+  unmanaged: true
+  targetPath: topLevelFile
+
+topLevelFileFalse:
+  delete: false
+  unmanaged: false
+  targetPath: movedToDir/
+
+subdir/:
+  delete: true
+  unmanaged: true
+  targetPath: movedDir/
+
+subdir/fileTrue: {}
+# this file should be deleted, as it's overridden by subdir/
+
+subdir/fileFalse:
+  # this file should still exist even if subdir/ defaults to true
+  delete: false
+  unmanaged: false
+  targetPath: anotherDir/file.renamed
+
+invalidFile:
+  delete: "string"
+  unmanaged:
+    object: key
+  targetPath: 12
