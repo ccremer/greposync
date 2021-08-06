@@ -15,7 +15,6 @@ func (s *LabelService) RunPipeline() error {
 	logger := printer.PipelineLogger{Logger: s.log}
 	result := pipeline.NewPipelineWithLogger(logger).WithSteps(
 		pipeline.NewStep("load config", s.loadManagedReposAction()),
-		pipeline.NewStep("init hosting providers", s.initHostingAPIAction()),
 		parallel.NewWorkerPoolStep("update labels", 1, s.updateReposInParallel(), s.errorHandler()),
 	).Run()
 	return result.Err
@@ -33,22 +32,20 @@ func (s *LabelService) updateReposInParallel() parallel.PipelineSupplier {
 	return func(pipelines chan *pipeline.Pipeline) {
 		defer close(pipelines)
 		for _, repoFacade := range s.repoFacades {
-			if hostingProvider, isSupported := s.repoProvider.GetSupportedGitHostingProviders()[repoFacade.GetConfig().Provider]; isSupported {
-				p := s.createPipelineForUpdatingLabels(repoFacade, hostingProvider)
-				pipelines <- p
-			}
+			p := s.createPipelineForUpdatingLabels(repoFacade)
+			pipelines <- p
 		}
 	}
 }
 
-func (s *LabelService) createPipelineForUpdatingLabels(rf core.GitRepository, hf core.GitHostingFacade) *pipeline.Pipeline {
+func (s *LabelService) createPipelineForUpdatingLabels(rf core.GitRepository) *pipeline.Pipeline {
 	log := printer.New().SetName(rf.GetConfig().URL.GetRepositoryName())
 	logger := printer.PipelineLogger{Logger: log}
 
 	p := pipeline.NewPipelineWithLogger(logger)
 	p.WithSteps(
-		pipeline.NewStep("edit labels", s.createOrUpdateLabelAction(rf, hf)),
-		pipeline.NewStep("delete labels", s.deleteLabelAction(rf, hf)),
+		pipeline.NewStep("edit labels", s.createOrUpdateLabelAction(rf)),
+		pipeline.NewStep("delete labels", s.deleteLabelAction(rf)),
 	)
 	return p
 }
@@ -65,20 +62,14 @@ func (s *LabelService) errorHandler() parallel.ResultHandler {
 	}
 }
 
-func (s *LabelService) initHostingAPIAction() pipeline.ActionFunc {
+func (s *LabelService) createOrUpdateLabelAction(r core.GitRepository) pipeline.ActionFunc {
 	return func() pipeline.Result {
-		return pipeline.Result{Err: s.initHostingAPIs()}
+		return pipeline.Result{Err: s.createOrUpdateLabels(r)}
 	}
 }
 
-func (s *LabelService) createOrUpdateLabelAction(r core.GitRepository, h core.GitHostingFacade) pipeline.ActionFunc {
+func (s *LabelService) deleteLabelAction(r core.GitRepository) pipeline.ActionFunc {
 	return func() pipeline.Result {
-		return pipeline.Result{Err: s.createOrUpdateLabels(r, h)}
-	}
-}
-
-func (s *LabelService) deleteLabelAction(r core.GitRepository, h core.GitHostingFacade) pipeline.ActionFunc {
-	return func() pipeline.Result {
-		return pipeline.Result{Err: s.deleteLabels(r, h)}
+		return pipeline.Result{Err: s.deleteLabels(r)}
 	}
 }

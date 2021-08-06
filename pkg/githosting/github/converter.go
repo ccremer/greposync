@@ -1,7 +1,6 @@
 package github
 
 import (
-	"github.com/ccremer/greposync/cfg"
 	"github.com/ccremer/greposync/core"
 )
 
@@ -12,7 +11,7 @@ type (
 
 // ConvertToEntity converts the given object to another.
 // Returns a non-nil empty list if labels is empty or nil.
-func (LabelConverter) ConvertToEntity(labels []*cfg.RepositoryLabel) []core.Label {
+func (LabelConverter) ConvertToEntity(labels []*LabelImpl) []core.Label {
 	if labels == nil || len(labels) == 0 {
 		return []core.Label{}
 	}
@@ -25,13 +24,13 @@ func (LabelConverter) ConvertToEntity(labels []*cfg.RepositoryLabel) []core.Labe
 
 // ConvertFromEntity converts the given object to another.
 // Returns a non-nil empty list if labels is empty or nil.
-func (LabelConverter) ConvertFromEntity(labels []core.Label) []*cfg.RepositoryLabel {
+func (LabelConverter) ConvertFromEntity(labels []core.Label) []*LabelImpl {
 	if labels == nil || len(labels) == 0 {
-		return []*cfg.RepositoryLabel{}
+		return []*LabelImpl{}
 	}
-	converted := make([]*cfg.RepositoryLabel, len(labels))
+	converted := make([]*LabelImpl, len(labels))
 	for i := range labels {
-		converted[i] = labels[i].(*cfg.RepositoryLabel)
+		converted[i] = labels[i].(*LabelImpl)
 	}
 	return converted
 }

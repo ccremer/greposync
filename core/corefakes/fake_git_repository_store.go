@@ -20,16 +20,6 @@ type FakeGitRepositoryStore struct {
 		result1 []core.GitRepository
 		result2 error
 	}
-	GetSupportedGitHostingProvidersStub        func() map[core.GitHostingProvider]core.GitHostingFacade
-	getSupportedGitHostingProvidersMutex       sync.RWMutex
-	getSupportedGitHostingProvidersArgsForCall []struct {
-	}
-	getSupportedGitHostingProvidersReturns struct {
-		result1 map[core.GitHostingProvider]core.GitHostingFacade
-	}
-	getSupportedGitHostingProvidersReturnsOnCall map[int]struct {
-		result1 map[core.GitHostingProvider]core.GitHostingFacade
-	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
@@ -90,66 +80,11 @@ func (fake *FakeGitRepositoryStore) FetchGitRepositoriesReturnsOnCall(i int, res
 	}{result1, result2}
 }
 
-func (fake *FakeGitRepositoryStore) GetSupportedGitHostingProviders() map[core.GitHostingProvider]core.GitHostingFacade {
-	fake.getSupportedGitHostingProvidersMutex.Lock()
-	ret, specificReturn := fake.getSupportedGitHostingProvidersReturnsOnCall[len(fake.getSupportedGitHostingProvidersArgsForCall)]
-	fake.getSupportedGitHostingProvidersArgsForCall = append(fake.getSupportedGitHostingProvidersArgsForCall, struct {
-	}{})
-	stub := fake.GetSupportedGitHostingProvidersStub
-	fakeReturns := fake.getSupportedGitHostingProvidersReturns
-	fake.recordInvocation("GetSupportedGitHostingProviders", []interface{}{})
-	fake.getSupportedGitHostingProvidersMutex.Unlock()
-	if stub != nil {
-		return stub()
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fakeReturns.result1
-}
-
-func (fake *FakeGitRepositoryStore) GetSupportedGitHostingProvidersCallCount() int {
-	fake.getSupportedGitHostingProvidersMutex.RLock()
-	defer fake.getSupportedGitHostingProvidersMutex.RUnlock()
-	return len(fake.getSupportedGitHostingProvidersArgsForCall)
-}
-
-func (fake *FakeGitRepositoryStore) GetSupportedGitHostingProvidersCalls(stub func() map[core.GitHostingProvider]core.GitHostingFacade) {
-	fake.getSupportedGitHostingProvidersMutex.Lock()
-	defer fake.getSupportedGitHostingProvidersMutex.Unlock()
-	fake.GetSupportedGitHostingProvidersStub = stub
-}
-
-func (fake *FakeGitRepositoryStore) GetSupportedGitHostingProvidersReturns(result1 map[core.GitHostingProvider]core.GitHostingFacade) {
-	fake.getSupportedGitHostingProvidersMutex.Lock()
-	defer fake.getSupportedGitHostingProvidersMutex.Unlock()
-	fake.GetSupportedGitHostingProvidersStub = nil
-	fake.getSupportedGitHostingProvidersReturns = struct {
-		result1 map[core.GitHostingProvider]core.GitHostingFacade
-	}{result1}
-}
-
-func (fake *FakeGitRepositoryStore) GetSupportedGitHostingProvidersReturnsOnCall(i int, result1 map[core.GitHostingProvider]core.GitHostingFacade) {
-	fake.getSupportedGitHostingProvidersMutex.Lock()
-	defer fake.getSupportedGitHostingProvidersMutex.Unlock()
-	fake.GetSupportedGitHostingProvidersStub = nil
-	if fake.getSupportedGitHostingProvidersReturnsOnCall == nil {
-		fake.getSupportedGitHostingProvidersReturnsOnCall = make(map[int]struct {
-			result1 map[core.GitHostingProvider]core.GitHostingFacade
-		})
-	}
-	fake.getSupportedGitHostingProvidersReturnsOnCall[i] = struct {
-		result1 map[core.GitHostingProvider]core.GitHostingFacade
-	}{result1}
-}
-
 func (fake *FakeGitRepositoryStore) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
 	fake.fetchGitRepositoriesMutex.RLock()
 	defer fake.fetchGitRepositoriesMutex.RUnlock()
-	fake.getSupportedGitHostingProvidersMutex.RLock()
-	defer fake.getSupportedGitHostingProvidersMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

@@ -11,16 +11,6 @@ type (
 	GitURL url.URL
 	// GitHostingProvider is the identification key for a Git hosting service.
 	GitHostingProvider string
-	// GitRepositoryConfig holds all the relevant Git properties.
-	GitRepositoryConfig struct {
-		// URL is the repository location on the remote hosting provider.
-		URL *GitURL
-		// Provider returns the GitHostingProvider identity string.
-		// Mainly used to identify the remote API implementation.
-		Provider GitHostingProvider
-		// RootDir is the local root path to the Git repository.
-		RootDir string
-	}
 )
 
 // GetRepositoryName returns the last element of the Git URL.

@@ -3,7 +3,9 @@ package labels
 import (
 	"github.com/ccremer/greposync/cfg"
 	"github.com/ccremer/greposync/cli/flags"
+	"github.com/ccremer/greposync/core"
 	"github.com/ccremer/greposync/core/labels"
+	"github.com/ccremer/greposync/pkg/githosting/github"
 	"github.com/ccremer/greposync/pkg/repository"
 	"github.com/urfave/cli/v2"
 )
@@ -41,6 +43,14 @@ func (c *Command) createCommand() *cli.Command {
 }
 
 func (c *Command) runCommand(ctx *cli.Context) error {
-	labelService := labels.NewService(repository.NewRepositoryStore(c.cfg))
+	providers := map[core.GitHostingProvider]repository.Remote{
+		github.GitHubProviderKey: github.NewRemote(),
+	}
+	for _, provider := range providers {
+		if err := provider.Initialize(); err != nil {
+			return err
+		}
+	}
+	labelService := labels.NewService(repository.NewRepositoryStore(c.cfg, providers))
 	return labelService.RunPipeline()
 }

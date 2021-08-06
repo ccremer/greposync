@@ -1,7 +1,6 @@
 package labels
 
 import (
-	"errors"
 	"net/url"
 	"testing"
 
@@ -35,18 +34,15 @@ func TestLabelService_createOrUpdateLabels(t *testing.T) {
 			}
 
 			repoFake := createRepoFake(core.GitRepositoryConfig{URL: gu}, tt.givenLabels)
-			hostingFake := createHostingFake(nil)
-			err := s.createOrUpdateLabels(repoFake, hostingFake)
+			err := s.createOrUpdateLabels(repoFake)
 			if tt.expectedErr {
 				assert.Error(t, err)
 				return
 			}
 			require.NoError(t, err)
-			assert.Equal(t, tt.expectedCalls, hostingFake.CreateOrUpdateLabelsForRepoCallCount())
 			if tt.expectedCalls > 0 {
-				gitUrl, result := hostingFake.CreateOrUpdateLabelsForRepoArgsForCall(0)
-				assert.Equal(t, gu, gitUrl)
-				assert.Equal(t, tt.givenLabels, result)
+				result := tt.givenLabels[0].(*corefakes.FakeLabel).EnsureCallCount()
+				assert.Equal(t, tt.expectedCalls, result)
 			}
 		})
 	}
@@ -76,18 +72,15 @@ func TestLabelService_deleteLabels(t *testing.T) {
 			}
 
 			repoFake := createRepoFake(core.GitRepositoryConfig{URL: gu}, tt.givenLabels)
-			hostingFake := createHostingFake(nil)
-			err := s.deleteLabels(repoFake, hostingFake)
+			err := s.deleteLabels(repoFake)
 			if tt.expectedErr {
 				assert.Error(t, err)
 				return
 			}
 			require.NoError(t, err)
-			assert.Equal(t, tt.expectedCalls, hostingFake.DeleteLabelsForRepoCallCount())
 			if tt.expectedCalls > 0 {
-				gitUrl, result := hostingFake.DeleteLabelsForRepoArgsForCall(0)
-				assert.Equal(t, gu, gitUrl)
-				assert.Equal(t, tt.givenLabels, result)
+				result := tt.givenLabels[0].(*corefakes.FakeLabel).DeleteCallCount()
+				assert.Equal(t, tt.expectedCalls, result)
 			}
 		})
 	}
@@ -147,26 +140,12 @@ func TestLabelService_filterDeadLabels(t *testing.T) {
 	}
 }
 
-func createHostingFake(returnErr error) *corefakes.FakeGitHostingFacade {
-	return &corefakes.FakeGitHostingFacade{
-		CreateOrUpdateLabelsForRepoStub: func(gu *core.GitURL, labels []core.Label) error {
-			return returnErr
-		},
-		DeleteLabelsForRepoStub: func(gu *core.GitURL, labels []core.Label) error {
-			return returnErr
-		},
-		InitializeStub: func() error {
-			return returnErr
-		},
-	}
-}
-
 func createRepoFake(cfg core.GitRepositoryConfig, labels []core.Label) *corefakes.FakeGitRepository {
 	return &corefakes.FakeGitRepository{
 		GetConfigStub: func() core.GitRepositoryConfig {
 			return cfg
 		},
-		FetchLabelsStub: func() []core.Label {
+		GetLabelsStub: func() []core.Label {
 			return labels
 		},
 	}
@@ -185,60 +164,4 @@ func createURl(t *testing.T) *core.GitURL {
 	require.NoError(t, err)
 	gu := core.GitURL(*u)
 	return &gu
-}
-
-func TestLabelService_initHostingAPIs(t *testing.T) {
-	tests := map[string]struct {
-		givenProvider   core.GitHostingProvider
-		expectErrString string
-		expectedCalls   int
-	}{
-		"GivenSupportedProviders_ThenInitHostingApi": {
-			givenProvider: "provider",
-			expectedCalls: 1,
-		},
-		"GivenSupportedProvider_WhenError_ThenExpectError": {
-			givenProvider:   "provider",
-			expectedCalls:   1,
-			expectErrString: "failed",
-		},
-		"GivenUnSupportedProviders_ThenIgnore": {
-			givenProvider: "unsupported",
-			expectedCalls: 0,
-		},
-	}
-	for name, tt := range tests {
-		t.Run(name, func(t *testing.T) {
-			var returnErr error
-			if tt.expectErrString != "" {
-				returnErr = errors.New(tt.expectErrString)
-			}
-			hostingFake := createHostingFake(returnErr)
-
-			s := &LabelService{
-				repoFacades: []core.GitRepository{
-					createRepoFake(core.GitRepositoryConfig{
-						Provider: tt.givenProvider,
-					}, nil),
-				},
-				repoProvider: &corefakes.FakeGitRepositoryStore{
-					GetSupportedGitHostingProvidersStub: func() map[core.GitHostingProvider]core.GitHostingFacade {
-						providers := map[core.GitHostingProvider]core.GitHostingFacade{
-							"provider": hostingFake,
-						}
-						return providers
-					},
-				},
-				log: printer.New(),
-			}
-			err := s.initHostingAPIs()
-			if tt.expectErrString != "" {
-				require.EqualError(t, err, tt.expectErrString)
-				assert.Equal(t, tt.expectedCalls, hostingFake.InitializeCallCount())
-				return
-			}
-			require.NoError(t, err)
-			assert.Equal(t, tt.expectedCalls, hostingFake.InitializeCallCount())
-		})
-	}
 }

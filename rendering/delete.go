@@ -6,7 +6,6 @@ import (
 
 	pipeline "github.com/ccremer/go-command-pipeline"
 	"github.com/ccremer/greposync/core"
-	"github.com/ccremer/greposync/pkg/githosting/github"
 )
 
 // DeleteUnwantedFiles goes through the sync config and deletes files from repositories that aren't targeted by the templates.
@@ -15,9 +14,8 @@ import (
 func (r *Renderer) DeleteUnwantedFiles() pipeline.ActionFunc {
 	return func() pipeline.Result {
 		files, err := r.valueStore.FetchFilesToDelete(&core.GitRepositoryConfig{
-			URL:      core.FromURL(r.cfg.Git.Url),
-			Provider: github.GitHubProviderKey,
-			RootDir:  r.cfg.Git.Dir,
+			URL:     core.FromURL(r.cfg.Git.Url),
+			RootDir: r.cfg.Git.Dir,
 		})
 		if err != nil {
 			return pipeline.Result{Err: err}

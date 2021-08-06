@@ -33,16 +33,6 @@ type FakeGitRepository struct {
 	ensureFileReturnsOnCall map[int]struct {
 		result1 error
 	}
-	FetchLabelsStub        func() []core.Label
-	fetchLabelsMutex       sync.RWMutex
-	fetchLabelsArgsForCall []struct {
-	}
-	fetchLabelsReturns struct {
-		result1 []core.Label
-	}
-	fetchLabelsReturnsOnCall map[int]struct {
-		result1 []core.Label
-	}
 	GetConfigStub        func() core.GitRepositoryConfig
 	getConfigMutex       sync.RWMutex
 	getConfigArgsForCall []struct {
@@ -52,6 +42,16 @@ type FakeGitRepository struct {
 	}
 	getConfigReturnsOnCall map[int]struct {
 		result1 core.GitRepositoryConfig
+	}
+	GetLabelsStub        func() []core.Label
+	getLabelsMutex       sync.RWMutex
+	getLabelsArgsForCall []struct {
+	}
+	getLabelsReturns struct {
+		result1 []core.Label
+	}
+	getLabelsReturnsOnCall map[int]struct {
+		result1 []core.Label
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
@@ -181,59 +181,6 @@ func (fake *FakeGitRepository) EnsureFileReturnsOnCall(i int, result1 error) {
 	}{result1}
 }
 
-func (fake *FakeGitRepository) FetchLabels() []core.Label {
-	fake.fetchLabelsMutex.Lock()
-	ret, specificReturn := fake.fetchLabelsReturnsOnCall[len(fake.fetchLabelsArgsForCall)]
-	fake.fetchLabelsArgsForCall = append(fake.fetchLabelsArgsForCall, struct {
-	}{})
-	stub := fake.FetchLabelsStub
-	fakeReturns := fake.fetchLabelsReturns
-	fake.recordInvocation("FetchLabels", []interface{}{})
-	fake.fetchLabelsMutex.Unlock()
-	if stub != nil {
-		return stub()
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fakeReturns.result1
-}
-
-func (fake *FakeGitRepository) FetchLabelsCallCount() int {
-	fake.fetchLabelsMutex.RLock()
-	defer fake.fetchLabelsMutex.RUnlock()
-	return len(fake.fetchLabelsArgsForCall)
-}
-
-func (fake *FakeGitRepository) FetchLabelsCalls(stub func() []core.Label) {
-	fake.fetchLabelsMutex.Lock()
-	defer fake.fetchLabelsMutex.Unlock()
-	fake.FetchLabelsStub = stub
-}
-
-func (fake *FakeGitRepository) FetchLabelsReturns(result1 []core.Label) {
-	fake.fetchLabelsMutex.Lock()
-	defer fake.fetchLabelsMutex.Unlock()
-	fake.FetchLabelsStub = nil
-	fake.fetchLabelsReturns = struct {
-		result1 []core.Label
-	}{result1}
-}
-
-func (fake *FakeGitRepository) FetchLabelsReturnsOnCall(i int, result1 []core.Label) {
-	fake.fetchLabelsMutex.Lock()
-	defer fake.fetchLabelsMutex.Unlock()
-	fake.FetchLabelsStub = nil
-	if fake.fetchLabelsReturnsOnCall == nil {
-		fake.fetchLabelsReturnsOnCall = make(map[int]struct {
-			result1 []core.Label
-		})
-	}
-	fake.fetchLabelsReturnsOnCall[i] = struct {
-		result1 []core.Label
-	}{result1}
-}
-
 func (fake *FakeGitRepository) GetConfig() core.GitRepositoryConfig {
 	fake.getConfigMutex.Lock()
 	ret, specificReturn := fake.getConfigReturnsOnCall[len(fake.getConfigArgsForCall)]
@@ -287,6 +234,59 @@ func (fake *FakeGitRepository) GetConfigReturnsOnCall(i int, result1 core.GitRep
 	}{result1}
 }
 
+func (fake *FakeGitRepository) GetLabels() []core.Label {
+	fake.getLabelsMutex.Lock()
+	ret, specificReturn := fake.getLabelsReturnsOnCall[len(fake.getLabelsArgsForCall)]
+	fake.getLabelsArgsForCall = append(fake.getLabelsArgsForCall, struct {
+	}{})
+	stub := fake.GetLabelsStub
+	fakeReturns := fake.getLabelsReturns
+	fake.recordInvocation("GetLabels", []interface{}{})
+	fake.getLabelsMutex.Unlock()
+	if stub != nil {
+		return stub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fakeReturns.result1
+}
+
+func (fake *FakeGitRepository) GetLabelsCallCount() int {
+	fake.getLabelsMutex.RLock()
+	defer fake.getLabelsMutex.RUnlock()
+	return len(fake.getLabelsArgsForCall)
+}
+
+func (fake *FakeGitRepository) GetLabelsCalls(stub func() []core.Label) {
+	fake.getLabelsMutex.Lock()
+	defer fake.getLabelsMutex.Unlock()
+	fake.GetLabelsStub = stub
+}
+
+func (fake *FakeGitRepository) GetLabelsReturns(result1 []core.Label) {
+	fake.getLabelsMutex.Lock()
+	defer fake.getLabelsMutex.Unlock()
+	fake.GetLabelsStub = nil
+	fake.getLabelsReturns = struct {
+		result1 []core.Label
+	}{result1}
+}
+
+func (fake *FakeGitRepository) GetLabelsReturnsOnCall(i int, result1 []core.Label) {
+	fake.getLabelsMutex.Lock()
+	defer fake.getLabelsMutex.Unlock()
+	fake.GetLabelsStub = nil
+	if fake.getLabelsReturnsOnCall == nil {
+		fake.getLabelsReturnsOnCall = make(map[int]struct {
+			result1 []core.Label
+		})
+	}
+	fake.getLabelsReturnsOnCall[i] = struct {
+		result1 []core.Label
+	}{result1}
+}
+
 func (fake *FakeGitRepository) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
@@ -294,10 +294,10 @@ func (fake *FakeGitRepository) Invocations() map[string][][]interface{} {
 	defer fake.deleteFileMutex.RUnlock()
 	fake.ensureFileMutex.RLock()
 	defer fake.ensureFileMutex.RUnlock()
-	fake.fetchLabelsMutex.RLock()
-	defer fake.fetchLabelsMutex.RUnlock()
 	fake.getConfigMutex.RLock()
 	defer fake.getConfigMutex.RUnlock()
+	fake.getLabelsMutex.RLock()
+	defer fake.getLabelsMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

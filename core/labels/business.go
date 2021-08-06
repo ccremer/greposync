@@ -22,10 +22,22 @@ func NewService(repoProvider core.GitRepositoryStore) *LabelService {
 	}
 }
 
-func (s *LabelService) createOrUpdateLabels(r core.GitRepository, h core.GitHostingFacade) error {
-	labels := filterActiveLabels(r.FetchLabels())
-	if len(labels) > 0 {
-		return h.CreateOrUpdateLabelsForRepo(r.GetConfig().URL, labels)
+func (s *LabelService) createOrUpdateLabels(r core.GitRepository) error {
+	labels := r.GetLabels()
+	labels = filterActiveLabels(labels)
+	if len(labels) <= 0 {
+		return nil
+	}
+	for _, label := range labels {
+		changed, err := label.Ensure()
+		if err != nil {
+			return err
+		}
+		if changed {
+			s.log.InfoF("Label '%s' changed", label.GetName())
+		} else {
+			s.log.InfoF("Label '%s' unchanged", label.GetName())
+		}
 	}
 	return nil
 }
@@ -40,10 +52,22 @@ func filterActiveLabels(labels []core.Label) []core.Label {
 	return filtered
 }
 
-func (s *LabelService) deleteLabels(r core.GitRepository, h core.GitHostingFacade) error {
-	labels := filterDeadLabels(r.FetchLabels())
-	if len(labels) > 0 {
-		return h.DeleteLabelsForRepo(r.GetConfig().URL, labels)
+func (s *LabelService) deleteLabels(r core.GitRepository) error {
+	labels := r.GetLabels()
+	labels = filterDeadLabels(labels)
+	if len(labels) <= 0 {
+		return nil
+	}
+	for _, label := range labels {
+		deleted, err := label.Delete()
+		if err != nil {
+			return err
+		}
+		if deleted {
+			s.log.InfoF("Label '%s' deleted", label.GetName())
+		} else {
+			s.log.InfoF("Label '%s' not deleted (not existing)", label.GetName())
+		}
 	}
 	return nil
 }
@@ -56,21 +80,4 @@ func filterDeadLabels(labels []core.Label) []core.Label {
 		}
 	}
 	return filtered
-}
-
-func (s *LabelService) initHostingAPIs() error {
-	occurringProviders := map[core.GitHostingProvider]bool{}
-	for _, facade := range s.repoFacades {
-		occurringProviders[facade.GetConfig().Provider] = true
-	}
-	for provider := range occurringProviders {
-		if hostingFacade, isSupported := s.repoProvider.GetSupportedGitHostingProviders()[provider]; isSupported {
-			if err := hostingFacade.Initialize(); err != nil {
-				return err
-			}
-		} else {
-			s.log.WarnF("Provider '%s' is not supported, ignoring all repositories from this Git hosting provider.", provider)
-		}
-	}
-	return nil
 }

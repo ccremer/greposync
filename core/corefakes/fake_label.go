@@ -8,6 +8,40 @@ import (
 )
 
 type FakeLabel struct {
+	DeleteStub        func() (bool, error)
+	deleteMutex       sync.RWMutex
+	deleteArgsForCall []struct {
+	}
+	deleteReturns struct {
+		result1 bool
+		result2 error
+	}
+	deleteReturnsOnCall map[int]struct {
+		result1 bool
+		result2 error
+	}
+	EnsureStub        func() (bool, error)
+	ensureMutex       sync.RWMutex
+	ensureArgsForCall []struct {
+	}
+	ensureReturns struct {
+		result1 bool
+		result2 error
+	}
+	ensureReturnsOnCall map[int]struct {
+		result1 bool
+		result2 error
+	}
+	GetNameStub        func() string
+	getNameMutex       sync.RWMutex
+	getNameArgsForCall []struct {
+	}
+	getNameReturns struct {
+		result1 string
+	}
+	getNameReturnsOnCall map[int]struct {
+		result1 string
+	}
 	IsInactiveStub        func() bool
 	isInactiveMutex       sync.RWMutex
 	isInactiveArgsForCall []struct {
@@ -20,6 +54,171 @@ type FakeLabel struct {
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
+}
+
+func (fake *FakeLabel) Delete() (bool, error) {
+	fake.deleteMutex.Lock()
+	ret, specificReturn := fake.deleteReturnsOnCall[len(fake.deleteArgsForCall)]
+	fake.deleteArgsForCall = append(fake.deleteArgsForCall, struct {
+	}{})
+	stub := fake.DeleteStub
+	fakeReturns := fake.deleteReturns
+	fake.recordInvocation("Delete", []interface{}{})
+	fake.deleteMutex.Unlock()
+	if stub != nil {
+		return stub()
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeLabel) DeleteCallCount() int {
+	fake.deleteMutex.RLock()
+	defer fake.deleteMutex.RUnlock()
+	return len(fake.deleteArgsForCall)
+}
+
+func (fake *FakeLabel) DeleteCalls(stub func() (bool, error)) {
+	fake.deleteMutex.Lock()
+	defer fake.deleteMutex.Unlock()
+	fake.DeleteStub = stub
+}
+
+func (fake *FakeLabel) DeleteReturns(result1 bool, result2 error) {
+	fake.deleteMutex.Lock()
+	defer fake.deleteMutex.Unlock()
+	fake.DeleteStub = nil
+	fake.deleteReturns = struct {
+		result1 bool
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeLabel) DeleteReturnsOnCall(i int, result1 bool, result2 error) {
+	fake.deleteMutex.Lock()
+	defer fake.deleteMutex.Unlock()
+	fake.DeleteStub = nil
+	if fake.deleteReturnsOnCall == nil {
+		fake.deleteReturnsOnCall = make(map[int]struct {
+			result1 bool
+			result2 error
+		})
+	}
+	fake.deleteReturnsOnCall[i] = struct {
+		result1 bool
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeLabel) Ensure() (bool, error) {
+	fake.ensureMutex.Lock()
+	ret, specificReturn := fake.ensureReturnsOnCall[len(fake.ensureArgsForCall)]
+	fake.ensureArgsForCall = append(fake.ensureArgsForCall, struct {
+	}{})
+	stub := fake.EnsureStub
+	fakeReturns := fake.ensureReturns
+	fake.recordInvocation("Ensure", []interface{}{})
+	fake.ensureMutex.Unlock()
+	if stub != nil {
+		return stub()
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeLabel) EnsureCallCount() int {
+	fake.ensureMutex.RLock()
+	defer fake.ensureMutex.RUnlock()
+	return len(fake.ensureArgsForCall)
+}
+
+func (fake *FakeLabel) EnsureCalls(stub func() (bool, error)) {
+	fake.ensureMutex.Lock()
+	defer fake.ensureMutex.Unlock()
+	fake.EnsureStub = stub
+}
+
+func (fake *FakeLabel) EnsureReturns(result1 bool, result2 error) {
+	fake.ensureMutex.Lock()
+	defer fake.ensureMutex.Unlock()
+	fake.EnsureStub = nil
+	fake.ensureReturns = struct {
+		result1 bool
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeLabel) EnsureReturnsOnCall(i int, result1 bool, result2 error) {
+	fake.ensureMutex.Lock()
+	defer fake.ensureMutex.Unlock()
+	fake.EnsureStub = nil
+	if fake.ensureReturnsOnCall == nil {
+		fake.ensureReturnsOnCall = make(map[int]struct {
+			result1 bool
+			result2 error
+		})
+	}
+	fake.ensureReturnsOnCall[i] = struct {
+		result1 bool
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeLabel) GetName() string {
+	fake.getNameMutex.Lock()
+	ret, specificReturn := fake.getNameReturnsOnCall[len(fake.getNameArgsForCall)]
+	fake.getNameArgsForCall = append(fake.getNameArgsForCall, struct {
+	}{})
+	stub := fake.GetNameStub
+	fakeReturns := fake.getNameReturns
+	fake.recordInvocation("GetName", []interface{}{})
+	fake.getNameMutex.Unlock()
+	if stub != nil {
+		return stub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fakeReturns.result1
+}
+
+func (fake *FakeLabel) GetNameCallCount() int {
+	fake.getNameMutex.RLock()
+	defer fake.getNameMutex.RUnlock()
+	return len(fake.getNameArgsForCall)
+}
+
+func (fake *FakeLabel) GetNameCalls(stub func() string) {
+	fake.getNameMutex.Lock()
+	defer fake.getNameMutex.Unlock()
+	fake.GetNameStub = stub
+}
+
+func (fake *FakeLabel) GetNameReturns(result1 string) {
+	fake.getNameMutex.Lock()
+	defer fake.getNameMutex.Unlock()
+	fake.GetNameStub = nil
+	fake.getNameReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeLabel) GetNameReturnsOnCall(i int, result1 string) {
+	fake.getNameMutex.Lock()
+	defer fake.getNameMutex.Unlock()
+	fake.GetNameStub = nil
+	if fake.getNameReturnsOnCall == nil {
+		fake.getNameReturnsOnCall = make(map[int]struct {
+			result1 string
+		})
+	}
+	fake.getNameReturnsOnCall[i] = struct {
+		result1 string
+	}{result1}
 }
 
 func (fake *FakeLabel) IsInactive() bool {
@@ -78,6 +277,12 @@ func (fake *FakeLabel) IsInactiveReturnsOnCall(i int, result1 bool) {
 func (fake *FakeLabel) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
+	fake.deleteMutex.RLock()
+	defer fake.deleteMutex.RUnlock()
+	fake.ensureMutex.RLock()
+	defer fake.ensureMutex.RUnlock()
+	fake.getNameMutex.RLock()
+	defer fake.getNameMutex.RUnlock()
 	fake.isInactiveMutex.RLock()
 	defer fake.isInactiveMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}

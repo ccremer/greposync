@@ -3,27 +3,26 @@ package github
 import (
 	"testing"
 
-	"github.com/ccremer/greposync/cfg"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestLabelConverter_convertEntity(t *testing.T) {
 	tests := map[string]struct {
-		givenLabels []*cfg.RepositoryLabel
+		givenLabels []*LabelImpl
 	}{
 		"GivenActualListWithLabels_WhenConverting_ThenConvertTypes": {
-			givenLabels: []*cfg.RepositoryLabel{
+			givenLabels: []*LabelImpl{
 				{
 					Name:        "label1",
 					Description: "active label",
 					Color:       "ABABAB",
-					Delete:      false,
+					Inactive:    false,
 				},
 				{
 					Name:        "label2",
 					Description: "dead label",
 					Color:       "ABABAB",
-					Delete:      true,
+					Inactive:    true,
 				},
 			},
 		},
@@ -31,7 +30,7 @@ func TestLabelConverter_convertEntity(t *testing.T) {
 			givenLabels: nil,
 		},
 		"GivenEmptySlices_WhenConverting_ThenReturnEmpty": {
-			givenLabels: []*cfg.RepositoryLabel{},
+			givenLabels: []*LabelImpl{},
 		},
 	}
 	for name, tt := range tests {

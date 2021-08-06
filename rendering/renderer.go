@@ -6,7 +6,6 @@ import (
 	pipeline "github.com/ccremer/go-command-pipeline"
 	"github.com/ccremer/greposync/cfg"
 	"github.com/ccremer/greposync/core"
-	"github.com/ccremer/greposync/pkg/githosting/github"
 	"github.com/ccremer/greposync/pkg/rendering"
 	"github.com/ccremer/greposync/pkg/repository"
 	"github.com/ccremer/greposync/pkg/valuestore"
@@ -63,9 +62,8 @@ func (r *Renderer) RenderTemplateDir() pipeline.ActionFunc {
 
 func (r *Renderer) processTemplate(tpl core.Template) error {
 	values, err := r.valueStore.FetchValuesForTemplate(tpl, &core.GitRepositoryConfig{
-		URL:      core.FromURL(r.cfg.Git.Url),
-		Provider: github.GitHubProviderKey,
-		RootDir:  r.cfg.Git.Dir,
+		URL:     core.FromURL(r.cfg.Git.Url),
+		RootDir: r.cfg.Git.Dir,
 	})
 	if err != nil {
 		return err
@@ -85,9 +83,8 @@ func (r *Renderer) applyTemplate(targetPath string, tpl core.Template, values co
 		return nil
 	}
 	gitCfg := core.GitRepositoryConfig{
-		URL:      core.FromURL(r.cfg.Git.Url),
-		Provider: github.GitHubProviderKey,
-		RootDir:  r.cfg.Git.Dir,
+		URL:     core.FromURL(r.cfg.Git.Url),
+		RootDir: r.cfg.Git.Dir,
 	}
 	unmanaged, err := r.valueStore.FetchUnmanagedFlag(tpl, &gitCfg)
 	if err != nil && !errors.Is(err, core.ErrKeyNotFound) {

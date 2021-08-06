@@ -3,10 +3,14 @@ package github
 import (
 	"testing"
 
-	"github.com/ccremer/greposync/cfg"
+	"github.com/ccremer/greposync/core"
 	"github.com/google/go-github/v37/github"
 	"github.com/stretchr/testify/assert"
 )
+
+func TestLabelImpl_ImplementsInterface(t *testing.T) {
+	assert.Implements(t, (*core.Label)(nil), new(LabelImpl))
+}
 
 func TestProvider_hasLabelChanged(t *testing.T) {
 	label := "label"
@@ -15,12 +19,12 @@ func TestProvider_hasLabelChanged(t *testing.T) {
 
 	tests := map[string]struct {
 		givenGhLabel   github.Label
-		givenRepoLabel cfg.RepositoryLabel
+		givenRepoLabel LabelImpl
 		expectedResult bool
 	}{
 		"GivenSameLabel_ThenExpectFalse": {
 			givenGhLabel: *newLabel(label, color, description),
-			givenRepoLabel: cfg.RepositoryLabel{
+			givenRepoLabel: LabelImpl{
 				Name:        label,
 				Description: description,
 				Color:       color,
@@ -29,7 +33,7 @@ func TestProvider_hasLabelChanged(t *testing.T) {
 		},
 		"GivenDifferentDescription_ThenExpectTrue": {
 			givenGhLabel: *newLabel(label, color, description),
-			givenRepoLabel: cfg.RepositoryLabel{
+			givenRepoLabel: LabelImpl{
 				Name:        label,
 				Description: "different",
 				Color:       color,
@@ -38,7 +42,7 @@ func TestProvider_hasLabelChanged(t *testing.T) {
 		},
 		"GivenDifferentColor_ThenExpectTrue": {
 			givenGhLabel: *newLabel(label, color, description),
-			givenRepoLabel: cfg.RepositoryLabel{
+			givenRepoLabel: LabelImpl{
 				Name:        label,
 				Description: description,
 				Color:       "FFFFFF",
@@ -48,7 +52,7 @@ func TestProvider_hasLabelChanged(t *testing.T) {
 	}
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
-			p := &Facade{}
+			p := &Remote{}
 			result := p.hasLabelChanged(&tt.givenGhLabel, &tt.givenRepoLabel)
 			assert.Equal(t, tt.expectedResult, result)
 		})
@@ -58,7 +62,7 @@ func TestProvider_hasLabelChanged(t *testing.T) {
 func TestProvider_findMatchingGhLabel(t *testing.T) {
 	tests := map[string]struct {
 		givenGhLabels               []*github.Label
-		givenRepoLabelForComparison *cfg.RepositoryLabel
+		givenRepoLabelForComparison *LabelImpl
 		expectedLabelIndex          int
 	}{
 		"GivenNilList_ThenExpectNil": {
@@ -73,7 +77,7 @@ func TestProvider_findMatchingGhLabel(t *testing.T) {
 			givenGhLabels: []*github.Label{
 				newLabel("label", "ABABAB", "desc"),
 			},
-			givenRepoLabelForComparison: &cfg.RepositoryLabel{Name: "label"},
+			givenRepoLabelForComparison: &LabelImpl{Name: "label"},
 			expectedLabelIndex:          0,
 		},
 		"GivenListWithMatchingLabels_ThenExpectSecond": {
@@ -81,20 +85,20 @@ func TestProvider_findMatchingGhLabel(t *testing.T) {
 				newLabel("label1", "ABABAB", "desc"),
 				newLabel("label2", "ABABAB", "desc"),
 			},
-			givenRepoLabelForComparison: &cfg.RepositoryLabel{Name: "label2"},
+			givenRepoLabelForComparison: &LabelImpl{Name: "label2"},
 			expectedLabelIndex:          1,
 		},
 		"GivenListWithNonMatchingLabel_ThenExpectNil": {
 			givenGhLabels: []*github.Label{
 				newLabel("label", "ABABAB", "desc"),
 			},
-			givenRepoLabelForComparison: &cfg.RepositoryLabel{Name: "different"},
+			givenRepoLabelForComparison: &LabelImpl{Name: "different"},
 			expectedLabelIndex:          -1,
 		},
 	}
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
-			p := &Facade{}
+			p := &Remote{}
 			result := p.findMatchingGhLabel(tt.givenGhLabels, tt.givenRepoLabelForComparison)
 			if tt.expectedLabelIndex >= 0 {
 				assert.Equal(t, tt.givenGhLabels[tt.expectedLabelIndex], result)
