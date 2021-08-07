@@ -52,7 +52,7 @@ func TestProvider_hasLabelChanged(t *testing.T) {
 	}
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
-			p := &Remote{}
+			p := &GhRemote{}
 			result := p.hasLabelChanged(&tt.givenGhLabel, &tt.givenRepoLabel)
 			assert.Equal(t, tt.expectedResult, result)
 		})
@@ -98,7 +98,7 @@ func TestProvider_findMatchingGhLabel(t *testing.T) {
 	}
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
-			p := &Remote{}
+			p := &GhRemote{}
 			result := p.findMatchingGhLabel(tt.givenGhLabels, tt.givenRepoLabelForComparison)
 			if tt.expectedLabelIndex >= 0 {
 				assert.Equal(t, tt.givenGhLabels[tt.expectedLabelIndex], result)

@@ -16,7 +16,7 @@ func (g *Repository) GetConfig() core.GitRepositoryConfig {
 
 // DeleteFile implements core.GitRepository.
 func (g *Repository) DeleteFile(relativePath string) error {
-	fileName := path.Join(g.Config.Dir, relativePath)
+	fileName := path.Join(g.GitConfig.Dir, relativePath)
 	if pathExists(fileName) {
 		return os.Remove(fileName)
 	}
@@ -29,7 +29,7 @@ func (g *Repository) EnsureFile(targetFile, content string, fileMode fs.FileMode
 	originalUmask := unix.Umask(0)
 	defer unix.Umask(originalUmask)
 
-	fileName := path.Join(g.Config.Dir, targetFile)
+	fileName := path.Join(g.GitConfig.Dir, targetFile)
 
 	if err := g.createParentDirs(fileName); err != nil {
 		return err

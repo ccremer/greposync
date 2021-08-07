@@ -19,6 +19,16 @@ type GitRepository interface {
 	// content is the file content to write.
 	// fileMode specifies the file permissions.
 	EnsureFile(targetPath, content string, fileMode fs.FileMode) error
+
+	// FetchPullRequest queries the remote Git hosting for an existing PullRequest.
+	// If no PR with matching branches is found, then nil is returned without error.
+	FetchPullRequest() (PullRequest, error)
+	// NewPullRequest creates a new instance with default properties.
+	NewPullRequest() PullRequest
+
+	// EnsurePullRequest creates the given PullRequest if it doesn't exist.
+	// The PullRequest is updated if it needs updating, otherwise left unchanged without error.
+	EnsurePullRequest(pr PullRequest) error
 }
 
 // GitRepositoryConfig holds all the relevant Git properties.
@@ -35,20 +45,4 @@ type GitRepositoryStore interface {
 	// FetchGitRepositories will load the managed repositories from a config store and returns an array of GitRepository for each Git repository.
 	// A non-nil empty slice is returned if there are none existing.
 	FetchGitRepositories() ([]GitRepository, error)
-}
-
-// Label is attached to a remote Git repository on a supported Git hosting provider.
-// The implementation may contain additional provider-specific properties.
-//counterfeiter:generate . Label
-type Label interface {
-	// IsInactive returns true if the label is bound for removal from a remote repository.
-	IsInactive() bool
-	// GetName returns the label name.
-	GetName() string
-
-	// Delete removes the label from the remote repository.
-	Delete() (bool, error)
-	// Ensure creates the label in the remote repository if it doesn't exist.
-	// If the label already exists, it will be updated if the properties are different.
-	Ensure() (bool, error)
 }

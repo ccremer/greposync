@@ -17,7 +17,7 @@ type LabelImpl struct {
 	// Inactive will remove this label.
 	Inactive bool `json:"delete" koanf:"delete"`
 
-	remote  *Remote
+	remote  *GhRemote
 	repo    *core.GitURL
 	ghLabel *github.Label
 }
@@ -44,10 +44,10 @@ func (l *LabelImpl) Ensure() (bool, error) {
 	return true, l.remote.updateLabel(l.repo, l.ghLabel, l)
 }
 
-func (p *Remote) createLabel(url *core.GitURL, label *LabelImpl) error {
-	p.m.Lock()
-	defer p.delay()
-	_, _, err := p.client.Issues.CreateLabel(p.ctx, url.GetNamespace(), url.GetRepositoryName(), &github.Label{
+func (r *GhRemote) createLabel(url *core.GitURL, label *LabelImpl) error {
+	r.m.Lock()
+	defer r.delay()
+	_, _, err := r.client.Issues.CreateLabel(r.ctx, url.GetNamespace(), url.GetRepositoryName(), &github.Label{
 		Name:        &label.Name,
 		Color:       &label.Color,
 		Description: &label.Description,
@@ -55,20 +55,20 @@ func (p *Remote) createLabel(url *core.GitURL, label *LabelImpl) error {
 	return err
 }
 
-func (p *Remote) updateLabel(url *core.GitURL, ghLabel *github.Label, label *LabelImpl) error {
-	p.m.Lock()
-	defer p.delay()
+func (r *GhRemote) updateLabel(url *core.GitURL, ghLabel *github.Label, label *LabelImpl) error {
+	r.m.Lock()
+	defer r.delay()
 	// TODO: Without a new_name property we cannot rename a label yet.
 	ghLabel.Description = &label.Description
 	ghLabel.Color = &label.Color
-	_, _, err := p.client.Issues.EditLabel(p.ctx, url.GetNamespace(), url.GetRepositoryName(), label.Name, ghLabel)
+	_, _, err := r.client.Issues.EditLabel(r.ctx, url.GetNamespace(), url.GetRepositoryName(), label.Name, ghLabel)
 	return err
 }
 
-func (p *Remote) deleteLabel(url *core.GitURL, name string) (bool, error) {
-	p.m.Lock()
-	defer p.delay()
-	resp, err := p.client.Issues.DeleteLabel(p.ctx, url.GetNamespace(), url.GetRepositoryName(), name)
+func (r *GhRemote) deleteLabel(url *core.GitURL, name string) (bool, error) {
+	r.m.Lock()
+	defer r.delay()
+	resp, err := r.client.Issues.DeleteLabel(r.ctx, url.GetNamespace(), url.GetRepositoryName(), name)
 	if resp != nil && resp.StatusCode == 404 {
 		// Not an error
 		return false, nil
@@ -76,13 +76,13 @@ func (p *Remote) deleteLabel(url *core.GitURL, name string) (bool, error) {
 	return err == nil, err
 }
 
-func (p *Remote) fetchAllLabels(url *core.GitURL) ([]*github.Label, error) {
-	p.m.Lock()
-	defer p.delay()
+func (r *GhRemote) fetchAllLabels(url *core.GitURL) ([]*github.Label, error) {
+	r.m.Lock()
+	defer r.delay()
 	nextPage := 1
 	var allLabels []*github.Label
 	for repeat := true; repeat; repeat = nextPage > 0 {
-		labels, resp, err := p.client.Issues.ListLabels(p.ctx, url.GetNamespace(), url.GetRepositoryName(), &github.ListOptions{
+		labels, resp, err := r.client.Issues.ListLabels(r.ctx, url.GetNamespace(), url.GetRepositoryName(), &github.ListOptions{
 			Page:    nextPage,
 			PerPage: 100,
 		})
@@ -96,7 +96,7 @@ func (p *Remote) fetchAllLabels(url *core.GitURL) ([]*github.Label, error) {
 	return allLabels, nil
 }
 
-func (p *Remote) findMatchingGhLabel(ghLabels []*github.Label, toFind *LabelImpl) *github.Label {
+func (r *GhRemote) findMatchingGhLabel(ghLabels []*github.Label, toFind *LabelImpl) *github.Label {
 	for _, label := range ghLabels {
 		if label.GetName() == toFind.Name {
 			return label
@@ -105,7 +105,7 @@ func (p *Remote) findMatchingGhLabel(ghLabels []*github.Label, toFind *LabelImpl
 	return nil
 }
 
-func (p *Remote) hasLabelChanged(ghLabel *github.Label, repoLabel *LabelImpl) bool {
+func (r *GhRemote) hasLabelChanged(ghLabel *github.Label, repoLabel *LabelImpl) bool {
 	return ghLabel.GetDescription() != repoLabel.Description || ghLabel.GetColor() != repoLabel.Color
 }
 
@@ -113,7 +113,7 @@ func (p *Remote) hasLabelChanged(ghLabel *github.Label, repoLabel *LabelImpl) bo
 //
 // https://docs.github.com/en/rest/guides/best-practices-for-integrators#dealing-with-abuse-rate-limits
 // "If you're making a large number of POST, PATCH, PUT, or DELETE requests for a single user or client ID, wait at least one second between each request."
-func (p *Remote) delay() {
+func (r *GhRemote) delay() {
 	time.Sleep(1 * time.Second)
-	p.m.Unlock()
+	r.m.Unlock()
 }

@@ -38,7 +38,7 @@ func (r *RepositoryStore) FetchGitRepositories() ([]core.GitRepository, error) {
 				return []core.GitRepository{}, err
 			}
 		}
-		repos[i] = NewGitRepository(service.Config, labels)
+		repos[i] = NewGitRepository(service.Config, r.config.PullRequest, labels)
 	}
 	return repos, err
 }

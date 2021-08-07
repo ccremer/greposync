@@ -9,6 +9,7 @@ import (
 	"github.com/ccremer/go-command-pipeline/predicate"
 	"github.com/ccremer/greposync/cfg"
 	"github.com/ccremer/greposync/cli/flags"
+	"github.com/ccremer/greposync/core/pullrequest"
 	"github.com/ccremer/greposync/printer"
 	"github.com/ccremer/greposync/rendering"
 	"github.com/ccremer/greposync/repository"
@@ -101,6 +102,9 @@ func (c *Command) createPipeline(r *repository.Service) *pipeline.Pipeline {
 		},
 	}
 	renderer := rendering.NewRenderer(sc, c.globalK)
+	prService := pullrequest.PullRequestService{
+
+	}
 	gitDirExists := r.DirExists(r.Config.Dir)
 	logger := printer.PipelineLogger{Logger: log}
 	p := pipeline.NewPipelineWithLogger(logger)
@@ -166,6 +170,12 @@ func (c *Command) updateReposInParallel() parallel.PipelineSupplier {
 			p := c.createPipeline(r)
 			pipelines <- p
 		}
+	}
+}
+
+func (c *Command) handlePullRequest(service pullrequest.PullRequestService) pipeline.ActionFunc {
+	return func() pipeline.Result {
+		return pipeline.Result{Err: service.RunPipeline()}
 	}
 }
 

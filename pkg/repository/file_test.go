@@ -30,7 +30,7 @@ func TestGitRepository_DeleteFile(t *testing.T) {
 				require.NoError(t, os.WriteFile(tt.givenPath, []byte("test"), 0644))
 			}
 			g := &Repository{
-				Config: &cfg.GitConfig{Dir: "testdata"},
+				GitConfig: &cfg.GitConfig{Dir: "testdata"},
 			}
 			err := g.DeleteFile(path.Base(tt.givenPath))
 			require.NoError(t, err)
@@ -60,7 +60,7 @@ func TestGitRepository_EnsureFile(t *testing.T) {
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
 			g := &Repository{
-				Config: &cfg.GitConfig{Dir: "testdata"},
+				GitConfig: &cfg.GitConfig{Dir: "testdata"},
 			}
 			fullPath := path.Join("testdata", tt.givenPath)
 			err := g.EnsureFile(tt.givenPath, "test", tt.expectedMode)

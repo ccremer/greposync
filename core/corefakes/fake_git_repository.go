@@ -33,6 +33,29 @@ type FakeGitRepository struct {
 	ensureFileReturnsOnCall map[int]struct {
 		result1 error
 	}
+	EnsurePullRequestStub        func(core.PullRequest) error
+	ensurePullRequestMutex       sync.RWMutex
+	ensurePullRequestArgsForCall []struct {
+		arg1 core.PullRequest
+	}
+	ensurePullRequestReturns struct {
+		result1 error
+	}
+	ensurePullRequestReturnsOnCall map[int]struct {
+		result1 error
+	}
+	FetchPullRequestStub        func() (core.PullRequest, error)
+	fetchPullRequestMutex       sync.RWMutex
+	fetchPullRequestArgsForCall []struct {
+	}
+	fetchPullRequestReturns struct {
+		result1 core.PullRequest
+		result2 error
+	}
+	fetchPullRequestReturnsOnCall map[int]struct {
+		result1 core.PullRequest
+		result2 error
+	}
 	GetConfigStub        func() core.GitRepositoryConfig
 	getConfigMutex       sync.RWMutex
 	getConfigArgsForCall []struct {
@@ -52,6 +75,16 @@ type FakeGitRepository struct {
 	}
 	getLabelsReturnsOnCall map[int]struct {
 		result1 []core.Label
+	}
+	NewPullRequestStub        func() core.PullRequest
+	newPullRequestMutex       sync.RWMutex
+	newPullRequestArgsForCall []struct {
+	}
+	newPullRequestReturns struct {
+		result1 core.PullRequest
+	}
+	newPullRequestReturnsOnCall map[int]struct {
+		result1 core.PullRequest
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
@@ -181,6 +214,123 @@ func (fake *FakeGitRepository) EnsureFileReturnsOnCall(i int, result1 error) {
 	}{result1}
 }
 
+func (fake *FakeGitRepository) EnsurePullRequest(arg1 core.PullRequest) error {
+	fake.ensurePullRequestMutex.Lock()
+	ret, specificReturn := fake.ensurePullRequestReturnsOnCall[len(fake.ensurePullRequestArgsForCall)]
+	fake.ensurePullRequestArgsForCall = append(fake.ensurePullRequestArgsForCall, struct {
+		arg1 core.PullRequest
+	}{arg1})
+	stub := fake.EnsurePullRequestStub
+	fakeReturns := fake.ensurePullRequestReturns
+	fake.recordInvocation("EnsurePullRequest", []interface{}{arg1})
+	fake.ensurePullRequestMutex.Unlock()
+	if stub != nil {
+		return stub(arg1)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fakeReturns.result1
+}
+
+func (fake *FakeGitRepository) EnsurePullRequestCallCount() int {
+	fake.ensurePullRequestMutex.RLock()
+	defer fake.ensurePullRequestMutex.RUnlock()
+	return len(fake.ensurePullRequestArgsForCall)
+}
+
+func (fake *FakeGitRepository) EnsurePullRequestCalls(stub func(core.PullRequest) error) {
+	fake.ensurePullRequestMutex.Lock()
+	defer fake.ensurePullRequestMutex.Unlock()
+	fake.EnsurePullRequestStub = stub
+}
+
+func (fake *FakeGitRepository) EnsurePullRequestArgsForCall(i int) core.PullRequest {
+	fake.ensurePullRequestMutex.RLock()
+	defer fake.ensurePullRequestMutex.RUnlock()
+	argsForCall := fake.ensurePullRequestArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeGitRepository) EnsurePullRequestReturns(result1 error) {
+	fake.ensurePullRequestMutex.Lock()
+	defer fake.ensurePullRequestMutex.Unlock()
+	fake.EnsurePullRequestStub = nil
+	fake.ensurePullRequestReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeGitRepository) EnsurePullRequestReturnsOnCall(i int, result1 error) {
+	fake.ensurePullRequestMutex.Lock()
+	defer fake.ensurePullRequestMutex.Unlock()
+	fake.EnsurePullRequestStub = nil
+	if fake.ensurePullRequestReturnsOnCall == nil {
+		fake.ensurePullRequestReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.ensurePullRequestReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeGitRepository) FetchPullRequest() (core.PullRequest, error) {
+	fake.fetchPullRequestMutex.Lock()
+	ret, specificReturn := fake.fetchPullRequestReturnsOnCall[len(fake.fetchPullRequestArgsForCall)]
+	fake.fetchPullRequestArgsForCall = append(fake.fetchPullRequestArgsForCall, struct {
+	}{})
+	stub := fake.FetchPullRequestStub
+	fakeReturns := fake.fetchPullRequestReturns
+	fake.recordInvocation("FetchPullRequest", []interface{}{})
+	fake.fetchPullRequestMutex.Unlock()
+	if stub != nil {
+		return stub()
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeGitRepository) FetchPullRequestCallCount() int {
+	fake.fetchPullRequestMutex.RLock()
+	defer fake.fetchPullRequestMutex.RUnlock()
+	return len(fake.fetchPullRequestArgsForCall)
+}
+
+func (fake *FakeGitRepository) FetchPullRequestCalls(stub func() (core.PullRequest, error)) {
+	fake.fetchPullRequestMutex.Lock()
+	defer fake.fetchPullRequestMutex.Unlock()
+	fake.FetchPullRequestStub = stub
+}
+
+func (fake *FakeGitRepository) FetchPullRequestReturns(result1 core.PullRequest, result2 error) {
+	fake.fetchPullRequestMutex.Lock()
+	defer fake.fetchPullRequestMutex.Unlock()
+	fake.FetchPullRequestStub = nil
+	fake.fetchPullRequestReturns = struct {
+		result1 core.PullRequest
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeGitRepository) FetchPullRequestReturnsOnCall(i int, result1 core.PullRequest, result2 error) {
+	fake.fetchPullRequestMutex.Lock()
+	defer fake.fetchPullRequestMutex.Unlock()
+	fake.FetchPullRequestStub = nil
+	if fake.fetchPullRequestReturnsOnCall == nil {
+		fake.fetchPullRequestReturnsOnCall = make(map[int]struct {
+			result1 core.PullRequest
+			result2 error
+		})
+	}
+	fake.fetchPullRequestReturnsOnCall[i] = struct {
+		result1 core.PullRequest
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeGitRepository) GetConfig() core.GitRepositoryConfig {
 	fake.getConfigMutex.Lock()
 	ret, specificReturn := fake.getConfigReturnsOnCall[len(fake.getConfigArgsForCall)]
@@ -287,6 +437,59 @@ func (fake *FakeGitRepository) GetLabelsReturnsOnCall(i int, result1 []core.Labe
 	}{result1}
 }
 
+func (fake *FakeGitRepository) NewPullRequest() core.PullRequest {
+	fake.newPullRequestMutex.Lock()
+	ret, specificReturn := fake.newPullRequestReturnsOnCall[len(fake.newPullRequestArgsForCall)]
+	fake.newPullRequestArgsForCall = append(fake.newPullRequestArgsForCall, struct {
+	}{})
+	stub := fake.NewPullRequestStub
+	fakeReturns := fake.newPullRequestReturns
+	fake.recordInvocation("NewPullRequest", []interface{}{})
+	fake.newPullRequestMutex.Unlock()
+	if stub != nil {
+		return stub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fakeReturns.result1
+}
+
+func (fake *FakeGitRepository) NewPullRequestCallCount() int {
+	fake.newPullRequestMutex.RLock()
+	defer fake.newPullRequestMutex.RUnlock()
+	return len(fake.newPullRequestArgsForCall)
+}
+
+func (fake *FakeGitRepository) NewPullRequestCalls(stub func() core.PullRequest) {
+	fake.newPullRequestMutex.Lock()
+	defer fake.newPullRequestMutex.Unlock()
+	fake.NewPullRequestStub = stub
+}
+
+func (fake *FakeGitRepository) NewPullRequestReturns(result1 core.PullRequest) {
+	fake.newPullRequestMutex.Lock()
+	defer fake.newPullRequestMutex.Unlock()
+	fake.NewPullRequestStub = nil
+	fake.newPullRequestReturns = struct {
+		result1 core.PullRequest
+	}{result1}
+}
+
+func (fake *FakeGitRepository) NewPullRequestReturnsOnCall(i int, result1 core.PullRequest) {
+	fake.newPullRequestMutex.Lock()
+	defer fake.newPullRequestMutex.Unlock()
+	fake.NewPullRequestStub = nil
+	if fake.newPullRequestReturnsOnCall == nil {
+		fake.newPullRequestReturnsOnCall = make(map[int]struct {
+			result1 core.PullRequest
+		})
+	}
+	fake.newPullRequestReturnsOnCall[i] = struct {
+		result1 core.PullRequest
+	}{result1}
+}
+
 func (fake *FakeGitRepository) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
@@ -294,10 +497,16 @@ func (fake *FakeGitRepository) Invocations() map[string][][]interface{} {
 	defer fake.deleteFileMutex.RUnlock()
 	fake.ensureFileMutex.RLock()
 	defer fake.ensureFileMutex.RUnlock()
+	fake.ensurePullRequestMutex.RLock()
+	defer fake.ensurePullRequestMutex.RUnlock()
+	fake.fetchPullRequestMutex.RLock()
+	defer fake.fetchPullRequestMutex.RUnlock()
 	fake.getConfigMutex.RLock()
 	defer fake.getConfigMutex.RUnlock()
 	fake.getLabelsMutex.RLock()
 	defer fake.getLabelsMutex.RUnlock()
+	fake.newPullRequestMutex.RLock()
+	defer fake.newPullRequestMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

@@ -9,6 +9,7 @@ import (
 type Values map[string]interface{}
 
 // Template is a representation of a single template file.
+//counterfeiter:generate . Template
 type Template interface {
 	// GetRelativePath returns the path to a template file relative to the template root directory.
 	// The path is delimited with a forward slash ("/") and not OS-specific.
@@ -20,9 +21,14 @@ type Template interface {
 }
 
 // TemplateStore is a service responsible for fetching templates.
+//counterfeiter:generate . TemplateStore
 type TemplateStore interface {
 	// FetchTemplates retrieves the templates or an error if one failed.
 	FetchTemplates() ([]Template, error)
+
+	// FetchPullRequestTemplate retrieves the template for pull requests.
+	// It returns nil if there is no template found or configured.
+	FetchPullRequestTemplate() (Template, error)
 }
 
 // ValueStore is a service centered around configuration values fetching and configuring templates.

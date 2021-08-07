@@ -8,20 +8,24 @@ import (
 type (
 	// Repository is the implementation for core.GitRepository.
 	Repository struct {
-		Config     *cfg.GitConfig
+		GitConfig  *cfg.GitConfig
+		PrConfig   *cfg.PullRequestConfig
 		coreConfig core.GitRepositoryConfig
 		labels     []core.Label
 		remote     Remote
+		pr         core.PullRequest
 	}
 )
 
-func NewGitRepository(cfg *cfg.GitConfig, labels []core.Label) *Repository {
+func NewGitRepository(cfg *cfg.GitConfig, prConfig *cfg.PullRequestConfig, labels []core.Label) *Repository {
 	return &Repository{
-		Config: cfg,
+		GitConfig: cfg,
 		coreConfig: core.GitRepositoryConfig{
-			URL: core.FromURL(cfg.Url),
+			URL:     core.FromURL(cfg.Url),
+			RootDir: cfg.Dir,
 		},
-		labels: labels,
+		PrConfig: prConfig,
+		labels:   labels,
 	}
 }
 
