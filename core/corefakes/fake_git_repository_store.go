@@ -20,6 +20,19 @@ type FakeGitRepositoryStore struct {
 		result1 []core.GitRepository
 		result2 error
 	}
+	FetchGitRepositoryStub        func(*core.GitURL) (core.GitRepository, error)
+	fetchGitRepositoryMutex       sync.RWMutex
+	fetchGitRepositoryArgsForCall []struct {
+		arg1 *core.GitURL
+	}
+	fetchGitRepositoryReturns struct {
+		result1 core.GitRepository
+		result2 error
+	}
+	fetchGitRepositoryReturnsOnCall map[int]struct {
+		result1 core.GitRepository
+		result2 error
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
@@ -80,11 +93,77 @@ func (fake *FakeGitRepositoryStore) FetchGitRepositoriesReturnsOnCall(i int, res
 	}{result1, result2}
 }
 
+func (fake *FakeGitRepositoryStore) FetchGitRepository(arg1 *core.GitURL) (core.GitRepository, error) {
+	fake.fetchGitRepositoryMutex.Lock()
+	ret, specificReturn := fake.fetchGitRepositoryReturnsOnCall[len(fake.fetchGitRepositoryArgsForCall)]
+	fake.fetchGitRepositoryArgsForCall = append(fake.fetchGitRepositoryArgsForCall, struct {
+		arg1 *core.GitURL
+	}{arg1})
+	stub := fake.FetchGitRepositoryStub
+	fakeReturns := fake.fetchGitRepositoryReturns
+	fake.recordInvocation("FetchGitRepository", []interface{}{arg1})
+	fake.fetchGitRepositoryMutex.Unlock()
+	if stub != nil {
+		return stub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeGitRepositoryStore) FetchGitRepositoryCallCount() int {
+	fake.fetchGitRepositoryMutex.RLock()
+	defer fake.fetchGitRepositoryMutex.RUnlock()
+	return len(fake.fetchGitRepositoryArgsForCall)
+}
+
+func (fake *FakeGitRepositoryStore) FetchGitRepositoryCalls(stub func(*core.GitURL) (core.GitRepository, error)) {
+	fake.fetchGitRepositoryMutex.Lock()
+	defer fake.fetchGitRepositoryMutex.Unlock()
+	fake.FetchGitRepositoryStub = stub
+}
+
+func (fake *FakeGitRepositoryStore) FetchGitRepositoryArgsForCall(i int) *core.GitURL {
+	fake.fetchGitRepositoryMutex.RLock()
+	defer fake.fetchGitRepositoryMutex.RUnlock()
+	argsForCall := fake.fetchGitRepositoryArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeGitRepositoryStore) FetchGitRepositoryReturns(result1 core.GitRepository, result2 error) {
+	fake.fetchGitRepositoryMutex.Lock()
+	defer fake.fetchGitRepositoryMutex.Unlock()
+	fake.FetchGitRepositoryStub = nil
+	fake.fetchGitRepositoryReturns = struct {
+		result1 core.GitRepository
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeGitRepositoryStore) FetchGitRepositoryReturnsOnCall(i int, result1 core.GitRepository, result2 error) {
+	fake.fetchGitRepositoryMutex.Lock()
+	defer fake.fetchGitRepositoryMutex.Unlock()
+	fake.FetchGitRepositoryStub = nil
+	if fake.fetchGitRepositoryReturnsOnCall == nil {
+		fake.fetchGitRepositoryReturnsOnCall = make(map[int]struct {
+			result1 core.GitRepository
+			result2 error
+		})
+	}
+	fake.fetchGitRepositoryReturnsOnCall[i] = struct {
+		result1 core.GitRepository
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeGitRepositoryStore) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
 	fake.fetchGitRepositoriesMutex.RLock()
 	defer fake.fetchGitRepositoriesMutex.RUnlock()
+	fake.fetchGitRepositoryMutex.RLock()
+	defer fake.fetchGitRepositoryMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

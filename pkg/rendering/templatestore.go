@@ -56,6 +56,12 @@ func (s *GoTemplateStore) FetchTemplates() ([]core.Template, error) {
 	return list, nil
 }
 
+// FetchPullRequestTemplate implements core.TemplateStore.
+func (s *GoTemplateStore) FetchPullRequestTemplate() (core.Template, error) {
+	// TODO: implement me
+	panic("implement me")
+}
+
 func (s *GoTemplateStore) listAllTemplates() (templates []*GoTemplate, err error) {
 	err = filepath.Walk(path.Clean(s.config.RootDir),
 		func(file string, info os.FileInfo, err error) error {

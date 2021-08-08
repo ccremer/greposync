@@ -1,6 +1,6 @@
 package core
 
-//go:generate rm -r corefakes
+//go:generate rm -rf corefakes
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -generate
 
 //CoreService is a representation of a core feature or process.

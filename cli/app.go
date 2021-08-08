@@ -20,23 +20,27 @@ type (
 		app    *cli.App
 		config *cfg.Configuration
 	}
+	VersionInfo struct {
+		Version string
+		Commit  string
+		Date    string
+	}
 )
 
 // NewApp initializes the CLI application.
-func NewApp(version, commit, date string) *App {
+func NewApp(info VersionInfo, config *cfg.Configuration) *App {
 	dateLayout := "2006-01-02"
-	t, err := time.Parse(dateLayout, date)
+	t, err := time.Parse(dateLayout, info.Date)
 	if err != nil {
 		printer.DefaultPrinter.ErrorF(err.Error())
 		os.Exit(2)
 	}
 
-	config := cfg.NewDefaultConfig()
 	flags.InitGlobalFlags(config)
 	a := &cli.App{
 		Name:                 "greposync",
 		Usage:                "git-repo-sync: Shameless reimplementation of ModuleSync in Go",
-		Version:              fmt.Sprintf("%s, commit %s, date %s", version, commit[0:7], t.Format(dateLayout)),
+		Version:              fmt.Sprintf("%s, commit %s, date %s", info.Version, info.Commit[0:7], t.Format(dateLayout)),
 		EnableBashCompletion: true,
 		Commands: []*cli.Command{
 			initialize.NewCommand(config).GetCliCommand(),

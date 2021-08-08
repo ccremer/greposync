@@ -7,23 +7,23 @@ import (
 	"github.com/ccremer/greposync/printer"
 )
 
-// PullRequestService contains the business logic to interact with labels on supported core.GitHostingProvider.
-type PullRequestService struct {
+// PullRequestHandler contains the business logic to interact with labels on supported core.GitHostingProvider.
+type PullRequestHandler struct {
+	repoStore     core.GitRepositoryStore
 	templateStore core.TemplateStore
 	valueStore    core.ValueStore
 	log           printer.Printer
 }
 
-
-func NewInstance() *PullRequestService {
-	return &PullRequestService{
-		templateStore: nil,
-		valueStore:    nil,
+func NewPullRequestHandler(ts core.TemplateStore, vs core.ValueStore) *PullRequestHandler {
+	return &PullRequestHandler{
+		templateStore: ts,
+		valueStore:    vs,
 		log:           printer.New(),
 	}
 }
 
-func (s *PullRequestService) fetchPrTemplate(ctx *pipelineContext) error {
+func (s *PullRequestHandler) fetchPrTemplate(ctx *pipelineContext) error {
 	template, err := s.templateStore.FetchPullRequestTemplate()
 	if err != nil {
 		return err
@@ -32,7 +32,7 @@ func (s *PullRequestService) fetchPrTemplate(ctx *pipelineContext) error {
 	return nil
 }
 
-func (s *PullRequestService) renderTemplate(ctx *pipelineContext) error {
+func (s *PullRequestHandler) renderTemplate(ctx *pipelineContext) error {
 	if isNil(ctx.template) {
 		return nil
 	}
@@ -47,14 +47,14 @@ func (s *PullRequestService) renderTemplate(ctx *pipelineContext) error {
 	return nil
 }
 
-func (s *PullRequestService) createOrUpdatePr(ctx *pipelineContext) error {
+func (s *PullRequestHandler) createOrUpdatePr(ctx *pipelineContext) error {
 	if ctx.body != "" {
 		ctx.pr.SetBody(ctx.body)
 	}
 	return ctx.repo.EnsurePullRequest(ctx.pr)
 }
 
-func (s *PullRequestService) fetchExistingPr(ctx *pipelineContext) error {
+func (s *PullRequestHandler) fetchExistingPr(ctx *pipelineContext) error {
 	pr, err := ctx.repo.FetchPullRequest()
 	if err != nil {
 		return err

@@ -10,13 +10,13 @@ import (
 )
 
 // GetConfig implements core.GitRepository.
-func (g *Repository) GetConfig() core.GitRepositoryConfig {
-	return g.coreConfig
+func (s *Repository) GetConfig() core.GitRepositoryProperties {
+	return s.coreConfig
 }
 
 // DeleteFile implements core.GitRepository.
-func (g *Repository) DeleteFile(relativePath string) error {
-	fileName := path.Join(g.GitConfig.Dir, relativePath)
+func (s *Repository) DeleteFile(relativePath string) error {
+	fileName := path.Join(s.GitConfig.Dir, relativePath)
 	if pathExists(fileName) {
 		return os.Remove(fileName)
 	}
@@ -24,25 +24,25 @@ func (g *Repository) DeleteFile(relativePath string) error {
 }
 
 // EnsureFile implements core.GitRepository.
-func (g *Repository) EnsureFile(targetFile, content string, fileMode fs.FileMode) error {
+func (s *Repository) EnsureFile(targetFile, content string, fileMode fs.FileMode) error {
 	// This allows us to create files with 777 permissions
 	originalUmask := unix.Umask(0)
 	defer unix.Umask(originalUmask)
 
-	fileName := path.Join(g.GitConfig.Dir, targetFile)
+	fileName := path.Join(s.GitConfig.Dir, targetFile)
 
-	if err := g.createParentDirs(fileName); err != nil {
+	if err := s.createParentDirs(fileName); err != nil {
 		return err
 	}
 
 	// To ensure we can update the file permissions, as os.WriteFile does not change permissions.
-	if err := g.DeleteFile(fileName); err != nil {
+	if err := s.DeleteFile(fileName); err != nil {
 		return err
 	}
 	return os.WriteFile(fileName, []byte(content), fileMode)
 }
 
-func (g *Repository) createParentDirs(targetPath string) error {
+func (s *Repository) createParentDirs(targetPath string) error {
 	dir := path.Dir(targetPath)
 	return os.MkdirAll(dir, 0775)
 }

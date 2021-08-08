@@ -33,7 +33,7 @@ func TestPullRequestService_fetchPrTemplate(t *testing.T) {
 					return nil, nil
 				},
 			}
-			s := &PullRequestService{
+			s := &PullRequestHandler{
 				templateStore: templateStore,
 			}
 			ctx := &pipelineContext{
@@ -53,12 +53,6 @@ func TestPullRequestService_fetchPrTemplate(t *testing.T) {
 			require.NoError(t, result)
 		})
 	}
-}
-
-func toUrl(t *testing.T, raw string) *core.GitURL {
-	u, err := url.Parse(raw)
-	require.NoError(t, err)
-	return core.FromURL(u)
 }
 
 func TestPullRequestService_renderTemplate(t *testing.T) {
@@ -83,7 +77,7 @@ func TestPullRequestService_renderTemplate(t *testing.T) {
 	}
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
-			s := &PullRequestService{}
+			s := &PullRequestHandler{}
 			ctx := &pipelineContext{
 				template: tt.givenTemplate,
 				repo: &corefakes.FakeGitRepository{GetConfigStub: func() core.GitRepositoryProperties {
@@ -109,4 +103,10 @@ func newFakeTemplate(returnString string, returnErr error) *corefakes.FakeTempla
 	return &corefakes.FakeTemplate{RenderStub: func(values core.Values) (string, error) {
 		return returnString, returnErr
 	}}
+}
+
+func toUrl(t *testing.T, raw string) *core.GitURL {
+	u, err := url.Parse(raw)
+	require.NoError(t, err)
+	return core.FromURL(u)
 }

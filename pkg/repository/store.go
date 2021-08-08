@@ -1,21 +1,24 @@
 package repository
 
 import (
+	"fmt"
+
 	"github.com/ccremer/greposync/cfg"
 	"github.com/ccremer/greposync/core"
 	"github.com/ccremer/greposync/repository"
 )
 
-type (
-	// RepositoryStore is the implementation of core.GitRepositoryStore.
-	RepositoryStore struct {
-		providers map[core.GitHostingProvider]Remote
-		config    *cfg.Configuration
-	}
-)
+// RepositoryStore is the implementation of core.GitRepositoryStore.
+type RepositoryStore struct {
+	providers ProviderMap
+	config    *cfg.Configuration
+	cache     map[*core.GitURL]core.GitRepository
+}
+
+type ProviderMap map[core.GitHostingProvider]Remote
 
 // NewRepositoryStore creates a new instance.
-func NewRepositoryStore(config *cfg.Configuration, providers map[core.GitHostingProvider]Remote) *RepositoryStore {
+func NewRepositoryStore(config *cfg.Configuration, providers ProviderMap) *RepositoryStore {
 	return &RepositoryStore{
 		providers: providers,
 		config:    config,
@@ -32,7 +35,7 @@ func (r *RepositoryStore) FetchGitRepositories() ([]core.GitRepository, error) {
 	for i, service := range services {
 
 		var labels = make([]core.Label, 0)
-		if provider, exists := r.providers[core.GitHostingProvider(service.Config.Provider)]; exists {
+		if provider, exists := r.providers[service.Config.Provider]; exists {
 			labels, err = provider.FindLabels(core.FromURL(service.Config.Url), convertLabels(r.config.RepositoryLabels))
 			if err != nil {
 				return []core.GitRepository{}, err
@@ -41,6 +44,17 @@ func (r *RepositoryStore) FetchGitRepositories() ([]core.GitRepository, error) {
 		repos[i] = NewGitRepository(service.Config, r.config.PullRequest, labels)
 	}
 	return repos, err
+}
+
+// FetchGitRepository implements core.GitRepositoryStore.
+func (r *RepositoryStore) FetchGitRepository(url *core.GitURL) (core.GitRepository, error) {
+	if r.cache == nil {
+		panic("implement me")
+	}
+	if repo, exists := r.cache[url]; exists {
+		return repo, nil
+	}
+	return nil, fmt.Errorf("repository with url '%s' not found", url.Redacted())
 }
 
 func convertLabels(labels map[string]cfg.RepositoryLabel) []*cfg.RepositoryLabel {
