@@ -13,7 +13,7 @@ import (
 // Only files are deleted, not directories.
 func (r *Renderer) DeleteUnwantedFiles() pipeline.ActionFunc {
 	return func() pipeline.Result {
-		files, err := r.valueStore.FetchFilesToDelete(&core.GitRepositoryConfig{
+		files, err := r.valueStore.FetchFilesToDelete(&core.GitRepositoryProperties{
 			URL:     core.FromURL(r.cfg.Git.Url),
 			RootDir: r.cfg.Git.Dir,
 		})

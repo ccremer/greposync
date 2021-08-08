@@ -56,15 +56,15 @@ type FakeGitRepository struct {
 		result1 core.PullRequest
 		result2 error
 	}
-	GetConfigStub        func() core.GitRepositoryConfig
+	GetConfigStub        func() core.GitRepositoryProperties
 	getConfigMutex       sync.RWMutex
 	getConfigArgsForCall []struct {
 	}
 	getConfigReturns struct {
-		result1 core.GitRepositoryConfig
+		result1 core.GitRepositoryProperties
 	}
 	getConfigReturnsOnCall map[int]struct {
-		result1 core.GitRepositoryConfig
+		result1 core.GitRepositoryProperties
 	}
 	GetLabelsStub        func() []core.Label
 	getLabelsMutex       sync.RWMutex

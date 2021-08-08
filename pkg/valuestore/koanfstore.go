@@ -34,7 +34,7 @@ func NewValueStore(globalKoanf *koanf.Koanf) *KoanfValueStore {
 }
 
 // FetchValuesForTemplate implements core.ValueStore.
-func (k *KoanfValueStore) FetchValuesForTemplate(template core.Template, config *core.GitRepositoryConfig) (core.Values, error) {
+func (k *KoanfValueStore) FetchValuesForTemplate(template core.Template, config *core.GitRepositoryProperties) (core.Values, error) {
 	repoKoanf, err := k.prepareRepoKoanf(config)
 	if err != nil {
 		return core.Values{}, err
@@ -43,7 +43,7 @@ func (k *KoanfValueStore) FetchValuesForTemplate(template core.Template, config 
 }
 
 // FetchUnmanagedFlag implements core.ValueStore.
-func (k *KoanfValueStore) FetchUnmanagedFlag(template core.Template, config *core.GitRepositoryConfig) (bool, error) {
+func (k *KoanfValueStore) FetchUnmanagedFlag(template core.Template, config *core.GitRepositoryProperties) (bool, error) {
 	repoKoanf, err := k.prepareRepoKoanf(config)
 	if err != nil {
 		return false, err
@@ -52,7 +52,7 @@ func (k *KoanfValueStore) FetchUnmanagedFlag(template core.Template, config *cor
 }
 
 // FetchTargetPath implements core.ValueStore.
-func (k *KoanfValueStore) FetchTargetPath(template core.Template, config *core.GitRepositoryConfig) (string, error) {
+func (k *KoanfValueStore) FetchTargetPath(template core.Template, config *core.GitRepositoryProperties) (string, error) {
 	repoKoanf, err := k.prepareRepoKoanf(config)
 	if err != nil {
 		return "", err
@@ -61,7 +61,7 @@ func (k *KoanfValueStore) FetchTargetPath(template core.Template, config *core.G
 }
 
 // FetchFilesToDelete implements core.ValueStore.
-func (k *KoanfValueStore) FetchFilesToDelete(config *core.GitRepositoryConfig) ([]string, error) {
+func (k *KoanfValueStore) FetchFilesToDelete(config *core.GitRepositoryProperties) ([]string, error) {
 	repoKoanf, err := k.prepareRepoKoanf(config)
 	if err != nil {
 		return []string{}, err
@@ -69,7 +69,7 @@ func (k *KoanfValueStore) FetchFilesToDelete(config *core.GitRepositoryConfig) (
 	return k.loadFilesToDelete(repoKoanf)
 }
 
-func (k *KoanfValueStore) prepareRepoKoanf(config *core.GitRepositoryConfig) (*koanf.Koanf, error) {
+func (k *KoanfValueStore) prepareRepoKoanf(config *core.GitRepositoryProperties) (*koanf.Koanf, error) {
 	k.log.SetName(config.URL.GetRepositoryName())
 	if repoKoanf, exists := k.cache[config.RootDir]; exists {
 		return repoKoanf, nil

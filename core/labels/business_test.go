@@ -33,7 +33,7 @@ func TestLabelService_createOrUpdateLabels(t *testing.T) {
 				log: printer.New(),
 			}
 
-			repoFake := createRepoFake(core.GitRepositoryConfig{URL: gu}, tt.givenLabels)
+			repoFake := createRepoFake(core.GitRepositoryProperties{URL: gu}, tt.givenLabels)
 			err := s.createOrUpdateLabels(repoFake)
 			if tt.expectedErr {
 				assert.Error(t, err)
@@ -71,7 +71,7 @@ func TestLabelService_deleteLabels(t *testing.T) {
 				log: printer.New(),
 			}
 
-			repoFake := createRepoFake(core.GitRepositoryConfig{URL: gu}, tt.givenLabels)
+			repoFake := createRepoFake(core.GitRepositoryProperties{URL: gu}, tt.givenLabels)
 			err := s.deleteLabels(repoFake)
 			if tt.expectedErr {
 				assert.Error(t, err)
@@ -140,9 +140,9 @@ func TestLabelService_filterDeadLabels(t *testing.T) {
 	}
 }
 
-func createRepoFake(cfg core.GitRepositoryConfig, labels []core.Label) *corefakes.FakeGitRepository {
+func createRepoFake(cfg core.GitRepositoryProperties, labels []core.Label) *corefakes.FakeGitRepository {
 	return &corefakes.FakeGitRepository{
-		GetConfigStub: func() core.GitRepositoryConfig {
+		GetConfigStub: func() core.GitRepositoryProperties {
 			return cfg
 		},
 		GetLabelsStub: func() []core.Label {

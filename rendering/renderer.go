@@ -61,7 +61,7 @@ func (r *Renderer) RenderTemplateDir() pipeline.ActionFunc {
 }
 
 func (r *Renderer) processTemplate(tpl core.Template) error {
-	values, err := r.valueStore.FetchValuesForTemplate(tpl, &core.GitRepositoryConfig{
+	values, err := r.valueStore.FetchValuesForTemplate(tpl, &core.GitRepositoryProperties{
 		URL:     core.FromURL(r.cfg.Git.Url),
 		RootDir: r.cfg.Git.Dir,
 	})
@@ -82,7 +82,7 @@ func (r *Renderer) applyTemplate(targetPath string, tpl core.Template, values co
 		// files are deleted in a separate step
 		return nil
 	}
-	gitCfg := core.GitRepositoryConfig{
+	gitCfg := core.GitRepositoryProperties{
 		URL:     core.FromURL(r.cfg.Git.Url),
 		RootDir: r.cfg.Git.Dir,
 	}
@@ -108,6 +108,6 @@ func (r *Renderer) applyTemplate(targetPath string, tpl core.Template, values co
 		return err
 	}
 	tpl.(*rendering.GoTemplate).RelativePath = targetPath
-	g := repository.NewGitRepository(r.cfg.Git, nil)
+	g := repository.NewGitRepository(r.cfg.Git, r.cfg.PullRequest, nil)
 	return g.EnsureFile(tpl.GetRelativePath(), result, tpl.GetFileMode())
 }

@@ -3,6 +3,7 @@ package repository
 import (
 	"github.com/ccremer/greposync/cfg"
 	"github.com/ccremer/greposync/core"
+	"github.com/ccremer/greposync/printer"
 )
 
 type (
@@ -10,26 +11,28 @@ type (
 	Repository struct {
 		GitConfig  *cfg.GitConfig
 		PrConfig   *cfg.PullRequestConfig
-		coreConfig core.GitRepositoryConfig
+		coreConfig core.GitRepositoryProperties
 		labels     []core.Label
 		remote     Remote
 		pr         core.PullRequest
+		log        printer.Printer
 	}
 )
 
 func NewGitRepository(cfg *cfg.GitConfig, prConfig *cfg.PullRequestConfig, labels []core.Label) *Repository {
 	return &Repository{
 		GitConfig: cfg,
-		coreConfig: core.GitRepositoryConfig{
+		coreConfig: core.GitRepositoryProperties{
 			URL:     core.FromURL(cfg.Url),
 			RootDir: cfg.Dir,
 		},
 		PrConfig: prConfig,
 		labels:   labels,
+		log:      printer.New().SetName(cfg.Name),
 	}
 }
 
 // GetLabels implements core.GitRepository.
-func (g *Repository) GetLabels() []core.Label {
-	return g.labels
+func (s *Repository) GetLabels() []core.Label {
+	return s.labels
 }

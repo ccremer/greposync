@@ -37,8 +37,8 @@ func TestPullRequestService_fetchPrTemplate(t *testing.T) {
 				templateStore: templateStore,
 			}
 			ctx := &pipelineContext{
-				repo: &corefakes.FakeGitRepository{GetConfigStub: func() core.GitRepositoryConfig {
-					return core.GitRepositoryConfig{
+				repo: &corefakes.FakeGitRepository{GetConfigStub: func() core.GitRepositoryProperties {
+					return core.GitRepositoryProperties{
 						URL: toUrl(t, "https://github.com/ccremer/greposync"),
 					}
 				}},
@@ -86,8 +86,8 @@ func TestPullRequestService_renderTemplate(t *testing.T) {
 			s := &PullRequestService{}
 			ctx := &pipelineContext{
 				template: tt.givenTemplate,
-				repo: &corefakes.FakeGitRepository{GetConfigStub: func() core.GitRepositoryConfig {
-					return core.GitRepositoryConfig{URL: toUrl(t, "github.com/ccremer/greposync")}
+				repo: &corefakes.FakeGitRepository{GetConfigStub: func() core.GitRepositoryProperties {
+					return core.GitRepositoryProperties{URL: toUrl(t, "github.com/ccremer/greposync")}
 				}},
 			}
 			err := s.renderTemplate(ctx)
