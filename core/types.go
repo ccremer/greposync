@@ -26,6 +26,12 @@ func (u *GitURL) GetNamespace() string {
 	return strings.TrimPrefix(path.Dir(u.Path), "/")
 }
 
+// Redacted returns the same as url.URL::Redacted.
+func (u *GitURL) Redacted() string {
+	plain := url.URL(*u)
+	return plain.Redacted()
+}
+
 // FromURL converts the given url.URL into a GitURL.
 func FromURL(url *url.URL) *GitURL {
 	g := GitURL(*url)

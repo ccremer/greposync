@@ -25,10 +25,15 @@ type GitRepository interface {
 	FetchPullRequest() (PullRequest, error)
 	// NewPullRequest creates a new instance with default properties.
 	NewPullRequest() PullRequest
-
 	// EnsurePullRequest creates the given PullRequest if it doesn't exist.
 	// The PullRequest is updated if it needs updating, otherwise left unchanged without error.
 	EnsurePullRequest(pr PullRequest) error
+
+	Clone() error
+	Checkout() error
+	Fetch() error
+	Reset() error
+	Pull() error
 }
 
 // GitRepositoryProperties holds all the relevant Git properties.
@@ -36,7 +41,10 @@ type GitRepositoryProperties struct {
 	// URL is the repository location on the remote hosting provider.
 	URL *GitURL
 	// RootDir is the local root path to the Git repository.
-	RootDir string
+	RootDir       string
+	CommitBranch  string
+	TargetBranch  string
+	DefaultBranch string
 }
 
 // GitRepositoryStore is a core service that is responsible for providing services for managing Git repositories.
@@ -45,4 +53,8 @@ type GitRepositoryStore interface {
 	// FetchGitRepositories will load the managed repositories from a config store and returns an array of GitRepository for each Git repository.
 	// A non-nil empty slice is returned if there are none existing.
 	FetchGitRepositories() ([]GitRepository, error)
+
+	// FetchGitRepository will load the managed repository from a config store and return the instance identified by url.
+	// An ErrNotFound,
+	FetchGitRepository(url *GitURL) (GitRepository, error)
 }

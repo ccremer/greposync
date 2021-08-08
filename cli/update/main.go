@@ -2,6 +2,7 @@ package update
 
 import (
 	"fmt"
+	"net/url"
 	"os"
 
 	pipeline "github.com/ccremer/go-command-pipeline"
@@ -9,6 +10,8 @@ import (
 	"github.com/ccremer/go-command-pipeline/predicate"
 	"github.com/ccremer/greposync/cfg"
 	"github.com/ccremer/greposync/cli/flags"
+	"github.com/ccremer/greposync/core"
+	"github.com/ccremer/greposync/core/gitrepo"
 	"github.com/ccremer/greposync/core/pullrequest"
 	"github.com/ccremer/greposync/printer"
 	"github.com/ccremer/greposync/rendering"
@@ -102,22 +105,10 @@ func (c *Command) createPipeline(r *repository.Service) *pipeline.Pipeline {
 		},
 	}
 	renderer := rendering.NewRenderer(sc, c.globalK)
-	prService := pullrequest.PullRequestService{
-
-	}
-	gitDirExists := r.DirExists(r.Config.Dir)
 	logger := printer.PipelineLogger{Logger: log}
 	p := pipeline.NewPipelineWithLogger(logger)
 	p.WithSteps(
-		pipeline.NewPipelineWithLogger(logger).
-			WithNestedSteps("prepare workspace",
-				predicate.ToStep("clone repository", r.CloneGitRepository(), predicate.Bool(!gitDirExists)),
-				pipeline.NewStep("determine default branch", r.GetDefaultBranch()),
-				predicate.ToStep("fetch", r.Fetch(), r.EnabledReset()),
-				predicate.ToStep("reset repository", r.ResetRepository(), r.EnabledReset()),
-				pipeline.NewStep("checkout branch", r.CheckoutBranch()),
-				predicate.ToStep("pull", r.Pull(), r.EnabledReset()),
-			),
+		pipeline.NewStep("prepare workspace", c.prepareWorkspace(sc.Git.Url)),
 		pipeline.NewStep("render templates", renderer.RenderTemplateDir()),
 		pipeline.NewStep("cleanup unwanted files", renderer.DeleteUnwantedFiles()),
 		predicate.WrapIn(pipeline.NewPipelineWithLogger(logger).
@@ -128,13 +119,7 @@ func (c *Command) createPipeline(r *repository.Service) *pipeline.Pipeline {
 			),
 			predicate.And(r.EnabledCommit(), r.Dirty())),
 		predicate.ToStep("push changes", r.PushToRemote(), predicate.And(r.EnabledPush(), r.IfBranchHasCommits())),
-		predicate.WrapIn(pipeline.NewPipelineWithLogger(logger).
-			WithNestedSteps("pull request",
-				pipeline.NewStep("render pull request template", renderer.RenderPrTemplate()),
-				pipeline.NewStep("prepare API", r.InitializeGitHubProvider(c.cfg.PullRequest)),
-				pipeline.NewStep("create or update pull request", r.CreateOrUpdatePr(c.cfg.PullRequest)),
-			),
-			predicate.And(r.IfBranchHasCommits(), predicate.Bool(sc.PullRequest.Create))),
+		predicate.ToStep("pull request", c.ensurePullRequest(sc.Git.Url), predicate.And(r.IfBranchHasCommits(), predicate.Bool(sc.PullRequest.Create))),
 		pipeline.NewStep("end", func() pipeline.Result {
 			log.InfoF("Pipeline for '%s/%s' finished", sc.Git.Namespace, sc.Git.Name)
 			return pipeline.Result{}
@@ -173,12 +158,6 @@ func (c *Command) updateReposInParallel() parallel.PipelineSupplier {
 	}
 }
 
-func (c *Command) handlePullRequest(service pullrequest.PullRequestService) pipeline.ActionFunc {
-	return func() pipeline.Result {
-		return pipeline.Result{Err: service.RunPipeline()}
-	}
-}
-
 func (c *Command) errorHandler() parallel.ResultHandler {
 	return func(results map[uint64]pipeline.Result) pipeline.Result {
 		var err error
@@ -188,5 +167,22 @@ func (c *Command) errorHandler() parallel.ResultHandler {
 			}
 		}
 		return pipeline.Result{Err: err}
+	}
+}
+
+func (c *Command) prepareWorkspace(url *url.URL) pipeline.ActionFunc {
+	return c.fireEvent(url, gitrepo.PrepareWorkspaceEvent)
+}
+
+func (c *Command) ensurePullRequest(url *url.URL) pipeline.ActionFunc {
+	return c.fireEvent(url, pullrequest.EnsurePullRequestEvent)
+}
+
+func (c *Command) fireEvent(u *url.URL, event core.EventName) pipeline.ActionFunc {
+	return func() pipeline.Result {
+		result := <-core.FireEvent(event, core.EventSource{
+			Url: core.FromURL(u),
+		})
+		return pipeline.Result{Err: result.Error}
 	}
 }

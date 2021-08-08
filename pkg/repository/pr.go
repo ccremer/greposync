@@ -10,23 +10,23 @@ type PullRequestProperties struct {
 }
 
 // FetchPullRequest implements core.GitRepository.
-func (g *Repository) FetchPullRequest() (core.PullRequest, error) {
-	return g.remote.FindPullRequest(core.FromURL(g.GitConfig.Url), PullRequestProperties{
-		CommitBranch: g.GitConfig.CommitBranch,
+func (s *Repository) FetchPullRequest() (core.PullRequest, error) {
+	return s.remote.FindPullRequest(core.FromURL(s.GitConfig.Url), PullRequestProperties{
+		CommitBranch: s.GitConfig.CommitBranch,
 	})
 }
 
 // NewPullRequest implements core.GitRepository.
-func (g *Repository) NewPullRequest() core.PullRequest {
-	return g.remote.NewPullRequest(core.FromURL(g.GitConfig.Url), PullRequestProperties{
-		CommitBranch: g.GitConfig.CommitBranch,
-		TargetBranch: g.PrConfig.TargetBranch,
-		Title:        g.PrConfig.Subject,
-		Body:         g.PrConfig.BodyTemplate,
+func (s *Repository) NewPullRequest() core.PullRequest {
+	return s.remote.NewPullRequest(core.FromURL(s.GitConfig.Url), PullRequestProperties{
+		CommitBranch: s.GitConfig.CommitBranch,
+		TargetBranch: s.PrConfig.TargetBranch,
+		Title:        s.PrConfig.Subject,
+		Body:         s.PrConfig.BodyTemplate,
 	})
 }
 
 // EnsurePullRequest implements core.GitRepository.
-func (g *Repository) EnsurePullRequest(pr core.PullRequest) error {
-	return g.remote.EnsurePullRequest(core.FromURL(g.GitConfig.Url), pr)
+func (s *Repository) EnsurePullRequest(pr core.PullRequest) error {
+	return s.remote.EnsurePullRequest(core.FromURL(s.GitConfig.Url), pr)
 }
