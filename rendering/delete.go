@@ -37,3 +37,10 @@ func (r *Renderer) deleteFileIfExists(targetPath string) error {
 	}
 	return nil
 }
+
+func fileExists(fileName string) bool {
+	if info, err := os.Stat(fileName); err == nil && !info.IsDir() {
+		return true
+	}
+	return false
+}

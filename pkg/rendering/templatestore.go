@@ -2,7 +2,6 @@ package rendering
 
 import (
 	"os"
-	"path"
 	"path/filepath"
 	"text/template"
 
@@ -12,7 +11,7 @@ import (
 
 // GoTemplateStore implements core.TemplateStore.
 type GoTemplateStore struct {
-	config *cfg.TemplateConfig
+	config *cfg.Configuration
 }
 
 const (
@@ -27,7 +26,7 @@ var (
 )
 
 // NewGoTemplateStore returns a new GoTemplateStore instance.
-func NewGoTemplateStore(config *cfg.TemplateConfig) *GoTemplateStore {
+func NewGoTemplateStore(config *cfg.Configuration) *GoTemplateStore {
 	return &GoTemplateStore{
 		config: config,
 	}
@@ -39,8 +38,11 @@ func (s *GoTemplateStore) FetchTemplates() ([]core.Template, error) {
 	if err != nil {
 		return []core.Template{}, err
 	}
+	helperPath := filepath.Join(s.config.Template.RootDir, HelperFileName)
 	for _, tpl := range templates {
-		t, err := s.parseTemplate(tpl)
+		t, err := s.parseTemplateFile(
+			filepath.Join(s.config.Template.RootDir, tpl.RelativePath),
+			helperPath)
 		if err != nil {
 			return []core.Template{}, err
 		}
@@ -58,12 +60,26 @@ func (s *GoTemplateStore) FetchTemplates() ([]core.Template, error) {
 
 // FetchPullRequestTemplate implements core.TemplateStore.
 func (s *GoTemplateStore) FetchPullRequestTemplate() (core.Template, error) {
-	// TODO: implement me
-	panic("implement me")
+	t := s.config.PullRequest.BodyTemplate
+	if t == "" {
+		return nil, nil
+	}
+
+	filePath := filepath.Clean(t)
+	if fileExists(filePath) {
+		tpl, err := s.parseTemplateFile(filePath, "")
+		return &GoTemplate{
+			template: tpl,
+		}, err
+	}
+	tpl, err := s.parseTemplateString(t)
+	return &GoTemplate{
+		template: tpl,
+	}, err
 }
 
 func (s *GoTemplateStore) listAllTemplates() (templates []*GoTemplate, err error) {
-	err = filepath.Walk(path.Clean(s.config.RootDir),
+	err = filepath.Walk(filepath.Clean(s.config.Template.RootDir),
 		func(file string, info os.FileInfo, err error) error {
 			tpl, pathErr := s.evaluatePath(file, info, err)
 			if pathErr != nil || tpl == nil {
@@ -80,10 +96,10 @@ func (s *GoTemplateStore) evaluatePath(file string, info os.FileInfo, err error)
 		return nil, err
 	}
 	// Don't add helper file or directories
-	if path.Base(file) == HelperFileName || info.IsDir() {
+	if filepath.Base(file) == HelperFileName || info.IsDir() {
 		return nil, nil
 	}
-	relativePath, pathErr := filepath.Rel(s.config.RootDir, file)
+	relativePath, pathErr := filepath.Rel(s.config.Template.RootDir, file)
 	if pathErr != nil {
 		return nil, pathErr
 	}
@@ -93,12 +109,10 @@ func (s *GoTemplateStore) evaluatePath(file string, info os.FileInfo, err error)
 	}, nil
 }
 
-func (s *GoTemplateStore) parseTemplate(tpl *GoTemplate) (*template.Template, error) {
-	originalFileName := path.Base(tpl.RelativePath)
-	originalTemplatePath := path.Join(s.config.RootDir, tpl.RelativePath)
+func (s *GoTemplateStore) parseTemplateFile(fileName, helperFilePath string) (*template.Template, error) {
+	originalFileName := filepath.Base(fileName)
 
-	templates := []string{originalTemplatePath}
-	helperFilePath := path.Join(s.config.RootDir, HelperFileName)
+	templates := []string{fileName}
 	if fileExists(helperFilePath) {
 		templates = append(templates, helperFilePath)
 	}
@@ -108,6 +122,15 @@ func (s *GoTemplateStore) parseTemplate(tpl *GoTemplate) (*template.Template, er
 		Option(ErrorOnMissingKey).
 		Funcs(templateFunctions).
 		ParseFiles(templates...)
+}
+
+func (s *GoTemplateStore) parseTemplateString(content string) (*template.Template, error) {
+	// Read template and helpers
+	return template.
+		New("").
+		Option(ErrorOnMissingKey).
+		Funcs(templateFunctions).
+		Parse(content)
 }
 
 func fileExists(fileName string) bool {

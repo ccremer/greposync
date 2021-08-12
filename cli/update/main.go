@@ -104,7 +104,7 @@ func (c *Command) createPipeline(r *repository.Service) *pipeline.Pipeline {
 			RootDir: c.cfg.Template.RootDir,
 		},
 	}
-	renderer := rendering.NewRenderer(sc, c.globalK)
+	renderer := rendering.NewRenderer(sc, c.globalK, c.cfg)
 	logger := printer.PipelineLogger{Logger: log}
 	p := pipeline.NewPipelineWithLogger(logger)
 	p.WithSteps(

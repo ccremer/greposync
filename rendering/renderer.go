@@ -26,24 +26,20 @@ type (
 	FileAction func(targetPath string, data Values) error
 )
 
-var (
-	SyncConfigFileName = ".sync.yml"
-)
-
 // NewRenderer returns a new instance of a renderer.
-func NewRenderer(c *cfg.SyncConfig, globalDefaults *koanf.Koanf) *Renderer {
+func NewRenderer(c *cfg.SyncConfig, globalDefaults *koanf.Koanf, cfg *cfg.Configuration) *Renderer {
 	return &Renderer{
 		p:              printer.New().SetLevel(printer.DefaultLevel).MapColorToLevel(printer.Magenta, printer.LevelInfo).SetName(c.Git.Name),
 		k:              koanf.New("."),
 		globalDefaults: globalDefaults,
 		cfg:            c,
-		instance:       rendering.NewGoTemplateStore(c.Template),
-		valueStore:     valuestore.NewValueStore(globalDefaults),
+		instance:       rendering.NewGoTemplateStore(cfg),
+		valueStore:     valuestore.NewValueStore(),
 	}
 }
 
 // RenderTemplateDir renders the templates parsed by ParseTemplateDir.
-// Values from SyncConfigFileName are injected.
+// Values are injected.
 // Files are written to git target directory, although special Values may override that behaviour.
 func (r *Renderer) RenderTemplateDir() pipeline.ActionFunc {
 	return func() pipeline.Result {

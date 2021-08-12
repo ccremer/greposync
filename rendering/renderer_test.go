@@ -72,7 +72,11 @@ func (s *TemplateTestSuite) TestRenderer_RenderTemplateDir() {
 		Template: &cfg.TemplateConfig{
 			RootDir: "testdata/template-1",
 		},
-	}, s.K)
+	}, s.K, &cfg.Configuration{
+		Template: &cfg.TemplateConfig{
+			RootDir: "testdata/template-1",
+		},
+	})
 	err = s.K.Load(confmap.Provider(map[string]interface{}{
 		"readme.md": core.Values{
 			"custom": "value",

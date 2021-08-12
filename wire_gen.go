@@ -10,8 +10,11 @@ import (
 	"github.com/ccremer/greposync/cli"
 	"github.com/ccremer/greposync/core"
 	"github.com/ccremer/greposync/core/gitrepo"
+	"github.com/ccremer/greposync/core/pullrequest"
 	"github.com/ccremer/greposync/pkg/githosting/github"
+	"github.com/ccremer/greposync/pkg/rendering"
 	"github.com/ccremer/greposync/pkg/repository"
+	"github.com/ccremer/greposync/pkg/valuestore"
 )
 
 // Injectors from wire.go:
@@ -20,10 +23,14 @@ func initInjector() *injector {
 	versionInfo := _wireVersionInfoValue
 	configuration := cfg.NewDefaultConfig()
 	app := cli.NewApp(versionInfo, configuration)
-	providerMap := newGitProviders()
+	ghRemote := github.NewRemote()
+	providerMap := newGitProviders(ghRemote)
 	repositoryStore := repository.NewRepositoryStore(configuration, providerMap)
 	prepareWorkspaceHandler := gitrepo.NewPrepareWorkspaceHandler(repositoryStore)
-	mainInjector := NewInjector(app, prepareWorkspaceHandler)
+	goTemplateStore := rendering.NewGoTemplateStore(configuration)
+	koanfValueStore := valuestore.NewValueStore()
+	pullRequestHandler := pullrequest.NewPullRequestHandler(goTemplateStore, koanfValueStore)
+	mainInjector := NewInjector(app, prepareWorkspaceHandler, pullRequestHandler)
 	return mainInjector
 }
 
@@ -35,14 +42,18 @@ var (
 
 type injector struct {
 	prepareWorkspaceHandler *gitrepo.PrepareWorkspaceHandler
+	pullRequestHandler      *pullrequest.PullRequestHandler
 	app                     *cli.App
 }
 
 func NewInjector(
 	app *cli.App,
-	pwh *gitrepo.PrepareWorkspaceHandler) *injector {
+	pwh *gitrepo.PrepareWorkspaceHandler,
+	prh *pullrequest.PullRequestHandler,
+) *injector {
 	i := &injector{
 		prepareWorkspaceHandler: pwh,
+		pullRequestHandler:      prh,
 		app:                     app,
 	}
 	return i
@@ -50,12 +61,13 @@ func NewInjector(
 
 func (i *injector) RegisterHandlers() {
 	core.RegisterHandler(gitrepo.PrepareWorkspaceEvent, i.prepareWorkspaceHandler)
+	core.RegisterHandler(pullrequest.EnsurePullRequestEvent, i.pullRequestHandler)
 }
 
 func (i *injector) RunApp() {
 	i.app.Run()
 }
 
-func newGitProviders() repository.ProviderMap {
-	return repository.ProviderMap{github.GitHubProviderKey: github.NewRemote()}
+func newGitProviders(ghRemote *github.GhRemote) repository.ProviderMap {
+	return repository.ProviderMap{github.GitHubProviderKey: ghRemote}
 }

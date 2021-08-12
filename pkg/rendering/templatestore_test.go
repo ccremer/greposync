@@ -60,7 +60,7 @@ func TestGoTemplateStore_evaluatePath(t *testing.T) {
 	}
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
-			s := &GoTemplateStore{config: &cfg.TemplateConfig{RootDir: "template"}}
+			s := &GoTemplateStore{config: &cfg.Configuration{Template: &cfg.TemplateConfig{RootDir: "template"}}}
 			result, err := s.evaluatePath(tt.givenFilePath, tt.givenFileInfo, tt.givenError)
 			if tt.expectedErrString != "" {
 				require.Error(t, err)
@@ -78,7 +78,7 @@ func TestGoTemplateStore_listAllTemplates(t *testing.T) {
 	fileInfo, err := os.Stat("testdata/template_1.tpl")
 	require.NoError(t, err)
 	s := &GoTemplateStore{
-		config: &cfg.TemplateConfig{RootDir: "testdata"},
+		config: &cfg.Configuration{Template: &cfg.TemplateConfig{RootDir: "testdata"}},
 	}
 	result, err := s.listAllTemplates()
 	require.NoError(t, err)
