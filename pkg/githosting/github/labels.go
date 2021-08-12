@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/ccremer/greposync/core"
-	"github.com/google/go-github/v37/github"
+	"github.com/google/go-github/v38/github"
 )
 
 type LabelImpl struct {

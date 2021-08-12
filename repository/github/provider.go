@@ -6,7 +6,7 @@ import (
 
 	"github.com/ccremer/greposync/cfg"
 	"github.com/ccremer/greposync/printer"
-	"github.com/google/go-github/v37/github"
+	"github.com/google/go-github/v38/github"
 	"golang.org/x/oauth2"
 )
 
