@@ -11,6 +11,7 @@ import (
 	"github.com/ccremer/greposync/core"
 	"github.com/ccremer/greposync/core/gitrepo"
 	"github.com/ccremer/greposync/core/pullrequest"
+	rendering2 "github.com/ccremer/greposync/core/rendering"
 	"github.com/ccremer/greposync/pkg/githosting/github"
 	"github.com/ccremer/greposync/pkg/rendering"
 	"github.com/ccremer/greposync/pkg/repository"
@@ -30,7 +31,8 @@ func initInjector() *injector {
 	goTemplateStore := rendering.NewGoTemplateStore(configuration)
 	koanfValueStore := valuestore.NewValueStore()
 	pullRequestHandler := pullrequest.NewPullRequestHandler(goTemplateStore, koanfValueStore)
-	mainInjector := NewInjector(app, prepareWorkspaceHandler, pullRequestHandler)
+	renderTemplatesHandler := rendering2.NewRenderTemplatesHandler(repositoryStore, goTemplateStore, koanfValueStore)
+	mainInjector := NewInjector(app, prepareWorkspaceHandler, pullRequestHandler, renderTemplatesHandler)
 	return mainInjector
 }
 
@@ -44,16 +46,19 @@ type injector struct {
 	prepareWorkspaceHandler *gitrepo.PrepareWorkspaceHandler
 	pullRequestHandler      *pullrequest.PullRequestHandler
 	app                     *cli.App
+	renderTemplatesHandler  core.EventHandler
 }
 
 func NewInjector(
 	app *cli.App,
 	pwh *gitrepo.PrepareWorkspaceHandler,
 	prh *pullrequest.PullRequestHandler,
+	rth *rendering2.RenderTemplatesHandler,
 ) *injector {
 	i := &injector{
 		prepareWorkspaceHandler: pwh,
 		pullRequestHandler:      prh,
+		renderTemplatesHandler:  rth,
 		app:                     app,
 	}
 	return i
@@ -62,6 +67,7 @@ func NewInjector(
 func (i *injector) RegisterHandlers() {
 	core.RegisterHandler(gitrepo.PrepareWorkspaceEvent, i.prepareWorkspaceHandler)
 	core.RegisterHandler(pullrequest.EnsurePullRequestEvent, i.pullRequestHandler)
+	core.RegisterHandler(rendering2.RenderTemplatesEvent, i.renderTemplatesHandler)
 }
 
 func (i *injector) RunApp() {

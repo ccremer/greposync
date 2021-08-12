@@ -1,7 +1,7 @@
 package valuestore
 
 import (
-	"path"
+	"path/filepath"
 	"testing"
 
 	"github.com/ccremer/greposync/core"
@@ -40,7 +40,8 @@ func TestKoanfValueStore_loadAndMergeConfig(t *testing.T) {
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
 			s := NewValueStore()
-			result, err := s.loadAndMergeConfig(path.Join("testdata", tt.givenSyncFile))
+			s.globalKoanf = koanf.New("")
+			result, err := s.loadAndMergeConfig(filepath.Join("testdata", tt.givenSyncFile))
 			require.NoError(t, err)
 			assert.Equal(t, tt.expectedConf, result.Raw())
 		})
@@ -75,7 +76,7 @@ func TestKoanfValueStore_loadDataForTemplate(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			s := NewValueStore()
 			k := koanf.New(".")
-			require.NoError(t, k.Load(file.Provider(path.Join("testdata", tt.givenSyncFile)), yaml.Parser()))
+			require.NoError(t, k.Load(file.Provider(filepath.Join("testdata", tt.givenSyncFile)), yaml.Parser()))
 			result, err := s.loadDataForTemplate(k, tt.givenTemplateFileName)
 			require.NoError(t, err)
 			assert.Equal(t, tt.expectedConf, result)

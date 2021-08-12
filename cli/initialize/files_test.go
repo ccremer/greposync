@@ -8,7 +8,7 @@ import (
 
 	"github.com/Masterminds/sprig/v3"
 	"github.com/ccremer/greposync/cfg"
-	"github.com/ccremer/greposync/rendering"
+	"github.com/ccremer/greposync/core"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"sigs.k8s.io/yaml"
@@ -108,11 +108,11 @@ func Test_writeFiles(t *testing.T) {
 
 func Test_CommentHelper(t *testing.T) {
 	tests := map[string]struct {
-		givenValues     rendering.Values
+		givenValues     core.Values
 		expectedContent string
 	}{
 		"GivenEmptyComments": {
-			givenValues: rendering.Values{
+			givenValues: core.Values{
 				"text":   "",
 				"open":   "",
 				"closed": "",
@@ -121,7 +121,7 @@ func Test_CommentHelper(t *testing.T) {
 			expectedContent: "# my-repository\n\ndescription\n",
 		},
 		"GivenEmptyCommentsWithEnclosures": {
-			givenValues: rendering.Values{
+			givenValues: core.Values{
 				"text":        "",
 				"open":        "<!--",
 				"closed":      "-->",
@@ -132,7 +132,7 @@ func Test_CommentHelper(t *testing.T) {
 			expectedContent: "# my-repository\n\ndescription\n",
 		},
 		"GivenSingleComments": {
-			givenValues: rendering.Values{
+			givenValues: core.Values{
 				"text":        "This file is managed by greposync",
 				"open":        "",
 				"closed":      "",
@@ -143,7 +143,7 @@ func Test_CommentHelper(t *testing.T) {
 			expectedContent: "This file is managed by greposync\n# my-repository\n\ndescription\n",
 		},
 		"GivenMultilineComments": {
-			givenValues: rendering.Values{
+			givenValues: core.Values{
 				"text":        "This file is managed by greposync\nDo not edit",
 				"open":        "",
 				"closed":      "",
@@ -154,7 +154,7 @@ func Test_CommentHelper(t *testing.T) {
 			expectedContent: "This file is managed by greposync\nDo not edit\n# my-repository\n\ndescription\n",
 		},
 		"GivenEnclosedComment": {
-			givenValues: rendering.Values{
+			givenValues: core.Values{
 				"text":        "This file is managed by greposync",
 				"open":        "<!--",
 				"closed":      "-->",
@@ -165,7 +165,7 @@ func Test_CommentHelper(t *testing.T) {
 			expectedContent: "<!--\nThis file is managed by greposync\n-->\n# my-repository\n\ndescription\n",
 		},
 		"GivenEnclosedCommentWithPrefixes": {
-			givenValues: rendering.Values{
+			givenValues: core.Values{
 				"text":        "This file is managed by greposync",
 				"open":        "<!--",
 				"closed":      "-->",
@@ -176,7 +176,7 @@ func Test_CommentHelper(t *testing.T) {
 			expectedContent: "<!--\n# This file is managed by greposync\n-->\n# my-repository\n\ndescription\n",
 		},
 		"GivenEnclosedMultilineComment": {
-			givenValues: rendering.Values{
+			givenValues: core.Values{
 				"text":        "This file is managed by greposync\nDo not edit",
 				"open":        "<!--",
 				"closed":      "-->",
@@ -187,7 +187,7 @@ func Test_CommentHelper(t *testing.T) {
 			expectedContent: "<!--\nThis file is managed by greposync\nDo not edit\n-->\n# my-repository\n\ndescription\n",
 		},
 		"GivenEnclosedMultilineCommentWithPrefixes": {
-			givenValues: rendering.Values{
+			givenValues: core.Values{
 				"text":        "This file is managed by greposync\nDo not edit",
 				"open":        "<!--",
 				"closed":      "-->",
@@ -204,7 +204,7 @@ func Test_CommentHelper(t *testing.T) {
 			tpl, err := template.New(readme).Funcs(sprig.TxtFuncMap()).ParseFiles("_helpers.tpl", readme)
 			require.NoError(t, err)
 			buf := bytes.NewBuffer([]byte{})
-			err = tpl.Execute(buf, map[string]rendering.Values{
+			err = tpl.Execute(buf, map[string]core.Values{
 				"Values": {
 					"comment":     tt.givenValues,
 					"name":        "my-repository",

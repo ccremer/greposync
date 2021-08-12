@@ -3,7 +3,6 @@ package update
 import (
 	"fmt"
 	"net/url"
-	"os"
 
 	pipeline "github.com/ccremer/go-command-pipeline"
 	"github.com/ccremer/go-command-pipeline/parallel"
@@ -13,13 +12,11 @@ import (
 	"github.com/ccremer/greposync/core"
 	"github.com/ccremer/greposync/core/gitrepo"
 	"github.com/ccremer/greposync/core/pullrequest"
+	corerendering "github.com/ccremer/greposync/core/rendering"
 	"github.com/ccremer/greposync/printer"
-	"github.com/ccremer/greposync/rendering"
 	"github.com/ccremer/greposync/repository"
 	"github.com/hashicorp/go-multierror"
 	"github.com/knadh/koanf"
-	"github.com/knadh/koanf/parsers/yaml"
-	"github.com/knadh/koanf/providers/file"
 	"github.com/urfave/cli/v2"
 )
 
@@ -35,16 +32,18 @@ type (
 	Command struct {
 		cfg          *cfg.Configuration
 		cliCommand   *cli.Command
-		repoServices []*repository.Service
+		repositories []core.GitRepository
+		repoStore    core.GitRepositoryStore
 		globalK      *koanf.Koanf
 	}
 )
 
 // NewCommand returns a new Command instance.
-func NewCommand(cfg *cfg.Configuration) *Command {
+func NewCommand(cfg *cfg.Configuration, repoStore core.GitRepositoryStore) *Command {
 	c := &Command{
-		globalK: koanf.New("."),
-		cfg:     cfg,
+		globalK:   koanf.New("."),
+		cfg:       cfg,
+		repoStore: repoStore,
 	}
 	c.cliCommand = c.createCliCommand()
 	return c
@@ -87,15 +86,14 @@ func (c *Command) runCommand(_ *cli.Context) error {
 
 	logger := printer.PipelineLogger{Logger: printer.New().SetName("update").SetLevel(printer.DefaultLevel)}
 	p := pipeline.NewPipelineWithLogger(logger).WithSteps(
-		pipeline.NewStep("parse config defaults", c.loadGlobalDefaults()),
 		pipeline.NewStep("parse managed repos config", c.parseServices()),
 		parallel.NewWorkerPoolStep("update repositories", c.cfg.Project.Jobs, c.updateReposInParallel(), c.errorHandler()),
 	)
 	return p.Run().Err
 }
 
-func (c *Command) createPipeline(r *repository.Service) *pipeline.Pipeline {
-	log := printer.New().SetName(r.Config.Name).SetLevel(printer.DefaultLevel)
+func (c *Command) createPipeline(r core.GitRepository) *pipeline.Pipeline {
+	log := printer.New().SetName(r.GetConfig().URL.GetRepositoryName()).SetLevel(printer.DefaultLevel)
 
 	sc := &cfg.SyncConfig{
 		Git:         r.Config,
@@ -104,13 +102,12 @@ func (c *Command) createPipeline(r *repository.Service) *pipeline.Pipeline {
 			RootDir: c.cfg.Template.RootDir,
 		},
 	}
-	renderer := rendering.NewRenderer(sc, c.globalK, c.cfg)
+	repoUrl := sc.Git.Url
 	logger := printer.PipelineLogger{Logger: log}
 	p := pipeline.NewPipelineWithLogger(logger)
 	p.WithSteps(
-		pipeline.NewStep("prepare workspace", c.prepareWorkspace(sc.Git.Url)),
-		pipeline.NewStep("render templates", renderer.RenderTemplateDir()),
-		pipeline.NewStep("cleanup unwanted files", renderer.DeleteUnwantedFiles()),
+		pipeline.NewStep("prepare workspace", c.prepareWorkspace(repoUrl)),
+		pipeline.NewStep("render templates", c.renderTemplates(repoUrl)),
 		predicate.WrapIn(pipeline.NewPipelineWithLogger(logger).
 			WithNestedSteps("commit changes",
 				pipeline.NewStep("add", r.Add()),
@@ -119,7 +116,7 @@ func (c *Command) createPipeline(r *repository.Service) *pipeline.Pipeline {
 			),
 			predicate.And(r.EnabledCommit(), r.Dirty())),
 		predicate.ToStep("push changes", r.PushToRemote(), predicate.And(r.EnabledPush(), r.IfBranchHasCommits())),
-		predicate.ToStep("pull request", c.ensurePullRequest(sc.Git.Url), predicate.And(r.IfBranchHasCommits(), predicate.Bool(sc.PullRequest.Create))),
+		predicate.ToStep("pull request", c.ensurePullRequest(repoUrl), predicate.And(r.IfBranchHasCommits(), predicate.Bool(sc.PullRequest.Create))),
 		pipeline.NewStep("end", func() pipeline.Result {
 			log.InfoF("Pipeline for '%s/%s' finished", sc.Git.Namespace, sc.Git.Name)
 			return pipeline.Result{}
@@ -130,20 +127,8 @@ func (c *Command) createPipeline(r *repository.Service) *pipeline.Pipeline {
 
 func (c *Command) parseServices() func() pipeline.Result {
 	return func() pipeline.Result {
-		s, err := repository.NewServicesFromFile(c.cfg)
-		c.repoServices = s
-		return pipeline.Result{Err: err}
-	}
-}
-
-func (c *Command) loadGlobalDefaults() pipeline.ActionFunc {
-	return func() pipeline.Result {
-		if info, err := os.Stat(c.cfg.Project.ConfigDefaultFileName); err != nil || info.IsDir() {
-			printer.WarnF("File %s does not exist, ignoring template defaults")
-			return pipeline.Result{}
-		}
-		printer.DebugF("Loading config %s", c.cfg.Project.ConfigDefaultFileName)
-		err := c.globalK.Load(file.Provider(c.cfg.Project.ConfigDefaultFileName), yaml.Parser())
+		repos, err := c.repoStore.FetchGitRepositories()
+		c.repositories = repos
 		return pipeline.Result{Err: err}
 	}
 }
@@ -151,7 +136,7 @@ func (c *Command) loadGlobalDefaults() pipeline.ActionFunc {
 func (c *Command) updateReposInParallel() parallel.PipelineSupplier {
 	return func(pipelines chan *pipeline.Pipeline) {
 		defer close(pipelines)
-		for _, r := range c.repoServices {
+		for _, r := range c.repositories {
 			p := c.createPipeline(r)
 			pipelines <- p
 		}
@@ -161,9 +146,9 @@ func (c *Command) updateReposInParallel() parallel.PipelineSupplier {
 func (c *Command) errorHandler() parallel.ResultHandler {
 	return func(results map[uint64]pipeline.Result) pipeline.Result {
 		var err error
-		for index, service := range c.repoServices {
+		for index, repo := range c.repositories {
 			if result := results[uint64(index)]; result.Err != nil {
-				err = multierror.Append(err, fmt.Errorf("%s: %w", service.Config.Name, result.Err))
+				err = multierror.Append(err, fmt.Errorf("%s: %w", repo.GetConfig().URL.GetRepositoryName(), result.Err))
 			}
 		}
 		return pipeline.Result{Err: err}
@@ -176,6 +161,10 @@ func (c *Command) prepareWorkspace(url *url.URL) pipeline.ActionFunc {
 
 func (c *Command) ensurePullRequest(url *url.URL) pipeline.ActionFunc {
 	return c.fireEvent(url, pullrequest.EnsurePullRequestEvent)
+}
+
+func (c *Command) renderTemplates(url *url.URL) pipeline.ActionFunc {
+	return c.fireEvent(url, corerendering.RenderTemplatesEvent)
 }
 
 func (c *Command) fireEvent(u *url.URL, event core.EventName) pipeline.ActionFunc {

@@ -8,6 +8,7 @@ import (
 	"github.com/ccremer/greposync/core"
 	"github.com/ccremer/greposync/core/gitrepo"
 	"github.com/ccremer/greposync/core/pullrequest"
+	corerendering "github.com/ccremer/greposync/core/rendering"
 	"github.com/ccremer/greposync/pkg/githosting/github"
 	"github.com/ccremer/greposync/pkg/rendering"
 	"github.com/ccremer/greposync/pkg/repository"
@@ -19,16 +20,19 @@ type injector struct {
 	prepareWorkspaceHandler *gitrepo.PrepareWorkspaceHandler
 	pullRequestHandler      *pullrequest.PullRequestHandler
 	app                     *cli.App
+	renderTemplatesHandler  core.EventHandler
 }
 
 func NewInjector(
 	app *cli.App,
 	pwh *gitrepo.PrepareWorkspaceHandler,
 	prh *pullrequest.PullRequestHandler,
+	rth *corerendering.RenderTemplatesHandler,
 ) *injector {
 	i := &injector{
 		prepareWorkspaceHandler: pwh,
 		pullRequestHandler:      prh,
+		renderTemplatesHandler:  rth,
 		app:                     app,
 	}
 	return i
@@ -37,6 +41,7 @@ func NewInjector(
 func (i *injector) RegisterHandlers() {
 	core.RegisterHandler(gitrepo.PrepareWorkspaceEvent, i.prepareWorkspaceHandler)
 	core.RegisterHandler(pullrequest.EnsurePullRequestEvent, i.pullRequestHandler)
+	core.RegisterHandler(corerendering.RenderTemplatesEvent, i.renderTemplatesHandler)
 }
 
 func (i *injector) RunApp() {
@@ -55,6 +60,7 @@ func initInjector() *injector {
 		// Core
 		gitrepo.NewPrepareWorkspaceHandler,
 		pullrequest.NewPullRequestHandler,
+		corerendering.NewRenderTemplatesHandler,
 
 		// Stores
 		wire.NewSet(repository.NewRepositoryStore, wire.Bind(new(core.GitRepositoryStore), new(*repository.RepositoryStore))),

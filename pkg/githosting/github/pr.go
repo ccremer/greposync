@@ -7,7 +7,7 @@ import (
 	"github.com/ccremer/greposync/core"
 	"github.com/ccremer/greposync/pkg/repository"
 	"github.com/ccremer/greposync/printer"
-	"github.com/google/go-github/v37/github"
+	"github.com/google/go-github/v38/github"
 )
 
 type GhPullRequest struct {
