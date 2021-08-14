@@ -8,8 +8,11 @@ package main
 import (
 	"github.com/ccremer/greposync/cfg"
 	"github.com/ccremer/greposync/cli"
+	"github.com/ccremer/greposync/cli/labels"
+	"github.com/ccremer/greposync/cli/update"
 	"github.com/ccremer/greposync/core"
 	"github.com/ccremer/greposync/core/gitrepo"
+	labels2 "github.com/ccremer/greposync/core/labels"
 	"github.com/ccremer/greposync/core/pullrequest"
 	rendering2 "github.com/ccremer/greposync/core/rendering"
 	"github.com/ccremer/greposync/pkg/githosting/github"
@@ -23,16 +26,19 @@ import (
 func initInjector() *injector {
 	versionInfo := _wireVersionInfoValue
 	configuration := cfg.NewDefaultConfig()
-	app := cli.NewApp(versionInfo, configuration)
 	ghRemote := github.NewRemote()
 	providerMap := newGitProviders(ghRemote)
 	repositoryStore := repository.NewRepositoryStore(configuration, providerMap)
+	command := labels.NewCommand(configuration, repositoryStore)
+	updateCommand := update.NewCommand(configuration, repositoryStore)
+	app := cli.NewApp(versionInfo, configuration, command, updateCommand)
 	prepareWorkspaceHandler := gitrepo.NewPrepareWorkspaceHandler(repositoryStore)
 	goTemplateStore := rendering.NewGoTemplateStore(configuration)
 	koanfValueStore := valuestore.NewValueStore()
 	pullRequestHandler := pullrequest.NewPullRequestHandler(goTemplateStore, koanfValueStore)
 	renderTemplatesHandler := rendering2.NewRenderTemplatesHandler(repositoryStore, goTemplateStore, koanfValueStore)
-	mainInjector := NewInjector(app, prepareWorkspaceHandler, pullRequestHandler, renderTemplatesHandler)
+	labelUpdateHandler := labels2.NewLabelUpdateHandler(repositoryStore)
+	mainInjector := NewInjector(app, prepareWorkspaceHandler, pullRequestHandler, renderTemplatesHandler, labelUpdateHandler)
 	return mainInjector
 }
 
@@ -43,10 +49,8 @@ var (
 // wire.go:
 
 type injector struct {
-	prepareWorkspaceHandler *gitrepo.PrepareWorkspaceHandler
-	pullRequestHandler      *pullrequest.PullRequestHandler
-	app                     *cli.App
-	renderTemplatesHandler  core.EventHandler
+	app      *cli.App
+	handlers map[core.EventName]core.EventHandler
 }
 
 func NewInjector(
@@ -54,20 +58,23 @@ func NewInjector(
 	pwh *gitrepo.PrepareWorkspaceHandler,
 	prh *pullrequest.PullRequestHandler,
 	rth *rendering2.RenderTemplatesHandler,
+	luh *labels2.LabelUpdateHandler,
 ) *injector {
 	i := &injector{
-		prepareWorkspaceHandler: pwh,
-		pullRequestHandler:      prh,
-		renderTemplatesHandler:  rth,
-		app:                     app,
+		app:      app,
+		handlers: map[core.EventName]core.EventHandler{},
 	}
+	i.handlers[gitrepo.PrepareWorkspaceEvent] = pwh
+	i.handlers[pullrequest.EnsurePullRequestEvent] = prh
+	i.handlers[rendering2.RenderTemplatesEvent] = rth
+	i.handlers[labels2.LabelUpdateEvent] = luh
 	return i
 }
 
 func (i *injector) RegisterHandlers() {
-	core.RegisterHandler(gitrepo.PrepareWorkspaceEvent, i.prepareWorkspaceHandler)
-	core.RegisterHandler(pullrequest.EnsurePullRequestEvent, i.pullRequestHandler)
-	core.RegisterHandler(rendering2.RenderTemplatesEvent, i.renderTemplatesHandler)
+	for name, handler := range i.handlers {
+		core.RegisterHandler(name, handler)
+	}
 }
 
 func (i *injector) RunApp() {

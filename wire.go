@@ -6,8 +6,10 @@ import (
 	"github.com/ccremer/greposync/cfg"
 	"github.com/ccremer/greposync/cli"
 	"github.com/ccremer/greposync/cli/labels"
+	"github.com/ccremer/greposync/cli/update"
 	"github.com/ccremer/greposync/core"
 	"github.com/ccremer/greposync/core/gitrepo"
+	corelabels "github.com/ccremer/greposync/core/labels"
 	"github.com/ccremer/greposync/core/pullrequest"
 	corerendering "github.com/ccremer/greposync/core/rendering"
 	"github.com/ccremer/greposync/pkg/githosting/github"
@@ -18,10 +20,8 @@ import (
 )
 
 type injector struct {
-	prepareWorkspaceHandler *gitrepo.PrepareWorkspaceHandler
-	pullRequestHandler      *pullrequest.PullRequestHandler
-	app                     *cli.App
-	renderTemplatesHandler  core.EventHandler
+	app      *cli.App
+	handlers map[core.EventName]core.EventHandler
 }
 
 func NewInjector(
@@ -29,20 +29,23 @@ func NewInjector(
 	pwh *gitrepo.PrepareWorkspaceHandler,
 	prh *pullrequest.PullRequestHandler,
 	rth *corerendering.RenderTemplatesHandler,
+	luh *corelabels.LabelUpdateHandler,
 ) *injector {
 	i := &injector{
-		prepareWorkspaceHandler: pwh,
-		pullRequestHandler:      prh,
-		renderTemplatesHandler:  rth,
-		app:                     app,
+		app:      app,
+		handlers: map[core.EventName]core.EventHandler{},
 	}
+	i.handlers[gitrepo.PrepareWorkspaceEvent] = pwh
+	i.handlers[pullrequest.EnsurePullRequestEvent] = prh
+	i.handlers[corerendering.RenderTemplatesEvent] = rth
+	i.handlers[corelabels.LabelUpdateEvent] = luh
 	return i
 }
 
 func (i *injector) RegisterHandlers() {
-	core.RegisterHandler(gitrepo.PrepareWorkspaceEvent, i.prepareWorkspaceHandler)
-	core.RegisterHandler(pullrequest.EnsurePullRequestEvent, i.pullRequestHandler)
-	core.RegisterHandler(corerendering.RenderTemplatesEvent, i.renderTemplatesHandler)
+	for name, handler := range i.handlers {
+		core.RegisterHandler(name, handler)
+	}
 }
 
 func (i *injector) RunApp() {
@@ -58,11 +61,13 @@ func initInjector() *injector {
 		wire.Value(cli.VersionInfo{Version: version, Commit: commit, Date: date}),
 		cfg.NewDefaultConfig,
 		labels.NewCommand,
+		update.NewCommand,
 
 		// Core
 		gitrepo.NewPrepareWorkspaceHandler,
 		pullrequest.NewPullRequestHandler,
 		corerendering.NewRenderTemplatesHandler,
+		corelabels.NewLabelUpdateHandler,
 
 		// Stores
 		wire.NewSet(repository.NewRepositoryStore, wire.Bind(new(core.GitRepositoryStore), new(*repository.RepositoryStore))),
