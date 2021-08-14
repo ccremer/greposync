@@ -29,12 +29,13 @@ func TestLabelService_createOrUpdateLabels(t *testing.T) {
 	for name, tt := range labelTests {
 		t.Run(name, func(t *testing.T) {
 			gu := createURl(t)
-			s := &LabelService{
-				log: printer.New(),
-			}
+			s := &LabelUpdateHandler{}
 
 			repoFake := createRepoFake(core.GitRepositoryProperties{URL: gu}, tt.givenLabels)
-			err := s.createOrUpdateLabels(repoFake)
+			err := s.createOrUpdateLabels(&pipelineContext{
+				repo: repoFake,
+				log:  printer.New(),
+			})
 			if tt.expectedErr {
 				assert.Error(t, err)
 				return
@@ -67,12 +68,13 @@ func TestLabelService_deleteLabels(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 
 			gu := createURl(t)
-			s := &LabelService{
-				log: printer.New(),
-			}
+			s := &LabelUpdateHandler{}
 
 			repoFake := createRepoFake(core.GitRepositoryProperties{URL: gu}, tt.givenLabels)
-			err := s.deleteLabels(repoFake)
+			err := s.deleteLabels(&pipelineContext{
+				repo: repoFake,
+				log:  printer.New(),
+			})
 			if tt.expectedErr {
 				assert.Error(t, err)
 				return

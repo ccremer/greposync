@@ -29,19 +29,14 @@ const GitHubProviderKey core.GitHostingProvider = "github"
 
 // NewRemote returns a new GitHub provider instance.
 func NewRemote() *GhRemote {
+	ctx := context.Background()
 	provider := &GhRemote{
-		log: printer.New(),
-		m:   &sync.Mutex{},
+		log:    printer.New(),
+		m:      &sync.Mutex{},
+		ctx:    ctx,
+		client: createClient(os.Getenv("GITHUB_TOKEN"), ctx),
 	}
 	return provider
-}
-
-// Initialize implements repository.Remote.
-func (r *GhRemote) Initialize() error {
-	ctx, client := createClient(os.Getenv("GITHUB_TOKEN"))
-	r.client = client
-	r.ctx = ctx
-	return nil
 }
 
 // FindLabels implements repository.Remote.
@@ -114,13 +109,12 @@ func (r *GhRemote) EnsurePullRequest(_ *core.GitURL, p core.PullRequest) error {
 	return pr.update()
 }
 
-func createClient(token string) (context.Context, *github.Client) {
-	ctx := context.Background()
+func createClient(token string, ctx context.Context) *github.Client {
 	ts := oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: token},
 	)
 	tc := oauth2.NewClient(ctx, ts)
 
 	client := github.NewClient(tc)
-	return ctx, client
+	return client
 }

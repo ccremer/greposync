@@ -5,6 +5,7 @@ package main
 import (
 	"github.com/ccremer/greposync/cfg"
 	"github.com/ccremer/greposync/cli"
+	"github.com/ccremer/greposync/cli/labels"
 	"github.com/ccremer/greposync/core"
 	"github.com/ccremer/greposync/core/gitrepo"
 	"github.com/ccremer/greposync/core/pullrequest"
@@ -56,6 +57,7 @@ func initInjector() *injector {
 		cli.NewApp,
 		wire.Value(cli.VersionInfo{Version: version, Commit: commit, Date: date}),
 		cfg.NewDefaultConfig,
+		labels.NewCommand,
 
 		// Core
 		gitrepo.NewPrepareWorkspaceHandler,
