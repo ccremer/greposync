@@ -10,6 +10,7 @@ import (
 	"github.com/ccremer/greposync/cli/flags"
 	"github.com/ccremer/greposync/cli/initialize"
 	"github.com/ccremer/greposync/cli/labels"
+	"github.com/ccremer/greposync/cli/update"
 	"github.com/ccremer/greposync/printer"
 	"github.com/urfave/cli/v2"
 )
@@ -29,7 +30,7 @@ type (
 // NewApp initializes the CLI application.
 func NewApp(info VersionInfo, config *cfg.Configuration,
 	labelCommand *labels.Command,
-	updateCommand *labels.Command,
+	updateCommand *update.Command,
 ) *App {
 	dateLayout := "2006-01-02"
 	t, err := time.Parse(dateLayout, info.Date)

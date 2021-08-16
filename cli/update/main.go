@@ -14,7 +14,6 @@ import (
 	"github.com/ccremer/greposync/core/pullrequest"
 	corerendering "github.com/ccremer/greposync/core/rendering"
 	"github.com/ccremer/greposync/printer"
-	"github.com/ccremer/greposync/repository"
 	"github.com/hashicorp/go-multierror"
 	"github.com/knadh/koanf"
 	"github.com/urfave/cli/v2"
@@ -96,7 +95,6 @@ func (c *Command) createPipeline(r core.GitRepository) *pipeline.Pipeline {
 	log := printer.New().SetName(r.GetConfig().URL.GetRepositoryName()).SetLevel(printer.DefaultLevel)
 
 	sc := &cfg.SyncConfig{
-		Git:         r.Config,
 		PullRequest: c.cfg.PullRequest,
 		Template: &cfg.TemplateConfig{
 			RootDir: c.cfg.Template.RootDir,
@@ -110,13 +108,13 @@ func (c *Command) createPipeline(r core.GitRepository) *pipeline.Pipeline {
 		pipeline.NewStep("render templates", c.renderTemplates(repoUrl)),
 		predicate.WrapIn(pipeline.NewPipelineWithLogger(logger).
 			WithNestedSteps("commit changes",
-				pipeline.NewStep("add", r.Add()),
-				pipeline.NewStep("commit", r.Commit()),
-				pipeline.NewStep("show diff", r.Diff()),
+				pipeline.NewStep("add", nil),
+				pipeline.NewStep("commit",nil),
+				pipeline.NewStep("show diff",nil),
 			),
-			predicate.And(r.EnabledCommit(), r.Dirty())),
-		predicate.ToStep("push changes", r.PushToRemote(), predicate.And(r.EnabledPush(), r.IfBranchHasCommits())),
-		predicate.ToStep("pull request", c.ensurePullRequest(repoUrl), predicate.And(r.IfBranchHasCommits(), predicate.Bool(sc.PullRequest.Create))),
+			predicate.And(nil, nil)),
+		predicate.ToStep("push changes", nil, predicate.And(nil, nil)),
+		predicate.ToStep("pull request", c.ensurePullRequest(repoUrl), predicate.And(nil, predicate.Bool(sc.PullRequest.Create))),
 		pipeline.NewStep("end", func() pipeline.Result {
 			log.InfoF("Pipeline for '%s/%s' finished", sc.Git.Namespace, sc.Git.Name)
 			return pipeline.Result{}
