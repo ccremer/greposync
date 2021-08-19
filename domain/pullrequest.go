@@ -54,7 +54,7 @@ func (pr *PullRequest) ChangeDescription(title, body string, store PullRequestSt
 	return nil
 }
 
-func (pr *PullRequest) SetLabels(labels LabelSet) error {
+func (pr *PullRequest) AttachLabels(labels LabelSet) error {
 	if err := pr.validateLabels(labels); hasFailed(err) {
 		return err
 	}

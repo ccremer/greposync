@@ -40,12 +40,23 @@ func (p Path) DirExists() bool {
 	return false
 }
 
+// Join takes this Path as root and makes a new Path with given elements.
+func (p Path) Join(elems ...Path) Path {
+	var strElems = make([]string, len(elems)+1)
+	strElems[0] = p.String()
+	for i := range elems {
+		strElems[i+1] = elems[i].String()
+	}
+	return NewFilePath(strElems...)
+}
+
 // Delete removes the path (and possibly all children if it's a directory), ignoring any errors.
 // If you need error handling, use os.RemoveAll directly.
 func (p Path) Delete() {
 	_ = os.RemoveAll(p.String())
 }
 
+// String returns a string representation of itself.
 func (p Path) String() string {
 	return string(p)
 }

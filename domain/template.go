@@ -2,7 +2,6 @@ package domain
 
 import (
 	"io/fs"
-	"os"
 )
 
 type Permissions fs.FileMode
@@ -19,12 +18,9 @@ func NewTemplate(relPath Path, perms Permissions) *Template {
 	}
 }
 
-func (t *Template) RenderToFile(values Values, absolutePath Path, renderer TemplateRenderer) error {
-	content, err := renderer.Render(values, t)
-	if err != nil {
-		return err
-	}
-	return os.WriteFile(absolutePath.String(), []byte(content), t.FilePermissions.FileMode())
+func (t *Template) Render(values Values, engine TemplateEngine) (string, error) {
+	content, err := engine.Execute(t, values)
+	return content, err
 }
 
 func (p Permissions) FileMode() fs.FileMode {

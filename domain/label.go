@@ -13,8 +13,6 @@ type Label struct {
 	color       Color
 }
 
-type LabelSet []Label
-
 var colorRegex *regexp.Regexp
 
 func init() {
@@ -52,34 +50,4 @@ func (c Color) CheckValue() error {
 		return nil
 	}
 	return fmt.Errorf("%w: color value must be 6-digit uppercased hexadecimal with '#' prefix: %s", ErrInvalidArgument, c)
-}
-
-func (s LabelSet) CheckForEmptyLabelNames() error {
-	for _, label := range s {
-		if label.Name == "" {
-			return fmt.Errorf("%w: label name cannot be empty", ErrInvalidArgument)
-		}
-	}
-	return nil
-}
-
-func (s LabelSet) CheckForDuplicates() error {
-	m := make(map[string]int, len(s))
-	for _, label := range s {
-		if _, exists := m[label.Name]; exists {
-			// TODO: Another Error type maybe?
-			return fmt.Errorf("%w: label is duplicated", ErrInvalidArgument)
-		}
-		m[label.Name] = 1
-	}
-	return nil
-}
-
-func (s LabelSet) FindLabelByName(label string) (Label, bool) {
-	for _, l := range s {
-		if l.Name == label {
-			return l, true
-		}
-	}
-	return Label{}, false
 }
