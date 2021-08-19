@@ -1,336 +1,394 @@
-<svg host="65bd71144e" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="734px" height="508px" viewBox="-0.5 -0.5 734 508" content="&lt;mxfile&gt;&lt;diagram id=&quot;aE8h9AjOpX9zFrYUGcad&quot; name=&quot;Page-1&quot;&gt;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&lt;/diagram&gt;&lt;/mxfile&gt;">
+<svg host="65bd71144e" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="759px" height="638px" viewBox="-0.5 -0.5 759 638" content="&lt;mxfile&gt;&lt;diagram id=&quot;aE8h9AjOpX9zFrYUGcad&quot; name=&quot;Page-1&quot;&gt;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&lt;/diagram&gt;&lt;/mxfile&gt;">
     <defs>
-        <clipPath id="mx-clip-314-239-152-26-0">
-            <rect x="314" y="239" width="152" height="26"/>
+        <clipPath id="mx-clip-309-447-152-26-0">
+            <rect x="309" y="447" width="152" height="26"/>
         </clipPath>
-        <clipPath id="mx-clip-314-265-152-26-0">
-            <rect x="314" y="265" width="152" height="26"/>
+        <clipPath id="mx-clip-309-473-152-26-0">
+            <rect x="309" y="473" width="152" height="26"/>
         </clipPath>
-        <clipPath id="mx-clip-314-291-152-26-0">
-            <rect x="314" y="291" width="152" height="26"/>
+        <clipPath id="mx-clip-309-499-152-26-0">
+            <rect x="309" y="499" width="152" height="26"/>
         </clipPath>
-        <clipPath id="mx-clip-314-317-152-26-0">
-            <rect x="314" y="317" width="152" height="26"/>
+        <clipPath id="mx-clip-519-161-182-26-0">
+            <rect x="519" y="161" width="182" height="26"/>
         </clipPath>
-        <clipPath id="mx-clip-314-343-152-26-0">
-            <rect x="314" y="343" width="152" height="26"/>
+        <clipPath id="mx-clip-519-187-182-26-0">
+            <rect x="519" y="187" width="182" height="26"/>
         </clipPath>
-        <clipPath id="mx-clip-314-369-152-26-0">
-            <rect x="314" y="369" width="152" height="26"/>
+        <clipPath id="mx-clip-4-251-192-26-0">
+            <rect x="4" y="251" width="192" height="26"/>
         </clipPath>
-        <clipPath id="mx-clip-314-395-152-26-0">
-            <rect x="314" y="395" width="152" height="26"/>
+        <clipPath id="mx-clip-4-277-192-26-0">
+            <rect x="4" y="277" width="192" height="26"/>
         </clipPath>
-        <clipPath id="mx-clip-519-31-182-26-0">
-            <rect x="519" y="31" width="182" height="26"/>
+        <clipPath id="mx-clip-4-303-192-26-0">
+            <rect x="4" y="303" width="192" height="26"/>
         </clipPath>
-        <clipPath id="mx-clip-519-57-182-26-0">
-            <rect x="519" y="57" width="182" height="26"/>
+        <clipPath id="mx-clip-4-329-192-26-0">
+            <rect x="4" y="329" width="192" height="26"/>
         </clipPath>
-        <clipPath id="mx-clip-34-151-192-26-0">
-            <rect x="34" y="151" width="192" height="26"/>
+        <clipPath id="mx-clip-4-355-192-26-0">
+            <rect x="4" y="355" width="192" height="26"/>
         </clipPath>
-        <clipPath id="mx-clip-34-177-192-26-0">
-            <rect x="34" y="177" width="192" height="26"/>
+        <clipPath id="mx-clip-494-551-132-26-0">
+            <rect x="494" y="551" width="132" height="26"/>
         </clipPath>
-        <clipPath id="mx-clip-494-421-132-26-0">
-            <rect x="494" y="421" width="132" height="26"/>
+        <clipPath id="mx-clip-494-577-132-26-0">
+            <rect x="494" y="577" width="132" height="26"/>
         </clipPath>
-        <clipPath id="mx-clip-494-447-132-26-0">
-            <rect x="494" y="447" width="132" height="26"/>
+        <clipPath id="mx-clip-494-603-132-26-0">
+            <rect x="494" y="603" width="132" height="26"/>
         </clipPath>
-        <clipPath id="mx-clip-494-473-132-26-0">
-            <rect x="494" y="473" width="132" height="26"/>
+        <clipPath id="mx-clip-542-361-184-26-0">
+            <rect x="542" y="361" width="184" height="26"/>
         </clipPath>
-        <clipPath id="mx-clip-542-231-184-26-0">
-            <rect x="542" y="231" width="184" height="26"/>
+        <clipPath id="mx-clip-542-387-184-26-0">
+            <rect x="542" y="387" width="184" height="26"/>
         </clipPath>
-        <clipPath id="mx-clip-542-257-184-26-0">
-            <rect x="542" y="257" width="184" height="26"/>
+        <clipPath id="mx-clip-542-413-184-26-0">
+            <rect x="542" y="413" width="184" height="26"/>
         </clipPath>
-        <clipPath id="mx-clip-542-283-184-26-0">
-            <rect x="542" y="283" width="184" height="26"/>
+        <clipPath id="mx-clip-542-439-184-26-0">
+            <rect x="542" y="439" width="184" height="26"/>
         </clipPath>
-        <clipPath id="mx-clip-542-309-184-26-0">
-            <rect x="542" y="309" width="184" height="26"/>
+        <clipPath id="mx-clip-542-465-184-26-0">
+            <rect x="542" y="465" width="184" height="26"/>
         </clipPath>
-        <clipPath id="mx-clip-542-335-184-26-0">
-            <rect x="542" y="335" width="184" height="26"/>
+        <clipPath id="mx-clip-4-155-172-26-0">
+            <rect x="4" y="155" width="172" height="26"/>
         </clipPath>
-        <clipPath id="mx-clip-4-55-172-26-0">
-            <rect x="4" y="55" width="172" height="26"/>
+        <clipPath id="mx-clip-519-281-177-26-0">
+            <rect x="519" y="281" width="177" height="26"/>
         </clipPath>
-        <clipPath id="mx-clip-519-151-177-26-0">
-            <rect x="519" y="151" width="177" height="26"/>
+        <clipPath id="mx-clip-4-431-262-26-0">
+            <rect x="4" y="431" width="262" height="26"/>
         </clipPath>
-        <clipPath id="mx-clip-4-301-262-26-0">
-            <rect x="4" y="301" width="262" height="26"/>
+        <clipPath id="mx-clip-4-457-262-26-0">
+            <rect x="4" y="457" width="262" height="26"/>
         </clipPath>
-        <clipPath id="mx-clip-4-327-262-26-0">
-            <rect x="4" y="327" width="262" height="26"/>
+        <clipPath id="mx-clip-4-483-262-26-0">
+            <rect x="4" y="483" width="262" height="26"/>
         </clipPath>
-        <clipPath id="mx-clip-4-353-262-26-0">
-            <rect x="4" y="353" width="262" height="26"/>
+        <clipPath id="mx-clip-4-509-262-26-0">
+            <rect x="4" y="509" width="262" height="26"/>
         </clipPath>
-        <clipPath id="mx-clip-4-379-262-26-0">
-            <rect x="4" y="379" width="262" height="26"/>
+        <clipPath id="mx-clip-4-587-182-26-0">
+            <rect x="4" y="587" width="182" height="26"/>
         </clipPath>
-        <clipPath id="mx-clip-4-457-182-26-0">
-            <rect x="4" y="457" width="182" height="26"/>
+        <clipPath id="mx-clip-4-613-182-26-0">
+            <rect x="4" y="613" width="182" height="26"/>
         </clipPath>
-        <clipPath id="mx-clip-4-483-182-26-0">
-            <rect x="4" y="483" width="182" height="26"/>
+        <clipPath id="mx-clip-234-611-232-26-0">
+            <rect x="234" y="611" width="232" height="26"/>
         </clipPath>
-        <clipPath id="mx-clip-234-481-232-26-0">
-            <rect x="234" y="481" width="232" height="26"/>
+        <clipPath id="mx-clip-264-283-172-26-0">
+            <rect x="264" y="283" width="172" height="26"/>
+        </clipPath>
+        <clipPath id="mx-clip-264-309-172-26-0">
+            <rect x="264" y="309" width="172" height="26"/>
+        </clipPath>
+        <clipPath id="mx-clip-284-103-132-26-0">
+            <rect x="284" y="103" width="132" height="26"/>
+        </clipPath>
+        <clipPath id="mx-clip-494-31-132-26-0">
+            <rect x="494" y="31" width="132" height="26"/>
         </clipPath>
     </defs>
     <g>
-        <path d="M 310 234 L 310 208 L 470 208 L 470 234" fill="#ffffff" stroke="#000000" stroke-miterlimit="10" pointer-events="all"/>
-        <path d="M 310 234 L 310 416 L 470 416 L 470 234" fill="none" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
-        <path d="M 310 234 L 470 234" fill="none" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
+        <path d="M 305 442 L 305 416 L 465 416 L 465 442" fill="#ffffff" stroke="#000000" stroke-miterlimit="10" pointer-events="all"/>
+        <path d="M 305 442 L 305 520 L 465 520 L 465 442" fill="none" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
+        <path d="M 305 442 L 465 442" fill="none" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
         <g fill="#000000" font-family="Helvetica" pointer-events="none" text-anchor="middle" font-size="12px">
-            <text x="389.5" y="225.5">
+            <text x="384.5" y="433.5">
                 GitRepository
             </text>
         </g>
-        <g fill="#000000" font-family="Helvetica" pointer-events="none" clip-path="url(#mx-clip-314-239-152-26-0)" font-size="12px">
-            <text x="315.5" y="251.5">
+        <g fill="#000000" font-family="Helvetica" pointer-events="none" clip-path="url(#mx-clip-309-447-152-26-0)" font-size="12px">
+            <text x="310.5" y="459.5">
                 &lt;Properties&gt;
             </text>
         </g>
-        <g fill="#000000" font-family="Helvetica" pointer-events="none" clip-path="url(#mx-clip-314-265-152-26-0)" font-size="12px">
-            <text x="315.5" y="277.5">
+        <g fill="#000000" font-family="Helvetica" pointer-events="none" clip-path="url(#mx-clip-309-473-152-26-0)" font-size="12px">
+            <text x="310.5" y="485.5">
                 PullRequests
             </text>
         </g>
-        <g fill="#000000" font-family="Helvetica" pointer-events="none" clip-path="url(#mx-clip-314-291-152-26-0)" font-size="12px">
-            <text x="315.5" y="303.5">
+        <g fill="#000000" font-family="Helvetica" pointer-events="none" clip-path="url(#mx-clip-309-499-152-26-0)" font-size="12px">
+            <text x="310.5" y="511.5">
                 Labels
             </text>
         </g>
-        <g fill="#000000" font-family="Helvetica" pointer-events="none" clip-path="url(#mx-clip-314-317-152-26-0)" font-size="12px">
-            <text x="315.5" y="329.5">
-                Commit()
-            </text>
-        </g>
-        <g fill="#000000" font-family="Helvetica" pointer-events="none" clip-path="url(#mx-clip-314-343-152-26-0)" font-size="12px">
-            <text x="315.5" y="355.5">
-                RemoveLabel(lblstr)
-            </text>
-        </g>
-        <g fill="#000000" font-family="Helvetica" pointer-events="none" clip-path="url(#mx-clip-314-369-152-26-0)" font-size="12px">
-            <text x="315.5" y="381.5">
-                AddLabel(lblstr)
-            </text>
-        </g>
-        <g fill="#000000" font-family="Helvetica" pointer-events="none" clip-path="url(#mx-clip-314-395-152-26-0)" font-size="12px">
-            <text x="315.5" y="407.5">
-                Push()
-            </text>
-        </g>
-        <path d="M 515 26 L 515 0 L 705 0 L 705 26" fill="#ffffff" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
-        <path d="M 515 26 L 515 78 L 705 78 L 705 26" fill="none" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
-        <path d="M 515 26 L 705 26" fill="none" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
+        <path d="M 515 156 L 515 130 L 705 130 L 705 156" fill="#ffffff" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
+        <path d="M 515 156 L 515 208 L 705 208 L 705 156" fill="none" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
+        <path d="M 515 156 L 705 156" fill="none" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
         <g fill="#000000" font-family="Helvetica" pointer-events="none" text-anchor="middle" font-size="12px">
-            <text x="609.5" y="10.5">
+            <text x="609.5" y="140.5">
                 &lt;&lt;Entity&gt;&gt;
             </text>
-            <text x="609.5" y="24.5">
+            <text x="609.5" y="154.5">
                 Template
             </text>
         </g>
-        <g fill="#000000" font-family="Helvetica" pointer-events="none" clip-path="url(#mx-clip-519-31-182-26-0)" font-size="12px">
-            <text x="520.5" y="43.5">
+        <g fill="#000000" font-family="Helvetica" pointer-events="none" clip-path="url(#mx-clip-519-161-182-26-0)" font-size="12px">
+            <text x="520.5" y="173.5">
                 RelativePath
             </text>
         </g>
-        <g fill="#000000" font-family="Helvetica" pointer-events="none" clip-path="url(#mx-clip-519-57-182-26-0)" font-size="12px">
-            <text x="520.5" y="69.5">
-                Render(Values, Path)
+        <g fill="#000000" font-family="Helvetica" pointer-events="none" clip-path="url(#mx-clip-519-187-182-26-0)" font-size="12px">
+            <text x="520.5" y="199.5">
+                Render(Values, Engine)
             </text>
         </g>
-        <path d="M 30 146 L 30 120 L 230 120 L 230 146" fill="#ffffff" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
-        <path d="M 30 146 L 30 198 L 230 198 L 230 146" fill="none" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
-        <path d="M 30 146 L 230 146" fill="none" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
+        <path d="M 0 246 L 0 220 L 200 220 L 200 246" fill="#ffffff" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
+        <path d="M 0 246 L 0 376 L 200 376 L 200 246" fill="none" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
+        <path d="M 0 246 L 200 246" fill="none" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
         <g fill="#000000" font-family="Helvetica" pointer-events="none" text-anchor="middle" font-size="12px">
-            <text x="129.5" y="137.5">
+            <text x="99.5" y="237.5">
                 GitRepositoryStore
             </text>
         </g>
-        <g fill="#000000" font-family="Helvetica" pointer-events="none" clip-path="url(#mx-clip-34-151-192-26-0)" font-size="12px">
-            <text x="35.5" y="163.5">
+        <g fill="#000000" font-family="Helvetica" pointer-events="none" clip-path="url(#mx-clip-4-251-192-26-0)" font-size="12px">
+            <text x="5.5" y="263.5">
                 FetchGitRepositories()
             </text>
         </g>
-        <g fill="#000000" font-family="Helvetica" pointer-events="none" clip-path="url(#mx-clip-34-177-192-26-0)" font-size="12px">
-            <text x="35.5" y="189.5">
-                FetchGitRepository(url)
+        <g fill="#000000" font-family="Helvetica" pointer-events="none" clip-path="url(#mx-clip-4-277-192-26-0)" font-size="12px">
+            <text x="5.5" y="289.5">
+                Commit()
             </text>
         </g>
-        <path d="M 490 416 L 490 390 L 630 390 L 630 416" fill="#ffffff" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
-        <path d="M 490 416 L 490 494 L 630 494 L 630 416" fill="none" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
-        <path d="M 490 416 L 630 416" fill="none" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
+        <g fill="#000000" font-family="Helvetica" pointer-events="none" clip-path="url(#mx-clip-4-303-192-26-0)" font-size="12px">
+            <text x="5.5" y="315.5">
+                Push()
+            </text>
+        </g>
+        <g fill="#000000" font-family="Helvetica" pointer-events="none" clip-path="url(#mx-clip-4-329-192-26-0)" font-size="12px">
+            <text x="5.5" y="341.5">
+                AddFile()
+            </text>
+        </g>
+        <g fill="#000000" font-family="Helvetica" pointer-events="none" clip-path="url(#mx-clip-4-355-192-26-0)" font-size="12px">
+            <text x="5.5" y="367.5">
+                DeleteFile()
+            </text>
+        </g>
+        <path d="M 490 546 L 490 520 L 630 520 L 630 546" fill="#ffffff" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
+        <path d="M 490 546 L 490 624 L 630 624 L 630 546" fill="none" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
+        <path d="M 490 546 L 630 546" fill="none" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
         <g fill="#000000" font-family="Helvetica" pointer-events="none" text-anchor="middle" font-size="12px">
-            <text x="559.5" y="407.5">
+            <text x="559.5" y="537.5">
                 Label
             </text>
         </g>
-        <g fill="#000000" font-family="Helvetica" pointer-events="none" clip-path="url(#mx-clip-494-421-132-26-0)" font-size="12px">
-            <text x="495.5" y="433.5">
+        <g fill="#000000" font-family="Helvetica" pointer-events="none" clip-path="url(#mx-clip-494-551-132-26-0)" font-size="12px">
+            <text x="495.5" y="563.5">
                 Name
             </text>
         </g>
-        <g fill="#000000" font-family="Helvetica" pointer-events="none" clip-path="url(#mx-clip-494-447-132-26-0)" font-size="12px">
-            <text x="495.5" y="459.5">
+        <g fill="#000000" font-family="Helvetica" pointer-events="none" clip-path="url(#mx-clip-494-577-132-26-0)" font-size="12px">
+            <text x="495.5" y="589.5">
                 Description
             </text>
         </g>
-        <g fill="#000000" font-family="Helvetica" pointer-events="none" clip-path="url(#mx-clip-494-473-132-26-0)" font-size="12px">
-            <text x="495.5" y="485.5">
+        <g fill="#000000" font-family="Helvetica" pointer-events="none" clip-path="url(#mx-clip-494-603-132-26-0)" font-size="12px">
+            <text x="495.5" y="615.5">
                 Color
             </text>
         </g>
-        <path d="M 400 64 L 457.48 64 L 457.48 65.04 L 508.63 65" fill="none" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
-        <path d="M 513.88 65 L 506.88 68.51 L 508.63 65 L 506.88 61.51 Z" fill="#000000" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
-        <path d="M 400 64 L 457.48 64 L 457.48 158.96 L 508.63 159" fill="none" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
-        <path d="M 513.88 159 L 506.88 162.49 L 508.63 159 L 506.88 155.49 Z" fill="#000000" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
-        <path d="M 260 76 L 260 52 L 400 52 L 400 76" fill="#ffffff" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
-        <path d="M 260 76 L 400 76" fill="none" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
+        <path d="M 400 194 L 457.48 194 L 457.48 195.04 L 508.63 195" fill="none" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
+        <path d="M 513.88 195 L 506.88 198.51 L 508.63 195 L 506.88 191.51 Z" fill="#000000" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
+        <path d="M 400 194 L 457.48 194 L 457.48 288.96 L 508.63 289" fill="none" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
+        <path d="M 513.88 289 L 506.88 292.49 L 508.63 289 L 506.88 285.49 Z" fill="#000000" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
+        <path d="M 260 206 L 260 182 L 400 182 L 400 206" fill="#ffffff" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
+        <path d="M 260 206 L 400 206" fill="none" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
         <g fill="#000000" font-family="Helvetica" pointer-events="none" text-anchor="middle" font-size="12px">
-            <text x="329.5" y="61.5">
+            <text x="329.5" y="191.5">
                 &lt;&lt;ValueObject&gt;&gt;
             </text>
-            <text x="329.5" y="75.5">
+            <text x="329.5" y="205.5">
                 Values
             </text>
         </g>
-        <path d="M 537.5 226 L 537.5 200 L 730 200 L 730 226" fill="#ffffff" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
-        <path d="M 537.5 226 L 537.5 356 L 730 356 L 730 226" fill="none" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
-        <path d="M 537.5 226 L 730 226" fill="none" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
+        <path d="M 537.5 356 L 537.5 330 L 730 330 L 730 356" fill="#ffffff" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
+        <path d="M 537.5 356 L 537.5 486 L 730 486 L 730 356" fill="none" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
+        <path d="M 537.5 356 L 730 356" fill="none" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
         <g fill="#000000" font-family="Helvetica" pointer-events="none" text-anchor="middle" font-size="12px">
-            <text x="633.25" y="217.5">
+            <text x="633.25" y="347.5">
                 PullRequest
             </text>
         </g>
-        <g fill="#000000" font-family="Helvetica" pointer-events="none" clip-path="url(#mx-clip-542-231-184-26-0)" font-size="12px">
-            <text x="543" y="243.5">
+        <g fill="#000000" font-family="Helvetica" pointer-events="none" clip-path="url(#mx-clip-542-361-184-26-0)" font-size="12px">
+            <text x="543" y="373.5">
                 PR Id
             </text>
         </g>
-        <g fill="#000000" font-family="Helvetica" pointer-events="none" clip-path="url(#mx-clip-542-257-184-26-0)" font-size="12px">
-            <text x="543" y="269.5">
+        <g fill="#000000" font-family="Helvetica" pointer-events="none" clip-path="url(#mx-clip-542-387-184-26-0)" font-size="12px">
+            <text x="543" y="399.5">
                 CommitBranch
             </text>
         </g>
-        <g fill="#000000" font-family="Helvetica" pointer-events="none" clip-path="url(#mx-clip-542-283-184-26-0)" font-size="12px">
-            <text x="543" y="295.5">
+        <g fill="#000000" font-family="Helvetica" pointer-events="none" clip-path="url(#mx-clip-542-413-184-26-0)" font-size="12px">
+            <text x="543" y="425.5">
                 Labels
             </text>
         </g>
-        <g fill="#000000" font-family="Helvetica" pointer-events="none" clip-path="url(#mx-clip-542-309-184-26-0)" font-size="12px">
-            <text x="543" y="321.5">
+        <g fill="#000000" font-family="Helvetica" pointer-events="none" clip-path="url(#mx-clip-542-439-184-26-0)" font-size="12px">
+            <text x="543" y="451.5">
                 SetLabels(ctrl, labels, repo)
             </text>
         </g>
-        <g fill="#000000" font-family="Helvetica" pointer-events="none" clip-path="url(#mx-clip-542-335-184-26-0)" font-size="12px">
-            <text x="543" y="347.5">
+        <g fill="#000000" font-family="Helvetica" pointer-events="none" clip-path="url(#mx-clip-542-465-184-26-0)" font-size="12px">
+            <text x="543" y="477.5">
                 BaseBranch
             </text>
         </g>
-        <path d="M 0 50 L 0 24 L 180 24 L 180 50" fill="#ffffff" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
-        <path d="M 0 50 L 0 76 L 180 76 L 180 50" fill="none" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
-        <path d="M 0 50 L 180 50" fill="none" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
+        <path d="M 0 150 L 0 124 L 180 124 L 180 150" fill="#ffffff" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
+        <path d="M 0 150 L 0 176 L 180 176 L 180 150" fill="none" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
+        <path d="M 0 150 L 180 150" fill="none" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
         <g fill="#000000" font-family="Helvetica" pointer-events="none" text-anchor="middle" font-size="12px">
-            <text x="89.5" y="41.5">
+            <text x="89.5" y="141.5">
                 ValueStore
             </text>
         </g>
-        <g fill="#000000" font-family="Helvetica" pointer-events="none" clip-path="url(#mx-clip-4-55-172-26-0)" font-size="12px">
-            <text x="5.5" y="67.5">
+        <g fill="#000000" font-family="Helvetica" pointer-events="none" clip-path="url(#mx-clip-4-155-172-26-0)" font-size="12px">
+            <text x="5.5" y="167.5">
                 FetchValues(GitRepository)
             </text>
         </g>
-        <path d="M 180 63 L 220 63.04 L 253.63 63.85" fill="none" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
-        <path d="M 258.88 63.97 L 251.8 67.3 L 253.63 63.85 L 251.97 60.31 Z" fill="#000000" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
-        <path d="M 515 146 L 515 120 L 700 120 L 700 146" fill="#ffffff" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
-        <path d="M 515 146 L 515 172 L 700 172 L 700 146" fill="none" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
-        <path d="M 515 146 L 700 146" fill="none" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
+        <path d="M 180 163 L 220 163.04 L 220 194 L 253.63 194" fill="none" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
+        <path d="M 258.88 194 L 251.88 197.5 L 253.63 194 L 251.88 190.5 Z" fill="#000000" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
+        <path d="M 515 276 L 515 250 L 700 250 L 700 276" fill="#ffffff" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
+        <path d="M 515 276 L 515 302 L 700 302 L 700 276" fill="none" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
+        <path d="M 515 276 L 700 276" fill="none" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
         <g fill="#000000" font-family="Helvetica" pointer-events="none" text-anchor="middle" font-size="12px">
-            <text x="607" y="130.5">
+            <text x="607" y="260.5">
                 &lt;&lt;Service&gt;&gt;
             </text>
-            <text x="607" y="144.5">
+            <text x="607" y="274.5">
                 TemplateRenderer
             </text>
         </g>
-        <g fill="#000000" font-family="Helvetica" pointer-events="none" clip-path="url(#mx-clip-519-151-177-26-0)" font-size="12px">
-            <text x="520.5" y="163.5">
+        <g fill="#000000" font-family="Helvetica" pointer-events="none" clip-path="url(#mx-clip-519-281-177-26-0)" font-size="12px">
+            <text x="520.5" y="293.5">
                 Render(Template, Values)
             </text>
         </g>
-        <path d="M 705 65 L 724.96 65.04 L 724.96 158.96 L 706.37 158.99" fill="none" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
-        <path d="M 701.12 159 L 708.11 155.49 L 706.37 158.99 L 708.12 162.49 Z" fill="#000000" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
-        <path d="M 0 296 L 0 270 L 270 270 L 270 296" fill="#ffffff" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
-        <path d="M 0 296 L 0 400 L 270 400 L 270 296" fill="none" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
-        <path d="M 0 296 L 270 296" fill="none" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
+        <path d="M 705 195 L 724.96 195.04 L 724.96 288.96 L 706.37 288.99" fill="none" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
+        <path d="M 701.12 289 L 708.11 285.49 L 706.37 288.99 L 708.12 292.49 Z" fill="#000000" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
+        <path d="M 0 426 L 0 400 L 270 400 L 270 426" fill="#ffffff" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
+        <path d="M 0 426 L 0 530 L 270 530 L 270 426" fill="none" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
+        <path d="M 0 426 L 270 426" fill="none" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
         <g fill="#000000" font-family="Helvetica" pointer-events="none" text-anchor="middle" font-size="12px">
-            <text x="134.5" y="287.5">
+            <text x="134.5" y="417.5">
                 PullRequestStore
             </text>
         </g>
-        <g fill="#000000" font-family="Helvetica" pointer-events="none" clip-path="url(#mx-clip-4-301-262-26-0)" font-size="12px">
-            <text x="5.5" y="313.5">
+        <g fill="#000000" font-family="Helvetica" pointer-events="none" clip-path="url(#mx-clip-4-431-262-26-0)" font-size="12px">
+            <text x="5.5" y="443.5">
                 EnsurePullRequest(repo)
             </text>
         </g>
-        <g fill="#000000" font-family="Helvetica" pointer-events="none" clip-path="url(#mx-clip-4-327-262-26-0)" font-size="12px">
-            <text x="5.5" y="339.5">
+        <g fill="#000000" font-family="Helvetica" pointer-events="none" clip-path="url(#mx-clip-4-457-262-26-0)" font-size="12px">
+            <text x="5.5" y="469.5">
                 SetLabelToPR(repo, PR)
             </text>
         </g>
-        <g fill="#000000" font-family="Helvetica" pointer-events="none" clip-path="url(#mx-clip-4-353-262-26-0)" font-size="12px">
-            <text x="5.5" y="365.5">
+        <g fill="#000000" font-family="Helvetica" pointer-events="none" clip-path="url(#mx-clip-4-483-262-26-0)" font-size="12px">
+            <text x="5.5" y="495.5">
                 RemoveLabelFromPR(repo, PR)
             </text>
         </g>
-        <g fill="#000000" font-family="Helvetica" pointer-events="none" clip-path="url(#mx-clip-4-379-262-26-0)" font-size="12px">
-            <text x="5.5" y="391.5">
+        <g fill="#000000" font-family="Helvetica" pointer-events="none" clip-path="url(#mx-clip-4-509-262-26-0)" font-size="12px">
+            <text x="5.5" y="521.5">
                 FindGreposyncPullRequests(repo)
             </text>
         </g>
-        <path d="M 0 452 L 0 426 L 190 426 L 190 452" fill="#ffffff" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
-        <path d="M 0 452 L 0 504 L 190 504 L 190 452" fill="none" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
-        <path d="M 0 452 L 190 452" fill="none" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
+        <path d="M 0 582 L 0 556 L 190 556 L 190 582" fill="#ffffff" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
+        <path d="M 0 582 L 0 634 L 190 634 L 190 582" fill="none" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
+        <path d="M 0 582 L 190 582" fill="none" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
         <g fill="#000000" font-family="Helvetica" pointer-events="none" text-anchor="middle" font-size="12px">
-            <text x="94.5" y="443.5">
+            <text x="94.5" y="573.5">
                 LabelStore
             </text>
         </g>
-        <g fill="#000000" font-family="Helvetica" pointer-events="none" clip-path="url(#mx-clip-4-457-182-26-0)" font-size="12px">
-            <text x="5.5" y="469.5">
+        <g fill="#000000" font-family="Helvetica" pointer-events="none" clip-path="url(#mx-clip-4-587-182-26-0)" font-size="12px">
+            <text x="5.5" y="599.5">
                 EnsureLabels(repo)
             </text>
         </g>
-        <g fill="#000000" font-family="Helvetica" pointer-events="none" clip-path="url(#mx-clip-4-483-182-26-0)" font-size="12px">
-            <text x="5.5" y="495.5">
+        <g fill="#000000" font-family="Helvetica" pointer-events="none" clip-path="url(#mx-clip-4-613-182-26-0)" font-size="12px">
+            <text x="5.5" y="625.5">
                 DeleteInactiveLabels(repo)
             </text>
         </g>
-        <path d="M 230 476 L 230 450 L 470 450 L 470 476" fill="#ffffff" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
-        <path d="M 230 476 L 230 502 L 470 502 L 470 476" fill="none" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
-        <path d="M 230 476 L 470 476" fill="none" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
+        <path d="M 230 606 L 230 580 L 470 580 L 470 606" fill="#ffffff" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
+        <path d="M 230 606 L 230 632 L 470 632 L 470 606" fill="none" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
+        <path d="M 230 606 L 470 606" fill="none" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
         <g fill="#000000" font-family="Helvetica" pointer-events="none" text-anchor="middle" font-size="12px">
-            <text x="349.5" y="460.5">
+            <text x="349.5" y="590.5">
                 &lt;&lt;Service&gt;&gt;
             </text>
-            <text x="349.5" y="474.5">
+            <text x="349.5" y="604.5">
                 PullRequestController
             </text>
         </g>
-        <g fill="#000000" font-family="Helvetica" pointer-events="none" clip-path="url(#mx-clip-234-481-232-26-0)" font-size="12px">
-            <text x="235.5" y="493.5">
+        <g fill="#000000" font-family="Helvetica" pointer-events="none" clip-path="url(#mx-clip-234-611-232-26-0)" font-size="12px">
+            <text x="235.5" y="623.5">
                 SetLabelsToPullRequest(repo, labels, pr)
+            </text>
+        </g>
+        <path d="M 260 291.04 L 230 291.04 L 230 298 L 206.37 298" fill="none" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
+        <path d="M 201.12 298 L 208.12 294.5 L 206.37 298 L 208.12 301.5 Z" fill="#000000" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
+        <path d="M 350 330 L 350 373.04 L 384.96 373.04 L 384.96 409.63" fill="none" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
+        <path d="M 384.96 414.88 L 381.46 407.88 L 384.96 409.63 L 388.46 407.88 Z" fill="#000000" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
+        <path d="M 410 252 L 410 220 L 610 220 L 610 214.37" fill="none" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
+        <path d="M 610 209.12 L 613.5 216.12 L 610 214.37 L 606.5 216.12 Z" fill="#000000" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
+        <path d="M 260 278 L 260 252 L 440 252 L 440 278" fill="#ffffff" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
+        <path d="M 260 278 L 260 330 L 440 330 L 440 278" fill="none" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
+        <path d="M 260 278 L 440 278" fill="none" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
+        <g fill="#000000" font-family="Helvetica" pointer-events="none" text-anchor="middle" font-size="12px">
+            <text x="349.5" y="269.5">
+                RenderService
+            </text>
+        </g>
+        <g fill="#000000" font-family="Helvetica" pointer-events="none" clip-path="url(#mx-clip-264-283-172-26-0)" font-size="12px">
+            <text x="265.5" y="295.5">
+                RenderTemplate(tpls, store
+            </text>
+        </g>
+        <g fill="#000000" font-family="Helvetica" pointer-events="none" clip-path="url(#mx-clip-264-309-172-26-0)" font-size="12px">
+            <text x="265.5" y="321.5">
+                DeleteUnwantedFiles(store)
+            </text>
+        </g>
+        <path d="M 420 85 L 610 85.04 L 610 123.63" fill="none" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
+        <path d="M 610 128.88 L 606.5 121.88 L 610 123.63 L 613.5 121.88 Z" fill="#000000" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
+        <path d="M 280 98 L 280 72 L 420 72 L 420 98" fill="#ffffff" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
+        <path d="M 280 98 L 280 124 L 420 124 L 420 98" fill="none" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
+        <path d="M 280 98 L 420 98" fill="none" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
+        <g fill="#000000" font-family="Helvetica" pointer-events="none" text-anchor="middle" font-size="12px">
+            <text x="349.5" y="89.5">
+                TemplateStore
+            </text>
+        </g>
+        <g fill="#000000" font-family="Helvetica" pointer-events="none" clip-path="url(#mx-clip-284-103-132-26-0)" font-size="12px">
+            <text x="285.5" y="115.5">
+                FetchTemplates()
+            </text>
+        </g>
+        <path d="M 630 13 L 750 13.04 L 750 276 L 706.37 276" fill="none" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
+        <path d="M 701.12 276 L 708.12 272.5 L 706.37 276 L 708.12 279.5 Z" fill="#000000" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
+        <path d="M 490 26 L 490 0 L 630 0 L 630 26" fill="#ffffff" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
+        <path d="M 490 26 L 490 52 L 630 52 L 630 26" fill="none" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
+        <path d="M 490 26 L 630 26" fill="none" stroke="#000000" stroke-miterlimit="10" pointer-events="none"/>
+        <g fill="#000000" font-family="Helvetica" pointer-events="none" text-anchor="middle" font-size="12px">
+            <text x="559.5" y="17.5">
+                TemplateEngine
+            </text>
+        </g>
+        <g fill="#000000" font-family="Helvetica" pointer-events="none" clip-path="url(#mx-clip-494-31-132-26-0)" font-size="12px">
+            <text x="495.5" y="43.5">
+                Execute()
             </text>
         </g>
     </g>
