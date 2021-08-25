@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	pipeline "github.com/ccremer/go-command-pipeline"
 	"github.com/ccremer/greposync/domain"
 	"github.com/ccremer/greposync/printer"
 	"github.com/knadh/koanf"
@@ -16,9 +17,11 @@ import (
 )
 
 type RepositoryStore struct {
-	log printer.Printer
-	k   *koanf.Koanf
 	StoreConfig
+	log        printer.Printer
+	k          *koanf.Koanf
+	prStore    domain.PullRequestStore
+	labelStore domain.LabelStore
 }
 
 // ManagedGitRepo is the representation of the managed git repos in the config file.
@@ -31,15 +34,24 @@ type StoreConfig struct {
 	DefaultNamespace string
 }
 
+type pipelineContext struct {
+	url    *domain.GitURL
+	labels domain.LabelSet
+	pr     *domain.PullRequest
+	repo   *domain.GitRepository
+}
+
 var (
 	// ManagedReposFileName is the base file name where managed git repositories config is searched.
 	ManagedReposFileName = "managed_repos.yml"
 )
 
-func NewRepositoryStore() *RepositoryStore {
+func NewRepositoryStore(prStore domain.PullRequestStore, labelStore domain.LabelStore) *RepositoryStore {
 	return &RepositoryStore{
-		log: printer.New(),
-		k:   koanf.New("."),
+		log:        printer.New(),
+		k:          koanf.New("."),
+		labelStore: labelStore,
+		prStore:    prStore,
 	}
 }
 
@@ -73,12 +85,20 @@ func (s *RepositoryStore) FetchGitRepositories() ([]*domain.GitRepository, error
 
 		// TODO: Reimplement filtering
 
-		root := s.toLocalFilePath(u)
-		domainRepo, err := domain.NewGitRepository(domain.FromURL(u), domain.NewFilePath(root), domain.LabelSet{})
-		if err != nil {
-			return list, err
+		gitUrl := domain.FromURL(u)
+		ctx := &pipelineContext{
+			url: gitUrl,
 		}
-		list = append(list, domainRepo)
+		p := pipeline.NewPipeline().WithSteps(
+			pipeline.NewStep("fetch labels", ctx.fetchLabels(s.labelStore)),
+			pipeline.NewStep("fetch PR", ctx.findPR(s.prStore)),
+			pipeline.NewStep("create repo", ctx.createRepo(s)),
+		)
+		result := p.Run()
+		if result.IsFailed() {
+			return nil, result.Err
+		}
+		list = append(list, ctx.repo)
 	}
 	return list, nil
 }
@@ -97,4 +117,29 @@ func parseUrl(m ManagedGitRepo, gitBase, defaultNs string) *url.URL {
 	u, err := giturls.Parse(fmt.Sprintf("%s/%s/%s", gitBase, defaultNs, m.Name))
 	printer.CheckIfError(err)
 	return u
+}
+
+func (ctx *pipelineContext) fetchLabels(labelStore domain.LabelStore) pipeline.ActionFunc {
+	return func() pipeline.Result {
+		labels, err := labelStore.FetchLabelsForRepository(ctx.url)
+		ctx.labels = labels
+		return pipeline.Result{Err: err}
+	}
+}
+
+func (ctx *pipelineContext) findPR(prStore domain.PullRequestStore) pipeline.ActionFunc {
+	return func() pipeline.Result {
+		pr, err := prStore.FindMatchingPullRequest(ctx.repo)
+		ctx.pr = pr
+		return pipeline.Result{Err: err}
+	}
+}
+
+func (ctx *pipelineContext) createRepo(s *RepositoryStore) pipeline.ActionFunc {
+	return func() pipeline.Result {
+		root := s.toLocalFilePath(ctx.url.AsURL())
+		domainRepo, err := domain.NewGitRepository(ctx.url, domain.NewFilePath(root), ctx.labels)
+		ctx.repo = domainRepo
+		return pipeline.Result{Err: err}
+	}
 }

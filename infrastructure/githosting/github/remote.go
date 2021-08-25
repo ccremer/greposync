@@ -23,8 +23,8 @@ type (
 	}
 )
 
-// GitHubProviderKey is the identifier for the GitHub githosting.RemoteProvider.
-const GitHubProviderKey githosting.RemoteProvider = "github"
+// ProviderKey is the identifier for the GitHub githosting.RemoteProvider.
+const ProviderKey githosting.RemoteProvider = "github"
 
 // NewRemote returns a new GitHub provider instance.
 func NewRemote() *GhRemote {

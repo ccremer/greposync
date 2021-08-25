@@ -34,6 +34,11 @@ func (u *GitURL) String() string {
 	return plain.String()
 }
 
+func (u *GitURL) AsURL() *url.URL {
+	plain := url.URL(*u)
+	return &plain
+}
+
 // FromURL converts the given url.URL into a GitURL.
 func FromURL(url *url.URL) *GitURL {
 	g := GitURL(*url)

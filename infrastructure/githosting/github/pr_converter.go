@@ -26,7 +26,8 @@ func (c PrConverter) ConvertToEntity(pr *github.PullRequest) *domain.PullRequest
 	}
 
 	set := LabelConverter{}.ConvertToEntity(pr.Labels)
-	// TODO: Ignore for now
+	// TODO: At least log a warning.
+	// We don't expect invalid colors if coming from a repository, but that's just an assumption
 	_ = entity.AttachLabels(set)
 	return entity
 }

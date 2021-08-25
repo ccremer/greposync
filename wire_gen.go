@@ -61,5 +61,5 @@ func (i *injector) RunApp() {
 }
 
 func newGitProviders(ghRemote *github.GhRemote) repository.ProviderMap {
-	return repository.ProviderMap{github.GitHubProviderKey: ghRemote}
+	return repository.ProviderMap{github.ProviderKey: ghRemote}
 }

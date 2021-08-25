@@ -55,6 +55,8 @@ func initInjector() *injector {
 		wire.NewSet(repository.NewRepositoryStore, wire.Bind(new(core.GitRepositoryStore), new(*repository.RepositoryStore))),
 		//wire.NewSet(rendering.NewGoTemplateStore, wire.Bind(new(core.GoTemplateStore), new(*rendering.GoTemplateStore))),
 		wire.NewSet(valuestore.NewValueStore, wire.Bind(new(domain.ValueStore), new(*valuestore.KoanfValueStore))),
+		wire.NewSet(githosting.NewPullRequestStore, wire.Bind(new(domain.PullRequestStore), new(*githosting.PullRequestStore))),
+		wire.NewSet(githosting.NewLabelStore, wire.Bind(new(domain.LabelStore), new(*githosting.LabelStore))),
 		wire.NewSet(repositorystore.NewRepositoryStore, wire.Bind(new(domain.GitRepositoryStore), new(*repositorystore.RepositoryStore))),
 
 		// Git providers
@@ -65,6 +67,6 @@ func initInjector() *injector {
 
 func newGitProviders(ghRemote *github.GhRemote) githosting.ProviderMap {
 	return githosting.ProviderMap{
-		github.GitHubProviderKey: ghRemote,
+		github.ProviderKey: ghRemote,
 	}
 }
