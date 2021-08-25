@@ -3,7 +3,9 @@ package github
 import (
 	"time"
 
+	"github.com/ccremer/greposync/cfg"
 	"github.com/ccremer/greposync/core"
+	"github.com/ccremer/greposync/domain"
 	"github.com/google/go-github/v38/github"
 )
 
@@ -32,6 +34,51 @@ func (l *LabelImpl) GetName() string {
 
 func (l *LabelImpl) Delete() (bool, error) {
 	return l.remote.deleteLabel(l.repo, l.Name)
+}
+
+func (r *GhRemote) FindLabels(url *domain.GitURL) ([]*domain.Label, error) {
+	ghLabels, err := r.fetchAllLabels(url)
+	if err != nil {
+		return []core.Label{}, err
+	}
+	var impls = make([]*LabelImpl, len(labels))
+	for i, configLabel := range labels {
+		impl := &LabelImpl{
+			Name:        configLabel.Name,
+			Description: configLabel.Description,
+			Color:       configLabel.Color,
+			Inactive:    configLabel.Delete,
+			remote:      r,
+			repo:        url,
+		}
+		ghLabel := r.findMatchingGhLabel(ghLabels, impl)
+		impl.ghLabel = ghLabel
+		impls[i] = impl
+	}
+	return LabelConverter{}.ConvertToEntity(impls), nil
+}
+
+// FindLabels implements githosting.Remote.
+func (r *GhRemote) FindLabels(url *core.GitURL, labels []*cfg.RepositoryLabel) ([]core.Label, error) {
+	ghLabels, err := r.fetchAllLabels(url)
+	if err != nil {
+		return []core.Label{}, err
+	}
+	var impls = make([]*LabelImpl, len(labels))
+	for i, configLabel := range labels {
+		impl := &LabelImpl{
+			Name:        configLabel.Name,
+			Description: configLabel.Description,
+			Color:       configLabel.Color,
+			Inactive:    configLabel.Delete,
+			remote:      r,
+			repo:        url,
+		}
+		ghLabel := r.findMatchingGhLabel(ghLabels, impl)
+		impl.ghLabel = ghLabel
+		impls[i] = impl
+	}
+	return LabelConverter{}.ConvertToEntity(impls), nil
 }
 
 func (l *LabelImpl) Ensure() (bool, error) {
@@ -76,7 +123,7 @@ func (r *GhRemote) deleteLabel(url *core.GitURL, name string) (bool, error) {
 	return err == nil, err
 }
 
-func (r *GhRemote) fetchAllLabels(url *core.GitURL) ([]*github.Label, error) {
+func (r *GhRemote) fetchAllLabels(url *domain.GitURL) ([]*github.Label, error) {
 	r.m.Lock()
 	defer r.delay()
 	nextPage := 1

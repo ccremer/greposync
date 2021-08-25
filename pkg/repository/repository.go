@@ -3,6 +3,7 @@ package repository
 import (
 	"github.com/ccremer/greposync/cfg"
 	"github.com/ccremer/greposync/core"
+	"github.com/ccremer/greposync/infrastructure/githosting"
 	"github.com/ccremer/greposync/printer"
 )
 
@@ -12,9 +13,9 @@ type (
 		GitConfig  *cfg.GitConfig
 		PrConfig   *cfg.PullRequestConfig
 		coreConfig core.GitRepositoryProperties
-		labels     []core.Label
-		remote     Remote
-		pr         core.PullRequest
+		labels []core.Label
+		remote githosting.Remote
+		pr     core.PullRequest
 		log        printer.Printer
 	}
 )

@@ -2,9 +2,9 @@ package domain
 
 type GitRepository struct {
 	RootDir      Path
-	URL          *GitURL
-	PullRequests []PullRequest
-	Labels       LabelSet
+	URL         *GitURL
+	PullRequest *PullRequest
+	Labels      LabelSet
 
 	CommitBranch  string
 	DefaultBranch string

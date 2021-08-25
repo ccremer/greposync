@@ -6,19 +6,19 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/ccremer/greposync/core"
+	"github.com/ccremer/greposync/domain"
 	"github.com/ccremer/greposync/printer"
 	"github.com/knadh/koanf"
 	"github.com/knadh/koanf/parsers/yaml"
 	"github.com/knadh/koanf/providers/file"
 )
 
-// KoanfValueStore implements core.ValueStore.
+// KoanfValueStore implements domain.ValueStore.
 type KoanfValueStore struct {
 	m           *sync.Mutex
 	globalKoanf *koanf.Koanf
 	log         printer.Printer
-	cache       map[*core.GitURL]*koanf.Koanf
+	cache       map[*domain.GitURL]*koanf.Koanf
 }
 
 var (
@@ -26,65 +26,65 @@ var (
 	GlobalConfigFileName = "config_defaults.yml"
 )
 
-// NewValueStore returns a new instance of core.ValueStore.
+// NewValueStore returns a new instance of domain.ValueStore.
 func NewValueStore() *KoanfValueStore {
 	return &KoanfValueStore{
 		log:   printer.New(),
-		cache: map[*core.GitURL]*koanf.Koanf{},
+		cache: map[*domain.GitURL]*koanf.Koanf{},
 		m:     &sync.Mutex{},
 	}
 }
 
-// FetchValuesForTemplate implements core.ValueStore.
-func (k *KoanfValueStore) FetchValuesForTemplate(template core.Template, config *core.GitRepositoryProperties) (core.Values, error) {
+// FetchValuesForTemplate implements domain.ValueStore.
+func (k *KoanfValueStore) FetchValuesForTemplate(template *domain.Template, config *domain.GitRepository) (domain.Values, error) {
 	k.loadGlobals()
 	repoKoanf, err := k.prepareRepoKoanf(config)
 	if err != nil {
-		return core.Values{}, err
+		return domain.Values{}, err
 	}
-	return k.loadDataForTemplate(repoKoanf, template.GetRelativePath())
+	return k.loadDataForTemplate(repoKoanf, template.RelativePath.String())
 }
 
-// FetchUnmanagedFlag implements core.ValueStore.
-func (k *KoanfValueStore) FetchUnmanagedFlag(template core.Template, config *core.GitRepositoryProperties) (bool, error) {
+// FetchUnmanagedFlag implements domain.ValueStore.
+func (k *KoanfValueStore) FetchUnmanagedFlag(template *domain.Template, config *domain.GitRepository) (bool, error) {
 	k.loadGlobals()
 	repoKoanf, err := k.prepareRepoKoanf(config)
 	if err != nil {
 		return false, err
 	}
-	return k.loadBooleanFlag(repoKoanf, template.GetRelativePath(), "unmanaged")
+	return k.loadBooleanFlag(repoKoanf, template.RelativePath.String(), "unmanaged")
 }
 
-// FetchTargetPath implements core.ValueStore.
-func (k *KoanfValueStore) FetchTargetPath(template core.Template, config *core.GitRepositoryProperties) (string, error) {
+// FetchTargetPath implements domain.ValueStore.
+func (k *KoanfValueStore) FetchTargetPath(template *domain.Template, config *domain.GitRepository) (domain.Path, error) {
 	k.loadGlobals()
 	repoKoanf, err := k.prepareRepoKoanf(config)
 	if err != nil {
 		return "", err
 	}
-	return k.loadTargetPath(repoKoanf, template.GetRelativePath())
+	return k.loadTargetPath(repoKoanf, template.RelativePath.String())
 }
 
-// FetchFilesToDelete implements core.ValueStore.
-func (k *KoanfValueStore) FetchFilesToDelete(config *core.GitRepositoryProperties) ([]string, error) {
+// FetchFilesToDelete implements domain.ValueStore.
+func (k *KoanfValueStore) FetchFilesToDelete(config *domain.GitRepository) ([]domain.Path, error) {
 	k.loadGlobals()
 	repoKoanf, err := k.prepareRepoKoanf(config)
 	if err != nil {
-		return []string{}, err
+		return []domain.Path{}, err
 	}
 	return k.loadFilesToDelete(repoKoanf)
 }
 
-func (k *KoanfValueStore) prepareRepoKoanf(config *core.GitRepositoryProperties) (*koanf.Koanf, error) {
-	k.log.SetName(config.URL.GetRepositoryName())
-	if repoKoanf, exists := k.cache[config.URL]; exists {
+func (k *KoanfValueStore) prepareRepoKoanf(repository *domain.GitRepository) (*koanf.Koanf, error) {
+	k.log.SetName(repository.URL.GetRepositoryName())
+	if repoKoanf, exists := k.cache[repository.URL]; exists {
 		return repoKoanf, nil
 	}
-	repoKoanf, err := k.loadAndMergeConfig(path.Join(config.RootDir, SyncConfigFileName))
+	repoKoanf, err := k.loadAndMergeConfig(path.Join(repository.RootDir.String(), SyncConfigFileName))
 	if err != nil {
 		return nil, err
 	}
-	k.cache[config.URL] = repoKoanf
+	k.cache[repository.URL] = repoKoanf
 	return repoKoanf, nil
 }
 
@@ -104,9 +104,9 @@ func (k *KoanfValueStore) loadAndMergeConfig(syncFile string) (*koanf.Koanf, err
 	return repoKoanf, nil
 }
 
-func (k *KoanfValueStore) loadDataForTemplate(repoKoanf *koanf.Koanf, templateFileName string) (core.Values, error) {
+func (k *KoanfValueStore) loadDataForTemplate(repoKoanf *koanf.Koanf, templateFileName string) (domain.Values, error) {
 	// Load the global variables into exposed values
-	data := make(core.Values)
+	data := make(domain.Values)
 	err := repoKoanf.Unmarshal(":globals", &data)
 	if err != nil {
 		return data, err

@@ -12,6 +12,5 @@ var (
 
 func main() {
 	injector := initInjector()
-	injector.RegisterHandlers()
 	injector.RunApp()
 }

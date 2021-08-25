@@ -4,6 +4,7 @@ import (
 	"path"
 	"testing"
 
+	"github.com/ccremer/greposync/domain"
 	"github.com/knadh/koanf"
 	"github.com/knadh/koanf/parsers/yaml"
 	"github.com/knadh/koanf/providers/file"
@@ -14,7 +15,7 @@ import (
 var specialFlagsCases = map[string]struct {
 	givenTemplateFileName string
 	expectedBooleanFlag   bool
-	expectedTargetPath    string
+	expectedTargetPath    domain.Path
 	expectedErrString     string
 }{
 	"GivenTopLevelFile_WhenTrue_ThenExpectTrue": {
@@ -51,18 +52,18 @@ var specialFlagsCases = map[string]struct {
 func TestKoanfValueStore_FetchFilesToDelete(t *testing.T) {
 	tests := map[string]struct {
 		givenSyncFile string
-		expectedFiles []string
+		expectedFiles []domain.Path
 	}{
 		"GivenExistingFile_ThenExpectCorrectPropertyInheritance": {
 			givenSyncFile: "specialflags.yml",
-			expectedFiles: []string{
+			expectedFiles: []domain.Path{
 				"subdir/fileTrue",
 				"topLevelFileTrue",
 			},
 		},
 		"GivenExistingFile_WhenMergingWithGlobals_ThenExpectAllListedFiles": {
 			givenSyncFile: "delete-globals.yml",
-			expectedFiles: []string{
+			expectedFiles: []domain.Path{
 				"topLevelFileTrue",
 				"subdir/fileTrue",
 			},

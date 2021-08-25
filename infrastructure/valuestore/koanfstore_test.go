@@ -4,7 +4,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/ccremer/greposync/core"
+	"github.com/ccremer/greposync/domain"
 	"github.com/knadh/koanf"
 	"github.com/knadh/koanf/parsers/yaml"
 	"github.com/knadh/koanf/providers/file"
@@ -13,7 +13,7 @@ import (
 )
 
 func TestKoanfValueStore_ImplementsInterface(t *testing.T) {
-	assert.Implements(t, (*core.ValueStore)(nil), new(KoanfValueStore))
+	assert.Implements(t, (*domain.ValueStore)(nil), new(KoanfValueStore))
 }
 
 func TestKoanfValueStore_loadAndMergeConfig(t *testing.T) {
@@ -50,14 +50,14 @@ func TestKoanfValueStore_loadAndMergeConfig(t *testing.T) {
 
 func TestKoanfValueStore_loadDataForTemplate(t *testing.T) {
 	tests := map[string]struct {
-		expectedConf          core.Values
+		expectedConf          domain.Values
 		givenSyncFile         string
 		givenTemplateFileName string
 	}{
 		"GivenExistingSimpleFile_ThenLoadYaml": {
 			givenSyncFile:         "sync.yml",
 			givenTemplateFileName: "README.md",
-			expectedConf: core.Values{
+			expectedConf: domain.Values{
 				"title": "Hello World",
 				"key":   "value",
 			},
@@ -65,7 +65,7 @@ func TestKoanfValueStore_loadDataForTemplate(t *testing.T) {
 		"GivenFileWithDirectoryDefaults_ThenLoadYaml": {
 			givenSyncFile:         "advanced.yml",
 			givenTemplateFileName: ".github/workflows/release.yaml",
-			expectedConf: core.Values{
+			expectedConf: domain.Values{
 				"title": "Hello World",
 				"key":   "specific",
 				"array": "overridden",

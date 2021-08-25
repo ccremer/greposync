@@ -10,6 +10,8 @@ import (
 
 type GoTemplateEngine struct {
 	RootDir domain.Path
+
+	cache map[domain.Path]*template.Template
 }
 
 const (
@@ -22,13 +24,13 @@ const (
 var templateFunctions = GoTemplateFuncMap()
 
 func NewEngine() *GoTemplateEngine {
-	return &GoTemplateEngine{}
+	return &GoTemplateEngine{
+		cache: map[domain.Path]*template.Template{},
+	}
 }
 
 func (e *GoTemplateEngine) Execute(template *domain.Template, values domain.Values) (string, error) {
-	fileName := filepath.Join(e.RootDir.String(), template.RelativePath.String())
-	helperPath := domain.NewFilePath(e.RootDir.String(), HelperFileName)
-	tpl, err := e.parseTemplateFile(fileName, helperPath)
+	tpl, err := e.loadGoTemplate(template)
 	if err != nil {
 		return "", err
 	}
@@ -36,6 +38,20 @@ func (e *GoTemplateEngine) Execute(template *domain.Template, values domain.Valu
 	buf := &bytes.Buffer{}
 	err = tpl.Execute(buf, values)
 	return buf.String(), err
+}
+
+func (e *GoTemplateEngine) loadGoTemplate(template *domain.Template) (*template.Template, error) {
+	if tpl, exists := e.cache[template.RelativePath]; exists {
+		return tpl, nil
+	}
+	fullFilePath := filepath.Join(e.RootDir.String(), template.RelativePath.String())
+	helperPath := domain.NewFilePath(e.RootDir.String(), HelperFileName)
+	tpl, err := e.parseTemplateFile(fullFilePath, helperPath)
+	if err != nil {
+		return nil, err
+	}
+	e.cache[template.RelativePath] = tpl
+	return tpl, nil
 }
 
 func (e *GoTemplateEngine) parseTemplateFile(fileName string, helperFilePath domain.Path) (*template.Template, error) {

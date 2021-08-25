@@ -6,11 +6,12 @@ import (
 	"strings"
 
 	"github.com/ccremer/greposync/core"
+	"github.com/ccremer/greposync/domain"
 	"github.com/knadh/koanf"
 )
 
-func (k *KoanfValueStore) loadFilesToDelete(repoKoanf *koanf.Koanf) ([]string, error) {
-	filePaths := make([]string, 0)
+func (k *KoanfValueStore) loadFilesToDelete(repoKoanf *koanf.Koanf) ([]domain.Path, error) {
+	filePaths := make([]domain.Path, 0)
 	allKeys := repoKoanf.Raw()
 	// Go through all top-level keys, which are the file names
 	for filePath, _ := range allKeys {
@@ -24,11 +25,11 @@ func (k *KoanfValueStore) loadFilesToDelete(repoKoanf *koanf.Koanf) ([]string, e
 			continue
 		}
 		del, err := k.loadBooleanFlag(repoKoanf, filePath, "delete")
-		if errors.Is(err, core.ErrKeyNotFound) {
+		if errors.Is(err, domain.ErrKeyNotFound) {
 			continue
 		}
 		if del {
-			filePaths = append(filePaths, filePath)
+			filePaths = append(filePaths, domain.Path(filePath))
 		}
 	}
 	return filePaths, nil
@@ -50,7 +51,7 @@ func (k *KoanfValueStore) loadBooleanFlag(repoKoanf *koanf.Koanf, relativePath, 
 	return false, core.ErrKeyNotFound
 }
 
-func (k *KoanfValueStore) loadTargetPath(repoKoanf *koanf.Koanf, relativePath string) (string, error) {
+func (k *KoanfValueStore) loadTargetPath(repoKoanf *koanf.Koanf, relativePath string) (domain.Path, error) {
 	values, err := k.loadDataForTemplate(repoKoanf, relativePath)
 	if err != nil {
 		return "", err
@@ -60,9 +61,9 @@ func (k *KoanfValueStore) loadTargetPath(repoKoanf *koanf.Koanf, relativePath st
 		newPath, isString := targetPath.(string)
 		if isString {
 			if strings.HasSuffix(newPath, "/") {
-				return path.Clean(path.Join(newPath, path.Base(relativePath))), nil
+				return domain.Path(path.Clean(path.Join(newPath, path.Base(relativePath)))), nil
 			}
-			return newPath, nil
+			return domain.Path(newPath), nil
 		}
 		return "", nil
 	}

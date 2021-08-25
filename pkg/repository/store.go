@@ -5,6 +5,7 @@ import (
 
 	"github.com/ccremer/greposync/cfg"
 	"github.com/ccremer/greposync/core"
+	"github.com/ccremer/greposync/infrastructure/githosting"
 	"github.com/ccremer/greposync/repository"
 )
 
@@ -15,7 +16,7 @@ type RepositoryStore struct {
 	cache     map[*core.GitURL]core.GitRepository
 }
 
-type ProviderMap map[core.GitHostingProvider]Remote
+type ProviderMap map[core.GitHostingProvider]githosting.Remote
 
 // NewRepositoryStore creates a new instance.
 func NewRepositoryStore(config *cfg.Configuration, providers ProviderMap) *RepositoryStore {

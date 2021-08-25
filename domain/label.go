@@ -5,6 +5,7 @@ import (
 	"regexp"
 )
 
+// Color is a 6-digit uppercase hexadecimal string value with '#' prefix
 type Color string
 
 type Label struct {
@@ -49,5 +50,5 @@ func (c Color) CheckValue() error {
 	if colorRegex.MatchString(c.String()) {
 		return nil
 	}
-	return fmt.Errorf("%w: color value must be 6-digit uppercased hexadecimal with '#' prefix: %s", ErrInvalidArgument, c)
+	return fmt.Errorf("%w: color value must be 6-digit uppercase hexadecimal with '#' prefix: %s", ErrInvalidArgument, c)
 }

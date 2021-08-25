@@ -7,27 +7,36 @@ import (
 )
 
 type changeSet struct {
-	toMerge   LabelSet
+	other     LabelSet
 	resultSet LabelSet
 }
 
 var labelSetCases = map[string]struct {
 	givenSet      LabelSet
-	changeSet     changeSet
+	mergeSet      changeSet
+	diffSet       changeSet
 	hasDuplicates bool
 	hasEmptyNames bool
 }{
 	"NilSet": {
 		givenSet: nil,
-		changeSet: changeSet{
-			toMerge:   nil,
+		mergeSet: changeSet{
+			other:     nil,
+			resultSet: nil,
+		},
+		diffSet: changeSet{
+			other:     nil,
 			resultSet: nil,
 		},
 	},
 	"EmptySet": {
 		givenSet: LabelSet{},
-		changeSet: changeSet{
-			toMerge:   LabelSet{},
+		mergeSet: changeSet{
+			other:     LabelSet{},
+			resultSet: LabelSet{},
+		},
+		diffSet: changeSet{
+			other:     LabelSet{},
 			resultSet: LabelSet{},
 		},
 	},
@@ -36,8 +45,8 @@ var labelSetCases = map[string]struct {
 			Label{Name: "foo"},
 			Label{Name: "bar"},
 		},
-		changeSet: changeSet{
-			toMerge: LabelSet{
+		mergeSet: changeSet{
+			other: LabelSet{
 				Label{Name: "new"},
 			},
 			resultSet: LabelSet{
@@ -46,20 +55,33 @@ var labelSetCases = map[string]struct {
 				Label{Name: "bar"},
 			},
 		},
+		diffSet: changeSet{
+			other: LabelSet{
+				Label{Name: "bar"},
+				Label{Name: "foo"},
+			},
+			resultSet: LabelSet{},
+		},
 	},
 	"SetWithDuplicates": {
 		givenSet: LabelSet{
 			Label{Name: "foo"},
 			Label{Name: "foo"},
 		},
-		changeSet: changeSet{
-			toMerge: LabelSet{
+		mergeSet: changeSet{
+			other: LabelSet{
 				Label{Name: "new"},
 			},
 			resultSet: LabelSet{
 				Label{Name: "new"},
 				Label{Name: "foo"},
 			},
+		},
+		diffSet: changeSet{
+			other: LabelSet{
+				Label{Name: "foo"},
+			},
+			resultSet: LabelSet{},
 		},
 		hasDuplicates: true,
 	},
@@ -68,13 +90,22 @@ var labelSetCases = map[string]struct {
 			Label{Name: "foo"},
 			Label{Name: ""},
 		},
-		changeSet: changeSet{
-			toMerge: LabelSet{
+		mergeSet: changeSet{
+			other: LabelSet{
 				Label{Name: ""},
 			},
 			resultSet: LabelSet{
 				Label{Name: ""},
 				Label{Name: "foo"},
+			},
+		},
+		diffSet: changeSet{
+			other: LabelSet{
+				Label{Name: "bar"},
+			},
+			resultSet: LabelSet{
+				Label{Name: "foo"},
+				Label{Name: ""},
 			},
 		},
 		hasEmptyNames: true,
@@ -110,8 +141,17 @@ func TestLabelSet_CheckForEmptyLabelNames(t *testing.T) {
 func TestLabelSet_Merge(t *testing.T) {
 	for name, tt := range labelSetCases {
 		t.Run(name, func(t *testing.T) {
-			result := tt.givenSet.Merge(tt.changeSet.toMerge)
-			assert.Equal(t, tt.changeSet.resultSet, result)
+			result := tt.givenSet.Merge(tt.mergeSet.other)
+			assert.Equal(t, tt.mergeSet.resultSet, result)
+		})
+	}
+}
+
+func TestLabelSet_DifferenceOf(t *testing.T) {
+	for name, tt := range labelSetCases {
+		t.Run(name, func(t *testing.T) {
+			result := tt.givenSet.DifferenceOf(tt.diffSet.other)
+			assert.Equal(t, tt.diffSet.resultSet, result)
 		})
 	}
 }

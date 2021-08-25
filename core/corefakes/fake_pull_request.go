@@ -462,7 +462,7 @@ func (fake *FakePullRequest) SetLabels(arg1 []core.Label) {
 		arg1 []core.Label
 	}{arg1Copy})
 	stub := fake.SetLabelsStub
-	fake.recordInvocation("SetLabels", []interface{}{arg1Copy})
+	fake.recordInvocation("AttachLabels", []interface{}{arg1Copy})
 	fake.setLabelsMutex.Unlock()
 	if stub != nil {
 		fake.SetLabelsStub(arg1)

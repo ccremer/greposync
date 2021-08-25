@@ -1,7 +1,6 @@
-package infrastructure
+package repositorystore
 
 import (
-	"errors"
 	"fmt"
 	"net/url"
 	"os"
@@ -42,88 +41,6 @@ func NewRepositoryStore() *RepositoryStore {
 		log: printer.New(),
 		k:   koanf.New("."),
 	}
-}
-
-func (s *RepositoryStore) Clone(repository *domain.GitRepository) error {
-	if repository.RootDir.DirExists() {
-		return errors.New("clone exists already")
-	}
-	dir := repository.RootDir.String()
-	url := repository.URL
-
-	// Don't want to expose credentials in the log, so we're not calling logArgs().
-	s.log.InfoF("%s %s", GitBinary, strings.Join([]string{"clone", url.Redacted(), dir}, " "))
-
-	out, stderr, err := execGitCommand(repository.RootDir, []string{"clone", url.String(), dir})
-	if err != nil {
-		return mergeWithStdErr(err, stderr)
-	}
-	s.log.PrintF(out)
-	return nil
-}
-
-func (s *RepositoryStore) Checkout(repository *domain.GitRepository) error {
-	args := []string{"checkout"}
-	if localExists, err := hasLocalBranch(repository, repository.CommitBranch); err != nil {
-		return err
-	} else if !localExists {
-		// Checkout to new branch
-		args = append(args, "-t", "-b")
-	}
-	args = append(args, repository.CommitBranch)
-
-	out, stderr, err := execGitCommand(repository.RootDir, s.logArgs(args))
-	if err != nil {
-		return mergeWithStdErr(err, stderr)
-	}
-	s.log.DebugF(out)
-	return nil
-}
-
-func (s *RepositoryStore) Fetch(repository *domain.GitRepository) error {
-	panic("implement me")
-}
-
-func (s *RepositoryStore) Reset(repository *domain.GitRepository) error {
-	panic("implement me")
-}
-
-func (s *RepositoryStore) Pull(repository *domain.GitRepository) error {
-	panic("implement me")
-}
-
-func (s *RepositoryStore) Commit(repository *domain.GitRepository, options domain.CommitOptions) error {
-	f, err := os.CreateTemp("", "COMMIT_MSG_")
-	if err != nil {
-		return fmt.Errorf("failed to create temporary commit message file: %w", err)
-	}
-	defer s.deleteFileHandler(f)
-
-	// Write commit message
-	_, err = fmt.Fprint(f, options.Message)
-	if err != nil {
-		return err
-	}
-
-	args := []string{"commit", "-a", "-F", f.Name()}
-
-	// Try to figure out if amend makes sense
-	if options.Amend {
-		if hasCommits, err := HasCommitsBetween(repository, repository.DefaultBranch, repository.CommitBranch); err != nil {
-			return err
-		} else if hasCommits {
-			args = append(args, "--amend")
-		}
-	}
-
-	// Commit
-	out, stderr, err := execGitCommand(repository.RootDir, s.logArgs(args))
-	if err != nil {
-		s.log.InfoF(out)
-		return mergeWithStdErr(err, stderr)
-	}
-	s.log.DebugF(out)
-	return nil
 }
 
 func (s *RepositoryStore) logArgs(args []string) []string {

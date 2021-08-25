@@ -1,4 +1,4 @@
-package infrastructure
+package repositorystore
 
 import (
 	"bytes"
