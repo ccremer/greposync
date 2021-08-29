@@ -44,8 +44,7 @@ func (r *GhRemote) EnsurePullRequest(url *domain.GitURL, pr *domain.PullRequest)
 	cached.Title = converted.Title
 	cached.Body = converted.Body
 	cached.Labels = converted.Labels
-	converted = cached
-	return r.updateExistingPr(url, converted, pr)
+	return r.updateExistingPr(url, cached, pr)
 }
 
 func (r *GhRemote) updateExistingPr(url *domain.GitURL, cached *github.PullRequest, pr *domain.PullRequest) error {
@@ -79,7 +78,7 @@ func (r *GhRemote) canSkipDescriptionUpdate(cached *github.PullRequest, pr *doma
 
 func (r *GhRemote) canSkipLabelUpdate(cached *github.PullRequest, pr *domain.PullRequest) bool {
 	converted := LabelSetConverter{}.ConvertToEntity(cached.Labels)
-	diff := pr.GetLabels().DifferenceOf(converted)
+	diff := pr.GetLabels().Without(converted)
 	return len(diff) == 0
 }
 

@@ -68,15 +68,41 @@ func (c *Command) createPipeline(r *domain.GitRepository) *pipeline.Pipeline {
 	}
 	return pipeline.NewPipeline().WithSteps(
 		pipeline.NewStep("fetch labels", uc.fetchLabelsForRepository(r)),
+		pipeline.NewStep("determine which labels to modify", c.determineLabelsToModify(uc, r)),
+		pipeline.NewStep("determine which labels to delete", c.determineLabelsToDelete(uc, r)),
 		pipeline.NewStep("update existing labels", uc.updateLabelsForRepositoryAction(r)),
 		pipeline.NewStep("delete unwanted labels", uc.deleteLabelsForRepository(r)),
 	)
 }
 
-func (c *Command) prepareLabelsToModify(_ pipeline.Context) error {
-	c.cfg.RepositoryLabels.SelectModifications()
+func (c *Command) determineLabelsToModify(uc *labelUseCase, r *domain.GitRepository) pipeline.ActionFunc {
+	converter := cfg.RepositoryLabelSetConverter{}
+	return func(ctx pipeline.Context) pipeline.Result {
+		toModify, err := converter.ConvertToEntity(c.cfg.RepositoryLabels.SelectModifications())
+		if err != nil {
+			return pipeline.Result{Err: err}
+		}
+		uc.labelsToModify = toModify
 
-	return nil
+		mergedSet := r.Labels.Merge(uc.labelsToModify)
+		err = r.SetLabels(mergedSet)
+		return pipeline.Result{Err: err}
+	}
+}
+
+func (c *Command) determineLabelsToDelete(uc *labelUseCase, r *domain.GitRepository) pipeline.ActionFunc {
+	converter := cfg.RepositoryLabelSetConverter{}
+	return func(ctx pipeline.Context) pipeline.Result {
+		toDelete, err := converter.ConvertToEntity(c.cfg.RepositoryLabels.SelectDeletions())
+		if err != nil {
+			return pipeline.Result{Err: err}
+		}
+		uc.labelsToDelete = toDelete
+
+		reducedSet := r.Labels.Without(toDelete)
+		err = r.SetLabels(reducedSet)
+		return pipeline.Result{Err: err}
+	}
 }
 
 func (c *Command) fetchRepositories(_ pipeline.Context) error {

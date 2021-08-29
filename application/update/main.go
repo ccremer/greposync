@@ -28,7 +28,7 @@ type (
 		cliCommand   *cli.Command
 		repositories []*domain.GitRepository
 		globalK      *koanf.Koanf
-		configurator *AppService
+		appService   *AppService
 	}
 )
 
@@ -38,9 +38,9 @@ func NewCommand(
 	configurator *AppService,
 ) *Command {
 	c := &Command{
-		globalK:      koanf.New("."),
-		cfg:          cfg,
-		configurator: configurator,
+		globalK:    koanf.New("."),
+		cfg:        cfg,
+		appService: configurator,
 	}
 	c.cliCommand = c.createCliCommand()
 	return c
@@ -49,7 +49,7 @@ func NewCommand(
 func (c *Command) runCommand(_ *cli.Context) error {
 
 	logger := printer.PipelineLogger{Logger: printer.New().SetName("update").SetLevel(printer.DefaultLevel)}
-	p := pipeline.NewPipelineWithLogger(logger).WithSteps(
+	p := pipeline.NewPipeline().AddBeforeHook(logger).WithSteps(
 		pipeline.NewStep("configure infrastructure", c.configureInfrastructure()),
 		pipeline.NewStep("fetch managed repos config", c.fetchRepositories()),
 		parallel.NewWorkerPoolStep("update repositories", c.cfg.Project.Jobs, c.updateReposInParallel(), c.errorHandler()),
@@ -66,7 +66,7 @@ func (c *Command) createPipeline(r *domain.GitRepository) *pipeline.Pipeline {
 			RootDir: c.cfg.Template.RootDir,
 		},
 	}
-	c.configurator.repoStore.DefaultNamespace = c.cfg.Git.Namespace
+
 	// temporary flags
 	resetRepo := true
 	enabledCommits := true
@@ -74,7 +74,7 @@ func (c *Command) createPipeline(r *domain.GitRepository) *pipeline.Pipeline {
 
 	repoCtx := &pipelineContext{
 		repo:       r,
-		appService: c.configurator,
+		appService: c.appService,
 		differ: &Differ{
 			log:        printer.New().MapColorToLevel(printer.Blue, printer.LevelInfo).SetName(r.URL.GetRepositoryName()),
 			repository: r,
@@ -82,9 +82,9 @@ func (c *Command) createPipeline(r *domain.GitRepository) *pipeline.Pipeline {
 	}
 
 	logger := printer.PipelineLogger{Logger: log}
-	p := pipeline.NewPipelineWithLogger(logger)
+	p := pipeline.NewPipeline().AddBeforeHook(logger)
 	p.WithSteps(
-		pipeline.NewPipelineWithLogger(logger).
+		pipeline.NewPipeline().AddBeforeHook(logger).
 			WithNestedSteps("prepare workspace",
 				predicate.ToStep("clone repository", repoCtx.clone(), repoCtx.dirMissing()),
 				predicate.ToStep("fetch", repoCtx.fetch(), predicate.Bool(resetRepo)),
@@ -93,7 +93,7 @@ func (c *Command) createPipeline(r *domain.GitRepository) *pipeline.Pipeline {
 				predicate.ToStep("pull", repoCtx.fetch(), predicate.Bool(resetRepo)),
 			),
 		pipeline.NewStep("render templates", repoCtx.renderTemplates()),
-		predicate.WrapIn(pipeline.NewPipelineWithLogger(logger).
+		predicate.WrapIn(pipeline.NewPipeline().AddBeforeHook(logger).
 			WithNestedSteps("commit changes",
 				pipeline.NewStep("add", repoCtx.add()),
 				pipeline.NewStep("commit", repoCtx.commit()),
@@ -135,14 +135,14 @@ func (c *Command) errorHandler() parallel.ResultHandler {
 
 func (c *Command) configureInfrastructure() pipeline.ActionFunc {
 	return func(_ pipeline.Context) pipeline.Result {
-		c.configurator.ConfigureInfrastructure()
+		c.appService.ConfigureInfrastructure()
 		return pipeline.Result{}
 	}
 }
 
 func (c *Command) fetchRepositories() pipeline.ActionFunc {
 	return func(_ pipeline.Context) pipeline.Result {
-		repos, err := c.configurator.repoStore.FetchGitRepositories()
+		repos, err := c.appService.repoStore.FetchGitRepositories()
 		c.repositories = repos
 		return pipeline.Result{Err: err}
 	}

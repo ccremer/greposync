@@ -14,7 +14,7 @@ type changeSet struct {
 var labelSetCases = map[string]struct {
 	givenSet      LabelSet
 	mergeSet      changeSet
-	diffSet       changeSet
+	withoutSet    changeSet
 	hasDuplicates bool
 	hasEmptyNames bool
 }{
@@ -24,7 +24,7 @@ var labelSetCases = map[string]struct {
 			other:     nil,
 			resultSet: nil,
 		},
-		diffSet: changeSet{
+		withoutSet: changeSet{
 			other:     nil,
 			resultSet: nil,
 		},
@@ -35,7 +35,7 @@ var labelSetCases = map[string]struct {
 			other:     LabelSet{},
 			resultSet: LabelSet{},
 		},
-		diffSet: changeSet{
+		withoutSet: changeSet{
 			other:     LabelSet{},
 			resultSet: LabelSet{},
 		},
@@ -55,7 +55,7 @@ var labelSetCases = map[string]struct {
 				Label{Name: "bar"},
 			},
 		},
-		diffSet: changeSet{
+		withoutSet: changeSet{
 			other: LabelSet{
 				Label{Name: "bar"},
 				Label{Name: "foo"},
@@ -77,7 +77,7 @@ var labelSetCases = map[string]struct {
 				Label{Name: "foo"},
 			},
 		},
-		diffSet: changeSet{
+		withoutSet: changeSet{
 			other: LabelSet{
 				Label{Name: "foo"},
 			},
@@ -99,7 +99,7 @@ var labelSetCases = map[string]struct {
 				Label{Name: "foo"},
 			},
 		},
-		diffSet: changeSet{
+		withoutSet: changeSet{
 			other: LabelSet{
 				Label{Name: "bar"},
 			},
@@ -147,11 +147,11 @@ func TestLabelSet_Merge(t *testing.T) {
 	}
 }
 
-func TestLabelSet_DifferenceOf(t *testing.T) {
+func TestLabelSet_Without(t *testing.T) {
 	for name, tt := range labelSetCases {
 		t.Run(name, func(t *testing.T) {
-			result := tt.givenSet.DifferenceOf(tt.diffSet.other)
-			assert.Equal(t, tt.diffSet.resultSet, result)
+			result := tt.givenSet.Without(tt.withoutSet.other)
+			assert.Equal(t, tt.withoutSet.resultSet, result)
 		})
 	}
 }

@@ -62,12 +62,12 @@ func (s LabelSet) Merge(other LabelSet) LabelSet {
 	return newSet
 }
 
-// DifferenceOf returns a new LabelSet that contains the Label that do not exist in other set.
-// A label difference is determined by equality of LabelSet.FindLabelByName.
+// Without returns a new LabelSet that contain only the labels that do not exist in other set.
+// A label is not included in the result if the name matches.
 //
 // No validation checks are performed.
 // The original order is preserved.
-func (s LabelSet) DifferenceOf(other LabelSet) LabelSet {
+func (s LabelSet) Without(other LabelSet) LabelSet {
 	if other == nil {
 		return nil
 	}

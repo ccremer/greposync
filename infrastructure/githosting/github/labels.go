@@ -18,10 +18,12 @@ func (r *GhRemote) FetchLabels(url *domain.GitURL) (domain.LabelSet, error) {
 func (r *GhRemote) EnsureLabels(url *domain.GitURL, labels domain.LabelSet) error {
 	for _, label := range labels {
 		cached, exists := r.findCachedLabel(url, label)
-		if exists && r.hasLabelChanged(cached, label) {
-			err := r.updateLabel(url, cached, label)
-			if err != nil {
-				return err
+		if exists {
+			if r.hasLabelChanged(cached, label) {
+				err := r.updateLabel(url, cached, label)
+				if err != nil {
+					return err
+				}
 			}
 			continue
 		}

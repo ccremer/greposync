@@ -29,6 +29,7 @@ type ManagedGitRepo struct {
 type StoreConfig struct {
 	ParentDir        string
 	DefaultNamespace string
+	CommitBranch     string
 }
 
 var (
@@ -72,6 +73,7 @@ func (s *RepositoryStore) FetchGitRepositories() ([]*domain.GitRepository, error
 		gitUrl := domain.FromURL(u)
 		root := s.toLocalFilePath(gitUrl.AsURL())
 		gitRepository := domain.NewGitRepository(gitUrl, domain.NewFilePath(root))
+		gitRepository.CommitBranch = s.CommitBranch
 		list = append(list, gitRepository)
 	}
 	return list, nil

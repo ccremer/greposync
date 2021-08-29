@@ -34,7 +34,7 @@ func initInjector() *injector {
 	koanfValueStore := valuestore.NewValueStore()
 	pullRequestStore := githosting.NewPullRequestStore(providerMap)
 	renderService := domain.NewRenderService()
-	updateAppService := update.NewConfigurator(goTemplateEngine, repositoryStore, goTemplateStore, koanfValueStore, pullRequestStore, renderService)
+	updateAppService := update.NewConfigurator(goTemplateEngine, repositoryStore, goTemplateStore, koanfValueStore, pullRequestStore, renderService, configuration)
 	updateCommand := update.NewCommand(configuration, updateAppService)
 	app := application.NewApp(versionInfo, configuration, command, updateCommand)
 	mainInjector := NewInjector(app)

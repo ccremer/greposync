@@ -50,7 +50,7 @@ func (c *Command) createCommand() *cli.Command {
 
 func (c *Command) runCommand(_ *cli.Context) error {
 	logger := printer.PipelineLogger{Logger: printer.New().SetLevel(printer.DefaultLevel)}
-	result := pipeline.NewPipelineWithLogger(logger).WithSteps(
+	result := pipeline.NewPipeline().AddBeforeHook(logger).WithSteps(
 		pipeline.NewStep("create main config files", c.createMainConfigFiles()),
 		pipeline.NewStep("create template dir", c.createTemplateDir()),
 		pipeline.NewStep("create template files", c.createTemplateFiles()),

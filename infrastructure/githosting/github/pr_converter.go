@@ -59,7 +59,7 @@ func (PrConverter) toGhNumber(number string) *int {
 		return nil
 	}
 	raw := strings.TrimPrefix(number, "#")
-	if nr, err := strconv.Atoi(raw); err != nil {
+	if nr, err := strconv.Atoi(raw); err == nil {
 		return &nr
 	}
 	return nil

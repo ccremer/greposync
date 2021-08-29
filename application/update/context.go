@@ -4,7 +4,6 @@ import (
 	pipeline "github.com/ccremer/go-command-pipeline"
 	"github.com/ccremer/go-command-pipeline/predicate"
 	"github.com/ccremer/greposync/domain"
-	"github.com/ccremer/greposync/infrastructure/repositorystore"
 	"github.com/ccremer/greposync/printer"
 )
 
@@ -44,7 +43,7 @@ func (c *pipelineContext) commit() pipeline.ActionFunc {
 		err := c.appService.repoStore.Commit(c.repo, domain.CommitOptions{
 			// TODO: make configurable
 			Message: "asdf",
-			Amend:   true,
+			Amend:   false,
 		})
 		return pipeline.Result{Err: err}
 	}
@@ -104,11 +103,14 @@ func (c *pipelineContext) isDirty() predicate.Predicate {
 
 func (c *pipelineContext) hasCommits() predicate.Predicate {
 	return func(step pipeline.Step) bool {
-		hasCommits, err := repositorystore.HasCommitsBetween(c.repo, c.repo.DefaultBranch, c.repo.CommitBranch)
-		if err != nil {
-			c.log.WarnF("%w", err)
-		}
-		return hasCommits
+		return true
+		// TODO: There should be a better way to determine whether to push...
+
+		/*		hasCommits, err := repositorystore.HasCommitsBetween(c.repo, c.repo.DefaultBranch, c.repo.CommitBranch)
+				if err != nil {
+					c.log.WarnF("%w", err)
+				}
+				return hasCommits*/
 	}
 }
 

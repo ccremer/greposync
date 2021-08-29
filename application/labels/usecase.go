@@ -6,7 +6,7 @@ import (
 )
 
 type labelUseCase struct {
-	appService *AppService
+	appService     *AppService
 	labelsToModify domain.LabelSet
 	labelsToDelete domain.LabelSet
 }
@@ -19,8 +19,6 @@ func (uc *labelUseCase) updateLabelsForRepositoryAction(r *domain.GitRepository)
 }
 
 func (uc *labelUseCase) updateLabelsForRepository(r *domain.GitRepository) error {
-	newLabelSet := r.Labels.Merge(uc.labelsToModify)
-	r.Labels = newLabelSet
 	err := uc.appService.labelStore.EnsureLabelsForRepository(r.URL, r.Labels)
 	return err
 }
@@ -38,7 +36,7 @@ func (uc *labelUseCase) fetchLabelsForRepository(r *domain.GitRepository) pipeli
 
 func (uc *labelUseCase) deleteLabelsForRepository(r *domain.GitRepository) pipeline.ActionFunc {
 	return func(ctx pipeline.Context) pipeline.Result {
-		// TODO: implement me
-		return pipeline.Result{}
+		err := uc.appService.labelStore.RemoveLabelsFromRepository(r.URL, uc.labelsToDelete)
+		return pipeline.Result{Err: err}
 	}
 }
