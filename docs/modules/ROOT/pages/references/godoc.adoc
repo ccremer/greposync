@@ -187,8 +187,6 @@ type SyncConfig struct {
 [source, go]
 ----
 type GitConfig struct {
-    Url              *url.URL
-    Dir              string
     SkipReset        bool
     SkipCommit       bool
     SkipPush         bool
@@ -199,19 +197,9 @@ type GitConfig struct {
     DefaultBranch    string
     Name             string
     Namespace        string
-    Provider         core.GitHostingProvider
 }
 ----
 
-
-Url::
-Url is the full Git URL to the remote repository.
-This option is not configurable in `greposync.yml`.
-In templates, the URL is looking like ``
-
-Dir::
-Dir is the relative path to current working directory where the repository is cloned locally.
-This option is not configurable in `greposync.yml`.
 
 
 
@@ -241,9 +229,6 @@ Name is the git repository name without .git extension.
 Namespace::
 Namespace is the repository owner without the repository name.
 This is often a user or organization name in GitHub.com or GitLab.com.
-
-Provider::
-Provider is the Git remote hosting identifier.
 
 
 

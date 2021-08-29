@@ -1,20 +1,14 @@
 package cfg
 
-import (
-	"net/url"
-
-	"github.com/ccremer/greposync/core"
-)
-
 type (
 	// Configuration holds a strongly-typed tree of the main configuration
 	Configuration struct {
-		Project          *ProjectConfig             `json:"project" koanf:"project"`
-		Log              *LogConfig                 `json:"log" koanf:"log"`
-		PullRequest      *PullRequestConfig         `json:"pr" koanf:"pr"`
-		Template         *TemplateConfig            `json:"template" koanf:"template"`
-		Git              *GitConfig                 `json:"git" koanf:"git"`
-		RepositoryLabels map[string]RepositoryLabel `json:"repositoryLabels" koanf:"repositoryLabels"`
+		Project          *ProjectConfig     `json:"project" koanf:"project"`
+		Log              *LogConfig         `json:"log" koanf:"log"`
+		PullRequest      *PullRequestConfig `json:"pr" koanf:"pr"`
+		Template         *TemplateConfig    `json:"template" koanf:"template"`
+		Git              *GitConfig         `json:"git" koanf:"git"`
+		RepositoryLabels RepositoryLabelMap `json:"repositoryLabels" koanf:"repositoryLabels"`
 	}
 	// ProjectConfig configures the main config settings
 	ProjectConfig struct {
@@ -70,6 +64,7 @@ type (
 		// Delete will remove this label.
 		Delete bool `json:"delete" koanf:"delete"`
 	}
+	RepositoryLabelMap map[string]RepositoryLabel
 
 	// SyncConfig configures a single repository sync
 	SyncConfig struct {
@@ -81,17 +76,10 @@ type (
 	// This structure is used to configuring the sync behaviour
 	// It is also passed to templates with filled-in information
 	GitConfig struct {
-		// Url is the full Git URL to the remote repository.
-		// This option is not configurable in `greposync.yml`.
-		// In templates, the URL is looking like ``
-		Url *url.URL `json:"-"`
-		// Dir is the relative path to current working directory where the repository is cloned locally.
-		// This option is not configurable in `greposync.yml`.
-		Dir        string `json:"-"`
-		SkipReset  bool   `json:"skipReset"`
-		SkipCommit bool   `json:"skipCommit"`
-		SkipPush   bool   `json:"skipPush"`
-		ForcePush  bool   `json:"forcePush"`
+		SkipReset  bool `json:"skipReset"`
+		SkipCommit bool `json:"skipCommit"`
+		SkipPush   bool `json:"skipPush"`
+		ForcePush  bool `json:"forcePush"`
 		// Amend will amend the last commit.
 		// This option is not configurable in `greposync.yml`.
 		// Configurable only via environment variables or CLI flag.
@@ -107,8 +95,6 @@ type (
 		// Namespace is the repository owner without the repository name.
 		// This is often a user or organization name in GitHub.com or GitLab.com.
 		Namespace string `json:"namespace"`
-		// Provider is the Git remote hosting identifier.
-		Provider core.GitHostingProvider `json:"-"`
 	}
 	// TemplateConfig configures template settings
 	TemplateConfig struct {
@@ -140,4 +126,32 @@ func NewDefaultConfig() *Configuration {
 			RootDir: "template",
 		},
 	}
+}
+
+func (s RepositoryLabelMap) Values() []RepositoryLabel {
+	list := make([]RepositoryLabel, 0)
+	for _, label := range s {
+		list = append(list, label)
+	}
+	return list
+}
+
+func (s RepositoryLabelMap) SelectDeletions() []RepositoryLabel {
+	list := make([]RepositoryLabel, 0)
+	for _, label := range s {
+		if label.Delete {
+			list = append(list, label)
+		}
+	}
+	return list
+}
+
+func (s RepositoryLabelMap) SelectModifications() []RepositoryLabel {
+	list := make([]RepositoryLabel, 0)
+	for _, label := range s {
+		if !label.Delete {
+			list = append(list, label)
+		}
+	}
+	return list
 }
