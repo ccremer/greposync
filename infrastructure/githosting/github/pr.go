@@ -78,7 +78,7 @@ func (r *GhRemote) canSkipDescriptionUpdate(cached *github.PullRequest, pr *doma
 }
 
 func (r *GhRemote) canSkipLabelUpdate(cached *github.PullRequest, pr *domain.PullRequest) bool {
-	converted := LabelConverter{}.ConvertToEntity(cached.Labels)
+	converted := LabelSetConverter{}.ConvertToEntity(cached.Labels)
 	diff := pr.GetLabels().DifferenceOf(converted)
 	return len(diff) == 0
 }

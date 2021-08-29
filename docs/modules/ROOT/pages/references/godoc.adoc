@@ -199,7 +199,6 @@ type GitConfig struct {
     DefaultBranch    string
     Name             string
     Namespace        string
-    Provider         core.GitHostingProvider
 }
 ----
 
@@ -241,9 +240,6 @@ Name is the git repository name without .git extension.
 Namespace::
 Namespace is the repository owner without the repository name.
 This is often a user or organization name in GitHub.com or GitLab.com.
-
-Provider::
-Provider is the Git remote hosting identifier.
 
 
 

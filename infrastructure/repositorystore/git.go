@@ -25,6 +25,10 @@ func execGitCommand(rootDir domain.Path, args []string) (stdOut, stdErr string, 
 	return stdout.String(), stderr.String(), err
 }
 
+func mergeWithStdErr(err error, stderr string) error {
+	return fmt.Errorf("%w: %s", err, stderr)
+}
+
 func hasRemoteBranch(repository *domain.GitRepository, branch string) (bool, error) {
 	out, stderr, err := execGitCommand(repository.RootDir, []string{"branch", "-r", "--list"})
 	return parseBranch(err, stderr, out, branch)

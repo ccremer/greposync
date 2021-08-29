@@ -10,11 +10,12 @@ import (
 	"github.com/ccremer/greposync/cli"
 	"github.com/ccremer/greposync/cli/labels"
 	"github.com/ccremer/greposync/cli/update"
+	"github.com/ccremer/greposync/domain"
+	"github.com/ccremer/greposync/infrastructure/githosting"
 	"github.com/ccremer/greposync/infrastructure/githosting/github"
 	"github.com/ccremer/greposync/infrastructure/repositorystore"
 	"github.com/ccremer/greposync/infrastructure/templateengine/gotemplate"
 	"github.com/ccremer/greposync/infrastructure/valuestore"
-	"github.com/ccremer/greposync/pkg/repository"
 )
 
 // Injectors from wire.go:
@@ -22,16 +23,19 @@ import (
 func initInjector() *injector {
 	versionInfo := _wireVersionInfoValue
 	configuration := cfg.NewDefaultConfig()
+	repositoryStore := repositorystore.NewRepositoryStore()
 	ghRemote := github.NewRemote()
 	providerMap := newGitProviders(ghRemote)
-	repositoryStore := repository.NewRepositoryStore(configuration, providerMap)
-	command := labels.NewCommand(configuration, repositoryStore)
+	labelStore := githosting.NewLabelStore(providerMap)
+	appService := labels.NewConfigurator(repositoryStore, labelStore)
+	command := labels.NewCommand(configuration, appService)
 	goTemplateEngine := gotemplate.NewEngine()
-	repositorystoreRepositoryStore := repositorystore.NewRepositoryStore()
 	goTemplateStore := gotemplate.NewTemplateStore()
 	koanfValueStore := valuestore.NewValueStore()
-	appService := update.NewConfigurator(goTemplateEngine, repositorystoreRepositoryStore, goTemplateStore, koanfValueStore)
-	updateCommand := update.NewCommand(configuration, appService)
+	pullRequestStore := githosting.NewPullRequestStore(providerMap)
+	renderService := domain.NewRenderService()
+	updateAppService := update.NewConfigurator(goTemplateEngine, repositoryStore, goTemplateStore, koanfValueStore, pullRequestStore, renderService)
+	updateCommand := update.NewCommand(configuration, updateAppService)
 	app := cli.NewApp(versionInfo, configuration, command, updateCommand)
 	mainInjector := NewInjector(app)
 	return mainInjector
@@ -60,6 +64,6 @@ func (i *injector) RunApp() {
 	i.app.Run()
 }
 
-func newGitProviders(ghRemote *github.GhRemote) repository.ProviderMap {
-	return repository.ProviderMap{github.ProviderKey: ghRemote}
+func newGitProviders(ghRemote *github.GhRemote) githosting.ProviderMap {
+	return githosting.ProviderMap{github.ProviderKey: ghRemote}
 }

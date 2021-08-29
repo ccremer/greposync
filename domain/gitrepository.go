@@ -1,7 +1,7 @@
 package domain
 
 type GitRepository struct {
-	RootDir      Path
+	RootDir     Path
 	URL         *GitURL
 	PullRequest *PullRequest
 	Labels      LabelSet
@@ -10,16 +10,11 @@ type GitRepository struct {
 	DefaultBranch string
 }
 
-func NewGitRepository(u *GitURL, root Path, labels LabelSet) (*GitRepository, error) {
-	r := &GitRepository{
+func NewGitRepository(u *GitURL, root Path) *GitRepository {
+	return &GitRepository{
 		URL:     u,
 		RootDir: root,
 	}
-	if err := r.validateLabels(labels); hasFailed(err) {
-		return r, err
-	}
-	r.Labels = labels
-	return r, nil
 }
 
 func (r *GitRepository) validateLabels(labels LabelSet) error {

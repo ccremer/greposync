@@ -4,6 +4,7 @@ import (
 	"context"
 	"os"
 	"sync"
+	"time"
 
 	"github.com/ccremer/greposync/domain"
 	"github.com/ccremer/greposync/infrastructure/githosting"
@@ -15,11 +16,12 @@ import (
 type (
 	// GhRemote contains the methods and data to interact with the GitHub API.
 	GhRemote struct {
-		client *github.Client
-		ctx    context.Context
-		log    printer.Printer
-		m       *sync.Mutex
-		prCache map[int]*github.PullRequest
+		client     *github.Client
+		ctx        context.Context
+		log        printer.Printer
+		m          *sync.Mutex
+		prCache    map[int]*github.PullRequest
+		labelCache map[*domain.GitURL][]*github.Label
 	}
 )
 
@@ -30,11 +32,12 @@ const ProviderKey githosting.RemoteProvider = "github"
 func NewRemote() *GhRemote {
 	ctx := context.Background()
 	provider := &GhRemote{
-		log:     printer.New(),
-		m:       &sync.Mutex{},
-		ctx:     ctx,
-		client:  createClient(os.Getenv("GITHUB_TOKEN"), ctx),
-		prCache: map[int]*github.PullRequest{},
+		log:        printer.New(),
+		m:          &sync.Mutex{},
+		ctx:        ctx,
+		client:     createClient(os.Getenv("GITHUB_TOKEN"), ctx),
+		prCache:    map[int]*github.PullRequest{},
+		labelCache: map[*domain.GitURL][]*github.Label{},
 	}
 	return provider
 }
@@ -51,4 +54,13 @@ func createClient(token string, ctx context.Context) *github.Client {
 
 func (r *GhRemote) HasSupportFor(url *domain.GitURL) bool {
 	return url.Host == "github.com"
+}
+
+// delay sleeps one second for abuse rate limit best-practice.
+//
+// https://docs.github.com/en/rest/guides/best-practices-for-integrators#dealing-with-abuse-rate-limits
+// "If you're making a large number of POST, PATCH, PUT, or DELETE requests for a single user or client ID, wait at least one second between each request."
+func (r *GhRemote) delay() {
+	time.Sleep(1 * time.Second)
+	r.m.Unlock()
 }

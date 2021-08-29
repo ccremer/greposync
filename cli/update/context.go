@@ -4,15 +4,15 @@ import (
 	pipeline "github.com/ccremer/go-command-pipeline"
 	"github.com/ccremer/go-command-pipeline/predicate"
 	"github.com/ccremer/greposync/domain"
+	"github.com/ccremer/greposync/infrastructure/repositorystore"
 	"github.com/ccremer/greposync/printer"
 )
 
 type pipelineContext struct {
-	log           printer.Printer
-	repo          *domain.GitRepository
-	renderService *domain.RenderService
-	appService    *AppService
-	differ        *Differ
+	log        printer.Printer
+	repo       *domain.GitRepository
+	appService *AppService
+	differ     *Differ
 }
 
 func (c *pipelineContext) clone() pipeline.ActionFunc {
@@ -40,8 +40,9 @@ func (c *pipelineContext) add() pipeline.ActionFunc {
 }
 
 func (c *pipelineContext) commit() pipeline.ActionFunc {
-	return func() pipeline.Result {
+	return func(_ pipeline.Context) pipeline.Result {
 		err := c.appService.repoStore.Commit(c.repo, domain.CommitOptions{
+			// TODO: make configurable
 			Message: "asdf",
 			Amend:   true,
 		})
@@ -50,7 +51,7 @@ func (c *pipelineContext) commit() pipeline.ActionFunc {
 }
 
 func (c *pipelineContext) diff() pipeline.ActionFunc {
-	return func() pipeline.Result {
+	return func(_ pipeline.Context) pipeline.Result {
 		diff, err := c.appService.repoStore.Diff(c.repo)
 		if err != nil {
 			return pipeline.Result{Err: err}
@@ -60,14 +61,31 @@ func (c *pipelineContext) diff() pipeline.ActionFunc {
 	}
 }
 
+func (c *pipelineContext) push() pipeline.ActionFunc {
+	return func(ctx pipeline.Context) pipeline.Result {
+		err := c.appService.repoStore.Push(c.repo, domain.PushOptions{
+			// TODO: make configurable
+			Force: true,
+		})
+		return pipeline.Result{Err: err}
+	}
+}
+
 func (c *pipelineContext) renderTemplates() pipeline.ActionFunc {
-	return func() pipeline.Result {
-		err := c.renderService.RenderTemplates(domain.RenderContext{
+	return func(_ pipeline.Context) pipeline.Result {
+		err := c.appService.renderService.RenderTemplates(domain.RenderContext{
 			Repository:    c.repo,
 			ValueStore:    c.appService.valueStore,
 			TemplateStore: c.appService.templateStore,
 			Engine:        c.appService.engine,
 		})
+		return pipeline.Result{Err: err}
+	}
+}
+
+func (c *pipelineContext) ensurePullRequest() pipeline.ActionFunc {
+	return func(_ pipeline.Context) pipeline.Result {
+		err := c.appService.prStore.EnsurePullRequest(c.repo)
 		return pipeline.Result{Err: err}
 	}
 }
@@ -78,9 +96,33 @@ func (c *pipelineContext) dirMissing() predicate.Predicate {
 	}
 }
 
+func (c *pipelineContext) isDirty() predicate.Predicate {
+	return func(step pipeline.Step) bool {
+		return c.appService.repoStore.IsDirty(c.repo)
+	}
+}
+
+func (c *pipelineContext) hasCommits() predicate.Predicate {
+	return func(step pipeline.Step) bool {
+		hasCommits, err := repositorystore.HasCommitsBetween(c.repo, c.repo.DefaultBranch, c.repo.CommitBranch)
+		if err != nil {
+			c.log.WarnF("%w", err)
+		}
+		return hasCommits
+	}
+}
+
 func (c *pipelineContext) toAction(f func(repository *domain.GitRepository) error) pipeline.ActionFunc {
-	return func() pipeline.Result {
+	return func(_ pipeline.Context) pipeline.Result {
 		err := f(c.repo)
+		return pipeline.Result{Err: err}
+	}
+}
+
+func (c *pipelineContext) fetchPullRequest() pipeline.ActionFunc {
+	return func(_ pipeline.Context) pipeline.Result {
+		pr, err := c.appService.prStore.FindMatchingPullRequest(c.repo)
+		c.repo.PullRequest = pr
 		return pipeline.Result{Err: err}
 	}
 }

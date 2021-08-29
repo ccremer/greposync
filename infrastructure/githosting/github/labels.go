@@ -1,124 +1,131 @@
 package github
 
 import (
-	"time"
-
-	"github.com/ccremer/greposync/cfg"
-	"github.com/ccremer/greposync/core"
 	"github.com/ccremer/greposync/domain"
 	"github.com/google/go-github/v38/github"
 )
 
-type LabelImpl struct {
-	// Name is the label name.
-	Name string `json:"name" koanf:"name"`
-	// Description is a short description of the label.
-	Description string `json:"description" koanf:"description"`
-	// Color is the hexadecimal color code for the label, without the leading #.
-	Color string `json:"color" koanf:"color"`
-	// Inactive will remove this label.
-	Inactive bool `json:"delete" koanf:"delete"`
-
-	remote  *GhRemote
-	repo    *core.GitURL
-	ghLabel *github.Label
-}
-
-func (l *LabelImpl) IsInactive() bool {
-	return l.Inactive
-}
-
-func (l *LabelImpl) GetName() string {
-	return l.Name
-}
-
-func (l *LabelImpl) Delete() (bool, error) {
-	return l.remote.deleteLabel(l.repo, l.Name)
-}
-
-func (r *GhRemote) FindLabels(url *domain.GitURL) ([]*domain.Label, error) {
+// FetchLabels implements githosting.Remote.
+func (r *GhRemote) FetchLabels(url *domain.GitURL) (domain.LabelSet, error) {
 	ghLabels, err := r.fetchAllLabels(url)
-	if err != nil {
-		return []core.Label{}, err
+	if err == nil {
+		r.labelCache[url] = ghLabels
 	}
-	var impls = make([]*LabelImpl, len(labels))
-	for i, configLabel := range labels {
-		impl := &LabelImpl{
-			Name:        configLabel.Name,
-			Description: configLabel.Description,
-			Color:       configLabel.Color,
-			Inactive:    configLabel.Delete,
-			remote:      r,
-			repo:        url,
+	return LabelSetConverter{}.ConvertToEntity(ghLabels), err
+}
+
+// EnsureLabels implements githosting.Remote.
+func (r *GhRemote) EnsureLabels(url *domain.GitURL, labels domain.LabelSet) error {
+	for _, label := range labels {
+		cached, exists := r.findCachedLabel(url, label)
+		if exists && r.hasLabelChanged(cached, label) {
+			err := r.updateLabel(url, cached, label)
+			if err != nil {
+				return err
+			}
+			continue
 		}
-		ghLabel := r.findMatchingGhLabel(ghLabels, impl)
-		impl.ghLabel = ghLabel
-		impls[i] = impl
-	}
-	return LabelConverter{}.ConvertToEntity(impls), nil
-}
-
-// FindLabels implements githosting.Remote.
-func (r *GhRemote) FindLabels(url *core.GitURL, labels []*cfg.RepositoryLabel) ([]core.Label, error) {
-	ghLabels, err := r.fetchAllLabels(url)
-	if err != nil {
-		return []core.Label{}, err
-	}
-	var impls = make([]*LabelImpl, len(labels))
-	for i, configLabel := range labels {
-		impl := &LabelImpl{
-			Name:        configLabel.Name,
-			Description: configLabel.Description,
-			Color:       configLabel.Color,
-			Inactive:    configLabel.Delete,
-			remote:      r,
-			repo:        url,
+		err := r.createLabel(url, label)
+		if err != nil {
+			return err
 		}
-		ghLabel := r.findMatchingGhLabel(ghLabels, impl)
-		impl.ghLabel = ghLabel
-		impls[i] = impl
 	}
-	return LabelConverter{}.ConvertToEntity(impls), nil
+	return nil
 }
 
-func (l *LabelImpl) Ensure() (bool, error) {
-	if l.ghLabel == nil {
-		return true, l.remote.createLabel(l.repo, l)
+// DeleteLabels implements githosting.Remote.
+func (r *GhRemote) DeleteLabels(url *domain.GitURL, labels domain.LabelSet) error {
+	for _, label := range labels {
+		var converted *github.Label
+		cached, exists := r.findCachedLabel(url, label)
+		if exists {
+			converted = cached
+		} else {
+			converted = LabelConverter{}.ConvertFromEntity(label)
+		}
+		_, err := r.deleteLabel(url, converted)
+		if err != nil {
+			return err
+		}
 	}
-	if !l.remote.hasLabelChanged(l.ghLabel, l) {
-		return false, nil
-	}
-	return true, l.remote.updateLabel(l.repo, l.ghLabel, l)
+	return nil
 }
 
-func (r *GhRemote) createLabel(url *core.GitURL, label *LabelImpl) error {
+func (r *GhRemote) findCachedLabel(url *domain.GitURL, label domain.Label) (*github.Label, bool) {
+	cachedSet, exists := r.labelCache[url]
+	if !exists {
+		return nil, false
+	}
+	for _, cached := range cachedSet {
+		if *cached.Name == label.Name {
+			return cached, true
+		}
+	}
+	return nil, false
+}
+
+func (r *GhRemote) updateLabelCache(url *domain.GitURL, label *github.Label) {
+	cachedSet, exists := r.labelCache[url]
+	if !exists {
+		r.labelCache[url] = []*github.Label{label}
+		return
+	}
+	for i, cached := range cachedSet {
+		if cached.GetName() == label.GetName() {
+			cachedSet[i] = label
+			return
+		}
+	}
+	cachedSet = append(cachedSet, label)
+	r.labelCache[url] = cachedSet
+}
+
+func (r *GhRemote) removeLabelFromCache(url *domain.GitURL, label *github.Label) {
+	cachedSet, exists := r.labelCache[url]
+	if !exists {
+		return
+	}
+	for i, cached := range cachedSet {
+		if cached.GetName() == label.GetName() {
+			// replace the existing index with the last element
+			cachedSet[i] = cachedSet[len(cachedSet)-1]
+			// remove the (duplicated) last element
+			newSet := cachedSet[:len(cachedSet)-1]
+			r.labelCache[url] = newSet
+			return
+		}
+	}
+}
+
+func (r *GhRemote) createLabel(url *domain.GitURL, label domain.Label) error {
 	r.m.Lock()
 	defer r.delay()
-	_, _, err := r.client.Issues.CreateLabel(r.ctx, url.GetNamespace(), url.GetRepositoryName(), &github.Label{
-		Name:        &label.Name,
-		Color:       &label.Color,
-		Description: &label.Description,
-	})
+	converted := LabelConverter{}.ConvertFromEntity(label)
+	newLabel, _, err := r.client.Issues.CreateLabel(r.ctx, url.GetNamespace(), url.GetRepositoryName(), converted)
+	r.updateLabelCache(url, newLabel)
 	return err
 }
 
-func (r *GhRemote) updateLabel(url *core.GitURL, ghLabel *github.Label, label *LabelImpl) error {
+func (r *GhRemote) updateLabel(url *domain.GitURL, ghLabel *github.Label, label domain.Label) error {
 	r.m.Lock()
 	defer r.delay()
-	// TODO: Without a new_name property we cannot rename a label yet.
 	ghLabel.Description = &label.Description
-	ghLabel.Color = &label.Color
-	_, _, err := r.client.Issues.EditLabel(r.ctx, url.GetNamespace(), url.GetRepositoryName(), label.Name, ghLabel)
+	ghLabel.Color = ColorConverter{}.ConvertFromEntity(label.GetColor())
+	updatedLabel, _, err := r.client.Issues.EditLabel(r.ctx, url.GetNamespace(), url.GetRepositoryName(), label.Name, ghLabel)
+	r.updateLabelCache(url, updatedLabel)
 	return err
 }
 
-func (r *GhRemote) deleteLabel(url *core.GitURL, name string) (bool, error) {
+func (r *GhRemote) deleteLabel(url *domain.GitURL, label *github.Label) (bool, error) {
 	r.m.Lock()
 	defer r.delay()
-	resp, err := r.client.Issues.DeleteLabel(r.ctx, url.GetNamespace(), url.GetRepositoryName(), name)
+	resp, err := r.client.Issues.DeleteLabel(r.ctx, url.GetNamespace(), url.GetRepositoryName(), label.GetName())
 	if resp != nil && resp.StatusCode == 404 {
 		// Not an error
 		return false, nil
+	}
+	if err == nil {
+		r.removeLabelFromCache(url, label)
 	}
 	return err == nil, err
 }
@@ -143,24 +150,7 @@ func (r *GhRemote) fetchAllLabels(url *domain.GitURL) ([]*github.Label, error) {
 	return allLabels, nil
 }
 
-func (r *GhRemote) findMatchingGhLabel(ghLabels []*github.Label, toFind *LabelImpl) *github.Label {
-	for _, label := range ghLabels {
-		if label.GetName() == toFind.Name {
-			return label
-		}
-	}
-	return nil
-}
-
-func (r *GhRemote) hasLabelChanged(ghLabel *github.Label, repoLabel *LabelImpl) bool {
-	return ghLabel.GetDescription() != repoLabel.Description || ghLabel.GetColor() != repoLabel.Color
-}
-
-// delay sleeps one second for abuse rate limit best-practice.
-//
-// https://docs.github.com/en/rest/guides/best-practices-for-integrators#dealing-with-abuse-rate-limits
-// "If you're making a large number of POST, PATCH, PUT, or DELETE requests for a single user or client ID, wait at least one second between each request."
-func (r *GhRemote) delay() {
-	time.Sleep(1 * time.Second)
-	r.m.Unlock()
+func (r *GhRemote) hasLabelChanged(ghLabel *github.Label, repoLabel domain.Label) bool {
+	converted := ColorConverter{}.ConvertFromEntity(repoLabel.GetColor())
+	return ghLabel.GetDescription() != repoLabel.Description || ghLabel.GetColor() != *converted
 }

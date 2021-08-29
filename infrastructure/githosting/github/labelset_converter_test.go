@@ -3,39 +3,24 @@ package github
 import (
 	"testing"
 
+	"github.com/google/go-github/v38/github"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestLabelConverter_convertEntity(t *testing.T) {
+func TestLabelSetConverter_ConvertToEntity(t *testing.T) {
 	tests := map[string]struct {
-		givenLabels []*LabelImpl
+		givenLabels []*github.Label
 	}{
-		"GivenActualListWithLabels_WhenConverting_ThenConvertTypes": {
-			givenLabels: []*LabelImpl{
-				{
-					Name:        "label1",
-					Description: "active label",
-					Color:       "ABABAB",
-					Inactive:    false,
-				},
-				{
-					Name:        "label2",
-					Description: "dead label",
-					Color:       "ABABAB",
-					Inactive:    true,
-				},
-			},
-		},
 		"GivenNilSlices_WhenConverting_ThenReturnEmpty": {
 			givenLabels: nil,
 		},
 		"GivenEmptySlices_WhenConverting_ThenReturnEmpty": {
-			givenLabels: []*LabelImpl{},
+			givenLabels: []*github.Label{},
 		},
 	}
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
-			converter := LabelConverter{}
+			converter := LabelSetConverter{}
 			asEntities := converter.ConvertToEntity(tt.givenLabels)
 			assert.Len(t, asEntities, len(tt.givenLabels))
 			for i := range asEntities {

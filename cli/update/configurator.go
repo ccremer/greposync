@@ -11,6 +11,8 @@ type AppService struct {
 	repoStore     *repositorystore.RepositoryStore
 	templateStore *gotemplate.GoTemplateStore
 	valueStore    domain.ValueStore
+	prStore       domain.PullRequestStore
+	renderService *domain.RenderService
 }
 
 func NewConfigurator(
@@ -18,12 +20,16 @@ func NewConfigurator(
 	repoStore *repositorystore.RepositoryStore,
 	templateStore *gotemplate.GoTemplateStore,
 	valueStore domain.ValueStore,
+	prStore domain.PullRequestStore,
+	renderService *domain.RenderService,
 ) *AppService {
 	return &AppService{
 		engine:        engine,
 		repoStore:     repoStore,
 		templateStore: templateStore,
 		valueStore:    valueStore,
+		prStore:       prStore,
+		renderService: renderService,
 	}
 }
 

@@ -2,14 +2,11 @@ package update
 
 import (
 	"fmt"
-	"net/url"
 
 	pipeline "github.com/ccremer/go-command-pipeline"
 	"github.com/ccremer/go-command-pipeline/parallel"
 	"github.com/ccremer/go-command-pipeline/predicate"
 	"github.com/ccremer/greposync/cfg"
-	"github.com/ccremer/greposync/core"
-	"github.com/ccremer/greposync/core/pullrequest"
 	"github.com/ccremer/greposync/domain"
 	"github.com/ccremer/greposync/printer"
 	"github.com/hashicorp/go-multierror"
@@ -70,8 +67,11 @@ func (c *Command) createPipeline(r *domain.GitRepository) *pipeline.Pipeline {
 		},
 	}
 	c.configurator.repoStore.DefaultNamespace = c.cfg.Git.Namespace
+	// temporary flags
+	resetRepo := true
+	enabledCommits := true
+	enabledPush := true
 
-	resetRepo := true // temporary
 	repoCtx := &pipelineContext{
 		repo:       r,
 		appService: c.configurator,
@@ -81,7 +81,6 @@ func (c *Command) createPipeline(r *domain.GitRepository) *pipeline.Pipeline {
 		},
 	}
 
-	repoUrl := sc.Git.Url
 	logger := printer.PipelineLogger{Logger: log}
 	p := pipeline.NewPipelineWithLogger(logger)
 	p.WithSteps(
@@ -100,11 +99,12 @@ func (c *Command) createPipeline(r *domain.GitRepository) *pipeline.Pipeline {
 				pipeline.NewStep("commit", repoCtx.commit()),
 				pipeline.NewStep("show diff", repoCtx.diff()),
 			),
-			predicate.And(nil, nil)),
-		predicate.ToStep("push changes", nil, predicate.And(nil, nil)),
-		predicate.ToStep("pull request", c.ensurePullRequest(repoUrl), predicate.And(nil, predicate.Bool(sc.PullRequest.Create))),
-		pipeline.NewStep("end", func() pipeline.Result {
-			log.InfoF("Pipeline for '%s/%s' finished", sc.Git.Namespace, sc.Git.Name)
+			predicate.And(predicate.Bool(enabledCommits), repoCtx.isDirty())),
+		predicate.ToStep("push changes", repoCtx.push(), predicate.And(predicate.Bool(enabledPush), repoCtx.hasCommits())),
+		predicate.ToStep("find existing pull request", repoCtx.fetchPullRequest(), predicate.Bool(sc.PullRequest.Create)),
+		predicate.ToStep("update pull request", repoCtx.ensurePullRequest(), predicate.And(repoCtx.hasCommits(), predicate.Bool(sc.PullRequest.Create))),
+		pipeline.NewStep("end", func(_ pipeline.Context) pipeline.Result {
+			log.InfoF("Pipeline for '%s/%s' finished", r.URL.GetNamespace(), r.URL.GetRepositoryName())
 			return pipeline.Result{}
 		}),
 	)
@@ -133,28 +133,15 @@ func (c *Command) errorHandler() parallel.ResultHandler {
 	}
 }
 
-func (c *Command) ensurePullRequest(url *url.URL) pipeline.ActionFunc {
-	return c.fireEvent(url, pullrequest.EnsurePullRequestEvent)
-}
-
-func (c *Command) fireEvent(u *url.URL, event core.EventName) pipeline.ActionFunc {
-	return func() pipeline.Result {
-		result := <-core.FireEvent(event, core.EventSource{
-			Url: core.FromURL(u),
-		})
-		return pipeline.Result{Err: result.Error}
-	}
-}
-
 func (c *Command) configureInfrastructure() pipeline.ActionFunc {
-	return func() pipeline.Result {
+	return func(_ pipeline.Context) pipeline.Result {
 		c.configurator.ConfigureInfrastructure()
 		return pipeline.Result{}
 	}
 }
 
-func (c *Command) fetchRepositories() func() pipeline.Result {
-	return func() pipeline.Result {
+func (c *Command) fetchRepositories() pipeline.ActionFunc {
+	return func(_ pipeline.Context) pipeline.Result {
 		repos, err := c.configurator.repoStore.FetchGitRepositories()
 		c.repositories = repos
 		return pipeline.Result{Err: err}

@@ -25,7 +25,7 @@ func (c PrConverter) ConvertToEntity(pr *github.PullRequest) *domain.PullRequest
 		BaseBranch:   *pr.Base.Ref,
 	}
 
-	set := LabelConverter{}.ConvertToEntity(pr.Labels)
+	set := LabelSetConverter{}.ConvertToEntity(pr.Labels)
 	// TODO: At least log a warning.
 	// We don't expect invalid colors if coming from a repository, but that's just an assumption
 	_ = entity.AttachLabels(set)
@@ -42,7 +42,7 @@ func (c PrConverter) ConvertFromEntity(entity *domain.PullRequest) *github.PullR
 		Number: c.toGhNumber(entity.Number),
 		Title:  &entity.Title,
 		Body:   &entity.Body,
-		Labels: LabelConverter{}.ConvertFromEntity(entity.GetLabels()),
+		Labels: LabelSetConverter{}.ConvertFromEntity(entity.GetLabels()),
 	}
 	return pr
 }

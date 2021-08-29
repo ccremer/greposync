@@ -5,7 +5,7 @@ import (
 	"os"
 
 	pipeline "github.com/ccremer/go-command-pipeline"
-	"github.com/ccremer/greposync/core"
+	"golang.org/x/sys/unix"
 )
 
 type RenderService struct{}
@@ -34,7 +34,7 @@ func (s *RenderService) RenderTemplates(ctx RenderContext) error {
 }
 
 func (ctx *RenderContext) preFlightCheck() pipeline.ActionFunc {
-	return func() pipeline.Result {
+	return func(_ pipeline.Context) pipeline.Result {
 		err := firstOf(
 			checkIfArgumentNil(ctx.Engine, "Engine"),
 			checkIfArgumentNil(ctx.Repository, "Repository"),
@@ -46,14 +46,14 @@ func (ctx *RenderContext) preFlightCheck() pipeline.ActionFunc {
 }
 
 func (ctx *RenderContext) toAction(action func() error) pipeline.ActionFunc {
-	return func() pipeline.Result {
+	return func(_ pipeline.Context) pipeline.Result {
 		return pipeline.Result{Err: action()}
 	}
 }
 
 func (ctx *RenderContext) renderTemplates() error {
 	for _, template := range ctx.templates {
-		if unmanaged, err := ctx.ValueStore.FetchUnmanagedFlag(template, ctx.Repository); err != nil && !errors.Is(err, core.ErrKeyNotFound) {
+		if unmanaged, err := ctx.ValueStore.FetchUnmanagedFlag(template, ctx.Repository); err != nil && !errors.Is(err, ErrKeyNotFound) {
 			return err
 		} else if unmanaged {
 			continue
@@ -67,6 +67,10 @@ func (ctx *RenderContext) renderTemplates() error {
 }
 
 func (ctx *RenderContext) renderTemplate(template *Template) error {
+	// This allows us to create files with 777 permissions
+	originalUmask := unix.Umask(0)
+	defer unix.Umask(originalUmask)
+
 	alternativePath, err := ctx.ValueStore.FetchTargetPath(template, ctx.Repository)
 	if err != nil {
 		return err

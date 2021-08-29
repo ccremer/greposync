@@ -62,3 +62,16 @@ func (s *RepositoryStore) Diff(repository *domain.GitRepository) (string, error)
 	}
 	return out, nil
 }
+
+func (s *RepositoryStore) IsDirty(repository *domain.GitRepository) bool {
+	out, stderr, err := execGitCommand(repository.RootDir, []string{"status", "--short"})
+	if err != nil {
+		s.log.WarnF("Could not determine working tree status: %s: %w", stderr, err)
+		return true
+	}
+	if out == "" {
+		s.log.InfoF("Nothing to commit, working tree clean")
+		return false
+	}
+	return true
+}

@@ -48,4 +48,3 @@ func TestColor_CheckValue(t *testing.T) {
 		})
 	}
 }
-

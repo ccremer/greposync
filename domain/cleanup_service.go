@@ -30,7 +30,7 @@ func (s *CleanupService) CleanupUnwantedFiles(ctx CleanupContext) error {
 }
 
 func (ctx *CleanupContext) preFlightCheck() pipeline.ActionFunc {
-	return func() pipeline.Result {
+	return func(_ pipeline.Context) pipeline.Result {
 		err := firstOf(
 			checkIfArgumentNil(ctx.Repository, "Repository"),
 			checkIfArgumentNil(ctx.ValueStore, "ValueStore"),
@@ -40,7 +40,7 @@ func (ctx *CleanupContext) preFlightCheck() pipeline.ActionFunc {
 }
 
 func (ctx *CleanupContext) toAction(action func() error) pipeline.ActionFunc {
-	return func() pipeline.Result {
+	return func(_ pipeline.Context) pipeline.Result {
 		return pipeline.Result{Err: action()}
 	}
 }

@@ -77,3 +77,16 @@ func (s *RepositoryStore) Pull(repository *domain.GitRepository) error {
 	}
 	return nil
 }
+
+func (s *RepositoryStore) Push(repository *domain.GitRepository, options domain.PushOptions) error {
+	args := []string{"push", "origin", repository.CommitBranch}
+	if options.Force {
+		args = append(args, "--force")
+	}
+	out, stderr, err := execGitCommand(repository.RootDir, s.logArgs(args))
+	if err != nil {
+		return mergeWithStdErr(err, stderr)
+	}
+	s.log.DebugF(out)
+	return nil
+}

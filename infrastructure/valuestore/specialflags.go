@@ -5,7 +5,6 @@ import (
 	"path"
 	"strings"
 
-	"github.com/ccremer/greposync/core"
 	"github.com/ccremer/greposync/domain"
 	"github.com/knadh/koanf"
 )
@@ -48,7 +47,7 @@ func (k *KoanfValueStore) loadBooleanFlag(repoKoanf *koanf.Koanf, relativePath, 
 	if exists {
 		return flag == true, nil
 	}
-	return false, core.ErrKeyNotFound
+	return false, domain.ErrKeyNotFound
 }
 
 func (k *KoanfValueStore) loadTargetPath(repoKoanf *koanf.Koanf, relativePath string) (domain.Path, error) {

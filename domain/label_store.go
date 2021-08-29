@@ -1,7 +1,7 @@
 package domain
 
 type LabelStore interface {
-	AddLabel(repository *GitRepository, label Label) error
-	RemoveLabel(repository *GitRepository, label Label) error
 	FetchLabelsForRepository(url *GitURL) (LabelSet, error)
+	EnsureLabelsForRepository(url *GitURL, labels LabelSet) error
+	RemoveLabelsFromRepository(url *GitURL, labels LabelSet) error
 }

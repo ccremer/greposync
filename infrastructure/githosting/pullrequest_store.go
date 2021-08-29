@@ -23,7 +23,7 @@ func (p *PullRequestStore) FindMatchingPullRequest(repository *domain.GitReposit
 			return pr, err
 		}
 	}
-	return nil, fmt.Errorf("no remote providers supported: %s", repository.URL)
+	return nil, fmt.Errorf("%s: %w", repository.URL, ErrProviderNotSupported)
 }
 
 func (p *PullRequestStore) EnsurePullRequest(repository *domain.GitRepository) error {
@@ -32,5 +32,5 @@ func (p *PullRequestStore) EnsurePullRequest(repository *domain.GitRepository) e
 			return remote.EnsurePullRequest(repository.URL, repository.PullRequest)
 		}
 	}
-	return fmt.Errorf("no remote providers supported: %s", repository.URL)
+	return fmt.Errorf("%s: %w", repository.URL, ErrProviderNotSupported)
 }
