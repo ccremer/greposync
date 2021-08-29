@@ -5,8 +5,8 @@ import (
 	"regexp"
 
 	"github.com/ccremer/greposync/cfg"
-	"github.com/ccremer/greposync/cli/clierror"
-	"github.com/ccremer/greposync/cli/flags"
+	"github.com/ccremer/greposync/application/clierror"
+	"github.com/ccremer/greposync/application/flags"
 	"github.com/ccremer/greposync/printer"
 	"github.com/urfave/cli/v2"
 )

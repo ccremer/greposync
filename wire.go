@@ -4,9 +4,9 @@ package main
 
 import (
 	"github.com/ccremer/greposync/cfg"
-	"github.com/ccremer/greposync/cli"
-	"github.com/ccremer/greposync/cli/labels"
-	"github.com/ccremer/greposync/cli/update"
+	"github.com/ccremer/greposync/application"
+	"github.com/ccremer/greposync/application/labels"
+	"github.com/ccremer/greposync/application/update"
 	"github.com/ccremer/greposync/domain"
 	"github.com/ccremer/greposync/infrastructure/githosting"
 	"github.com/ccremer/greposync/infrastructure/githosting/github"
@@ -17,11 +17,11 @@ import (
 )
 
 type injector struct {
-	app *cli.App
+	app *application.App
 }
 
 func NewInjector(
-	app *cli.App,
+	app *application.App,
 ) *injector {
 	i := &injector{
 		app: app,
@@ -38,9 +38,9 @@ func initInjector() *injector {
 		NewInjector,
 
 		// CLI
-		cli.NewApp,
+		application.NewApp,
 		update.NewConfigurator,
-		wire.Value(cli.VersionInfo{Version: version, Commit: commit, Date: date}),
+		wire.Value(application.VersionInfo{Version: version, Commit: commit, Date: date}),
 		cfg.NewDefaultConfig,
 		labels.NewCommand,
 		labels.NewConfigurator,

@@ -1,7 +1,7 @@
 package labels
 
 import (
-	"github.com/ccremer/greposync/cli/flags"
+	"github.com/ccremer/greposync/application/flags"
 	"github.com/urfave/cli/v2"
 )
 

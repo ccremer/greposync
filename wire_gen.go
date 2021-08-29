@@ -6,10 +6,10 @@
 package main
 
 import (
+	"github.com/ccremer/greposync/application"
+	"github.com/ccremer/greposync/application/labels"
+	"github.com/ccremer/greposync/application/update"
 	"github.com/ccremer/greposync/cfg"
-	"github.com/ccremer/greposync/cli"
-	"github.com/ccremer/greposync/cli/labels"
-	"github.com/ccremer/greposync/cli/update"
 	"github.com/ccremer/greposync/domain"
 	"github.com/ccremer/greposync/infrastructure/githosting"
 	"github.com/ccremer/greposync/infrastructure/githosting/github"
@@ -36,23 +36,23 @@ func initInjector() *injector {
 	renderService := domain.NewRenderService()
 	updateAppService := update.NewConfigurator(goTemplateEngine, repositoryStore, goTemplateStore, koanfValueStore, pullRequestStore, renderService)
 	updateCommand := update.NewCommand(configuration, updateAppService)
-	app := cli.NewApp(versionInfo, configuration, command, updateCommand)
+	app := application.NewApp(versionInfo, configuration, command, updateCommand)
 	mainInjector := NewInjector(app)
 	return mainInjector
 }
 
 var (
-	_wireVersionInfoValue = cli.VersionInfo{Version: version, Commit: commit, Date: date}
+	_wireVersionInfoValue = application.VersionInfo{Version: version, Commit: commit, Date: date}
 )
 
 // wire.go:
 
 type injector struct {
-	app *cli.App
+	app *application.App
 }
 
 func NewInjector(
-	app *cli.App,
+	app *application.App,
 ) *injector {
 	i := &injector{
 		app: app,
