@@ -1,0 +1,35 @@
+package labels
+
+import (
+	pipeline "github.com/ccremer/go-command-pipeline"
+	"github.com/ccremer/greposync/domain"
+)
+
+type labelUseCase struct {
+	appService *AppService
+}
+
+func (uc *labelUseCase) updateLabelsForRepository(r *domain.GitRepository) pipeline.ActionFunc {
+	return func(ctx pipeline.Context) pipeline.Result {
+		err := uc.appService.labelStore.EnsureLabelsForRepository(r.URL, r.Labels)
+		return pipeline.Result{Err: err}
+	}
+}
+
+func (uc *labelUseCase) fetchLabelsForRepository(r *domain.GitRepository) pipeline.ActionFunc {
+	return func(_ pipeline.Context) pipeline.Result {
+		labels, err := uc.appService.labelStore.FetchLabelsForRepository(r.URL)
+		if err != nil {
+			return pipeline.Result{Err: err}
+		}
+		err = r.SetLabels(labels)
+		return pipeline.Result{Err: err}
+	}
+}
+
+func (uc *labelUseCase) deleteLabelsForRepository(r *domain.GitRepository) pipeline.ActionFunc {
+	return func(ctx pipeline.Context) pipeline.Result {
+		// TODO: implement me
+		return pipeline.Result{}
+	}
+}

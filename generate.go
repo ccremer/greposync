@@ -8,6 +8,9 @@ package main
 // Generate fakes
 //go:generate go generate ./core
 
+// Generate dependency tree
+//go:generate go run github.com/google/wire/cmd/wire
+
 import (
 	"fmt"
 	"io/ioutil"
