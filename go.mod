@@ -8,7 +8,7 @@ require (
 	github.com/ccremer/go-command-pipeline v0.4.0
 	github.com/google/go-github/v38 v38.1.0
 	github.com/hashicorp/go-multierror v1.1.1
-	github.com/knadh/koanf v1.2.1
+	github.com/knadh/koanf v1.2.2
 	github.com/mariotoffia/goasciidoc v0.4.5
 	github.com/maxbrunsfeld/counterfeiter/v6 v6.4.1
 	github.com/stretchr/testify v1.7.0
