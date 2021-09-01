@@ -71,8 +71,8 @@ func (r *GhRemote) updatePrLabels(url *domain.GitURL, cached *github.PullRequest
 }
 
 func (r *GhRemote) canSkipDescriptionUpdate(cached *github.PullRequest, pr *domain.PullRequest) bool {
-	sameTitle := *cached.Title == pr.Title
-	sameBody := *cached.Body == pr.Body
+	sameTitle := *cached.Title == pr.GetTitle()
+	sameBody := *cached.Body == pr.GetBody()
 	return sameTitle && sameBody
 }
 
@@ -86,10 +86,10 @@ func (r *GhRemote) canSkipLabelUpdate(cached *github.PullRequest, pr *domain.Pul
 // Based on: https://godoc.org/github.com/google/go-github/github#example-PullRequestsService-Create
 func (r *GhRemote) createNewPr(url *domain.GitURL, pr *domain.PullRequest) error {
 	newPR := &github.NewPullRequest{
-		Title:               &pr.Title,
+		Title:               github.String(pr.GetTitle()),
 		Head:                &pr.CommitBranch,
 		Base:                &pr.BaseBranch,
-		Body:                &pr.Body,
+		Body:                github.String(pr.GetBody()),
 		MaintainerCanModify: github.Bool(true),
 	}
 

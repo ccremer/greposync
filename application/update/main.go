@@ -42,7 +42,6 @@ func NewCommand(
 		cfg:        cfg,
 		appService: configurator,
 	}
-	c.cliCommand = c.createCliCommand()
 	return c
 }
 
@@ -58,7 +57,7 @@ func (c *Command) runCommand(_ *cli.Context) error {
 }
 
 func (c *Command) createPipeline(r *domain.GitRepository) *pipeline.Pipeline {
-	log := printer.New().SetName(r.URL.GetRepositoryName()).SetLevel(printer.DefaultLevel)
+	log := printer.New().SetName(r.URL.GetFullName()).SetLevel(printer.DefaultLevel)
 
 	sc := &cfg.SyncConfig{
 		PullRequest: c.cfg.PullRequest,
@@ -67,10 +66,9 @@ func (c *Command) createPipeline(r *domain.GitRepository) *pipeline.Pipeline {
 		},
 	}
 
-	// temporary flags
-	resetRepo := true
-	enabledCommits := true
-	enabledPush := true
+	resetRepo := !c.cfg.Git.SkipReset
+	enabledCommits := !c.cfg.Git.SkipCommit
+	enabledPush := !c.cfg.Git.SkipPush
 
 	repoCtx := &pipelineContext{
 		repo:       r,

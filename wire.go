@@ -11,6 +11,7 @@ import (
 	"github.com/ccremer/greposync/infrastructure/githosting"
 	"github.com/ccremer/greposync/infrastructure/githosting/github"
 	"github.com/ccremer/greposync/infrastructure/repositorystore"
+	"github.com/ccremer/greposync/infrastructure/templateengine"
 	"github.com/ccremer/greposync/infrastructure/templateengine/gotemplate"
 	"github.com/ccremer/greposync/infrastructure/valuestore"
 	"github.com/google/wire"
@@ -49,6 +50,7 @@ func initInjector() *injector {
 		// Template Engine
 		wire.NewSet(gotemplate.NewEngine, wire.Bind(new(domain.TemplateEngine), new(*gotemplate.GoTemplateEngine))),
 		wire.NewSet(gotemplate.NewTemplateStore, wire.Bind(new(domain.TemplateStore), new(*gotemplate.GoTemplateStore))),
+		wire.NewSet(templateengine.NewRenderServiceInstrumentation, wire.Bind(new(domain.RenderServiceInstrumentationFactory), new(*templateengine.RenderServiceInstrumentation))),
 
 		// Stores
 		wire.NewSet(repositorystore.NewRepositoryStore, wire.Bind(new(domain.GitRepositoryStore), new(*repositorystore.RepositoryStore))),

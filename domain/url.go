@@ -34,6 +34,11 @@ func (u *GitURL) String() string {
 	return plain.String()
 }
 
+// GetFullName returns the hostname (or host:port) joined by GetNamespace and GetRepositoryName delimited by slashes.
+func (u *GitURL) GetFullName() string {
+	return strings.Join([]string{u.Host, u.GetNamespace(), u.GetRepositoryName()}, "/")
+}
+
 func (u *GitURL) AsURL() *url.URL {
 	plain := url.URL(*u)
 	return &plain

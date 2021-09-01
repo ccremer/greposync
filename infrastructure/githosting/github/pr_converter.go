@@ -1,10 +1,6 @@
 package github
 
 import (
-	"fmt"
-	"strconv"
-	"strings"
-
 	"github.com/ccremer/greposync/domain"
 	"github.com/google/go-github/v38/github"
 )
@@ -17,18 +13,12 @@ func (c PrConverter) ConvertToEntity(pr *github.PullRequest) *domain.PullRequest
 		return nil
 	}
 
-	entity := &domain.PullRequest{
-		Number:       c.toEntityNumber(pr.Number),
-		Title:        *pr.Title,
-		Body:         *pr.Body,
-		CommitBranch: *pr.Head.Ref,
-		BaseBranch:   *pr.Base.Ref,
-	}
-
 	set := LabelSetConverter{}.ConvertToEntity(pr.Labels)
 	// TODO: At least log a warning.
 	// We don't expect invalid colors if coming from a repository, but that's just an assumption
-	_ = entity.AttachLabels(set)
+
+	entity, _ := domain.NewPullRequest(domain.NewPullRequestNumber(pr.Number), *pr.Title, *pr.Body, *pr.Head.Ref, *pr.Base.Ref, set)
+
 	return entity
 }
 
@@ -39,28 +29,10 @@ func (c PrConverter) ConvertFromEntity(entity *domain.PullRequest) *github.PullR
 		return nil
 	}
 	pr := &github.PullRequest{
-		Number: c.toGhNumber(entity.Number),
-		Title:  &entity.Title,
-		Body:   &entity.Body,
+		Number: entity.GetNumber().Int(),
+		Title:  github.String(entity.GetTitle()),
+		Body:   github.String(entity.GetBody()),
 		Labels: LabelSetConverter{}.ConvertFromEntity(entity.GetLabels()),
 	}
 	return pr
-}
-
-func (PrConverter) toEntityNumber(number *int) string {
-	if number == nil {
-		return ""
-	}
-	return fmt.Sprintf("#%d", *number)
-}
-
-func (PrConverter) toGhNumber(number string) *int {
-	if number == "" {
-		return nil
-	}
-	raw := strings.TrimPrefix(number, "#")
-	if nr, err := strconv.Atoi(raw); err == nil {
-		return &nr
-	}
-	return nil
 }

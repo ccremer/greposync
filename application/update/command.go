@@ -7,7 +7,7 @@ import (
 
 // GetCliCommand returns the command instance for CLI library.
 func (c *Command) GetCliCommand() *cli.Command {
-	return c.cliCommand
+	return c.createCliCommand()
 }
 
 func (c *Command) createCliCommand() *cli.Command {

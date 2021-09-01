@@ -31,13 +31,12 @@ func NewCommand(cfg *cfg.Configuration) *Command {
 			cfg.Template.RootDir + "/README.md":    readmeTpl,
 		},
 	}
-	c.cliCommand = c.createCommand()
 	return c
 }
 
 // GetCliCommand returns the command instance for CLI library.
 func (c *Command) GetCliCommand() *cli.Command {
-	return c.cliCommand
+	return c.createCommand()
 }
 
 func (c *Command) createCommand() *cli.Command {

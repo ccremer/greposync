@@ -45,8 +45,8 @@ func (s *GoTemplateStore) evaluatePath(file string, info os.FileInfo, err error)
 	if pathErr != nil {
 		return nil, pathErr
 	}
-	return &domain.Template{
-		RelativePath:    domain.NewPath(relativePath),
-		FilePermissions: domain.Permissions(info.Mode()),
-	}, nil
+	return domain.NewTemplate(
+		domain.NewPath(relativePath),
+		domain.Permissions(info.Mode()),
+	), nil
 }

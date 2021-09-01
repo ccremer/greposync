@@ -29,7 +29,7 @@ func NewEngine() *GoTemplateEngine {
 	}
 }
 
-func (e *GoTemplateEngine) Execute(template *domain.Template, values domain.Values) (string, error) {
+func (e *GoTemplateEngine) Execute(template *domain.Template, values domain.Values) (domain.RenderResult, error) {
 	tpl, err := e.loadGoTemplate(template)
 	if err != nil {
 		return "", err
@@ -37,7 +37,7 @@ func (e *GoTemplateEngine) Execute(template *domain.Template, values domain.Valu
 
 	buf := &bytes.Buffer{}
 	err = tpl.Execute(buf, values)
-	return buf.String(), err
+	return domain.RenderResult(buf.String()), err
 }
 
 func (e *GoTemplateEngine) loadGoTemplate(template *domain.Template) (*template.Template, error) {

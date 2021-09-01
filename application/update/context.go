@@ -41,9 +41,8 @@ func (c *pipelineContext) add() pipeline.ActionFunc {
 func (c *pipelineContext) commit() pipeline.ActionFunc {
 	return func(_ pipeline.Context) pipeline.Result {
 		err := c.appService.repoStore.Commit(c.repo, domain.CommitOptions{
-			// TODO: make configurable
-			Message: "asdf",
-			Amend:   false,
+			Message: c.appService.cfg.Git.CommitMessage,
+			Amend:   c.appService.cfg.Git.Amend,
 		})
 		return pipeline.Result{Err: err}
 	}
@@ -63,8 +62,7 @@ func (c *pipelineContext) diff() pipeline.ActionFunc {
 func (c *pipelineContext) push() pipeline.ActionFunc {
 	return func(ctx pipeline.Context) pipeline.Result {
 		err := c.appService.repoStore.Push(c.repo, domain.PushOptions{
-			// TODO: make configurable
-			Force: true,
+			Force: c.appService.cfg.Git.ForcePush,
 		})
 		return pipeline.Result{Err: err}
 	}

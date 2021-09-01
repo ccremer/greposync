@@ -18,7 +18,7 @@ func NewTemplate(relPath Path, perms Permissions) *Template {
 	}
 }
 
-func (t *Template) Render(values Values, engine TemplateEngine) (string, error) {
+func (t *Template) Render(values Values, engine TemplateEngine) (RenderResult, error) {
 	content, err := engine.Execute(t, values)
 	return content, err
 }

@@ -27,7 +27,6 @@ func NewCommand(cfg *cfg.Configuration, appService *AppService) *Command {
 		cfg:        cfg,
 		appService: appService,
 	}
-	c.cliCommand = c.createCommand()
 	return c
 }
 

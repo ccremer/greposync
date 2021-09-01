@@ -14,6 +14,7 @@ import (
 	"github.com/ccremer/greposync/infrastructure/githosting"
 	"github.com/ccremer/greposync/infrastructure/githosting/github"
 	"github.com/ccremer/greposync/infrastructure/repositorystore"
+	"github.com/ccremer/greposync/infrastructure/templateengine"
 	"github.com/ccremer/greposync/infrastructure/templateengine/gotemplate"
 	"github.com/ccremer/greposync/infrastructure/valuestore"
 )
@@ -33,7 +34,8 @@ func initInjector() *injector {
 	goTemplateStore := gotemplate.NewTemplateStore()
 	koanfValueStore := valuestore.NewValueStore()
 	pullRequestStore := githosting.NewPullRequestStore(providerMap)
-	renderService := domain.NewRenderService()
+	renderServiceInstrumentation := templateengine.NewRenderServiceInstrumentation()
+	renderService := domain.NewRenderService(renderServiceInstrumentation)
 	updateAppService := update.NewConfigurator(goTemplateEngine, repositoryStore, goTemplateStore, koanfValueStore, pullRequestStore, renderService, configuration)
 	updateCommand := update.NewCommand(configuration, updateAppService)
 	app := application.NewApp(versionInfo, configuration, command, updateCommand)

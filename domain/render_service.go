@@ -2,13 +2,14 @@ package domain
 
 import (
 	"errors"
-	"os"
 
 	pipeline "github.com/ccremer/go-command-pipeline"
 	"golang.org/x/sys/unix"
 )
 
-type RenderService struct{}
+type RenderService struct {
+	instrumentationFactory RenderServiceInstrumentationFactory
+}
 
 type RenderContext struct {
 	Repository    *GitRepository
@@ -16,15 +17,19 @@ type RenderContext struct {
 	TemplateStore TemplateStore
 	Engine        TemplateEngine
 
-	templates []*Template
-	values    Values
+	instrumentation RenderServiceInstrumentation
+	templates       []*Template
+	values          Values
 }
 
-func NewRenderService() *RenderService {
-	return &RenderService{}
+func NewRenderService(analyticsFactory RenderServiceInstrumentationFactory) *RenderService {
+	return &RenderService{
+		instrumentationFactory: analyticsFactory,
+	}
 }
 
 func (s *RenderService) RenderTemplates(ctx RenderContext) error {
+	ctx.instrumentation = s.instrumentationFactory.NewRenderServiceInstrumentation(ctx.Repository)
 	result := pipeline.NewPipeline().WithSteps(
 		pipeline.NewStep("preflight check", ctx.preFlightCheck()),
 		pipeline.NewStep("load templates", ctx.toAction(ctx.loadTemplates)),
@@ -71,6 +76,7 @@ func (ctx *RenderContext) renderTemplate(template *Template) error {
 	originalUmask := unix.Umask(0)
 	defer unix.Umask(originalUmask)
 
+	ctx.instrumentation.AttemptingToRenderTemplate(template)
 	alternativePath, err := ctx.ValueStore.FetchTargetPath(template, ctx.Repository)
 	if err != nil {
 		return err
@@ -85,13 +91,14 @@ func (ctx *RenderContext) renderTemplate(template *Template) error {
 		targetPath = alternativePath
 	}
 
-	return os.WriteFile(ctx.Repository.RootDir.Join(targetPath).String(), []byte(result), template.FilePermissions.FileMode())
+	err = result.WriteToFile(ctx.Repository.RootDir.Join(targetPath), template.FilePermissions)
+	return ctx.instrumentation.WrittenRenderResultToFile(template, targetPath, err)
 }
 
 func (ctx *RenderContext) loadTemplates() error {
 	templates, err := ctx.TemplateStore.FetchTemplates()
 	ctx.templates = templates
-	return err
+	return ctx.instrumentation.FetchedTemplatesFromStore(err)
 }
 
 func (ctx *RenderContext) loadValues(template *Template) error {
@@ -100,5 +107,5 @@ func (ctx *RenderContext) loadValues(template *Template) error {
 		"Values":   values,
 		"Metadata": ctx.Repository,
 	}
-	return err
+	return ctx.instrumentation.FetchedValuesForTemplate(err, template)
 }
