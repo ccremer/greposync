@@ -2,8 +2,6 @@ package main
 
 import (
 	"time"
-
-	"github.com/ccremer/greposync/cli"
 )
 
 var (
@@ -13,5 +11,6 @@ var (
 )
 
 func main() {
-	cli.NewApp(version, commit, date).Run()
+	injector := initInjector()
+	injector.RunApp()
 }

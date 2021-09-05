@@ -1,5 +1,7 @@
 package printer
 
+import pipeline "github.com/ccremer/go-command-pipeline"
+
 type (
 	// PipelineLogger is the implementation for the pipeline lib.
 	PipelineLogger struct {
@@ -7,7 +9,7 @@ type (
 	}
 )
 
-// Log prints the message and name to debug level.
-func (p PipelineLogger) Log(message, name string) {
-	p.Logger.DebugF("%s '%s'", message, name)
+// Accept prints the name to debug level.
+func (p PipelineLogger) Accept(step pipeline.Step) {
+	p.Logger.DebugF("executing step '%s'", step.Name)
 }
