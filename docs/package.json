@@ -10,7 +10,7 @@
     "watch": "1.0.2"
   },
   "scripts": {
-    "build": "antora ${ANTORA_PLAYBOOK_PATH:-local-antora-playbook.yml} ${ANTORA_ARGS}",
+    "build": "antora ${ANTORA_PLAYBOOK_PATH:-antora-playbook.yml} ${ANTORA_ARGS}",
     "watch": "watch 'npm run build' modules",
     "serve": "reload -d public -b",
     "preview": "run-p watch serve",
