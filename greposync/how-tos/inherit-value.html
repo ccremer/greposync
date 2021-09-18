@@ -3,11 +3,10 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Add comment headers to files :: greposync docs</title>
-    <link rel="canonical" href="http://localhost/greposync/latest/how-tos/comment-files.html">
+    <title>Inherit values for all files in directory :: greposync docs</title>
     <meta name="generator" content="Antora 2.3.4">
-    <link rel="stylesheet" href="../../../_/css/site.css">
-    <script>var uiRootPath = '../../../_'</script>
+    <link rel="stylesheet" href="../../_/css/site.css">
+    <script>var uiRootPath = '../../_'</script>
   </head>
   <body class="article">
 <header class="header" role="banner">
@@ -20,7 +19,7 @@
   </nav>
 </header>
 <div class="body">
-<div class="nav-container" data-component="greposync" data-version="latest">
+<div class="nav-container" data-component="greposync" data-version="master">
   <aside class="nav">
     <div class="panels">
 <div class="nav-panel-menu is-active" data-panel="menu">
@@ -53,7 +52,7 @@
     <button class="nav-item-toggle"></button>
     <span class="nav-text">How To</span>
 <ul class="nav-list">
-  <li class="nav-item" data-depth="1">
+  <li class="nav-item is-current-page" data-depth="1">
     <a class="nav-link" href="inherit-value.html">Inherit values in directories</a>
   </li>
   <li class="nav-item" data-depth="1">
@@ -65,7 +64,7 @@
   <li class="nav-item" data-depth="1">
     <a class="nav-link" href="delete-files.html">Remove files in all repositories</a>
   </li>
-  <li class="nav-item is-current-page" data-depth="1">
+  <li class="nav-item" data-depth="1">
     <a class="nav-link" href="comment-files.html">Add comment headers</a>
   </li>
   <li class="nav-item" data-depth="1">
@@ -109,14 +108,14 @@
 <div class="nav-panel-explore" data-panel="explore">
   <div class="context">
     <span class="title">greposync</span>
-    <span class="version">latest</span>
+    <span class="version">master</span>
   </div>
   <ul class="components">
     <li class="component is-current">
       <a class="title" href="../index.html">greposync</a>
       <ul class="versions">
         <li class="version is-current is-latest">
-          <a href="../index.html">latest</a>
+          <a href="../index.html">master</a>
         </li>
       </ul>
     </li>
@@ -133,29 +132,37 @@
   <ul>
     <li><a href="../index.html">greposync</a></li>
     <li>How To</li>
-    <li><a href="comment-files.html">Add comment headers</a></li>
+    <li><a href="inherit-value.html">Inherit values in directories</a></li>
   </ul>
 </nav>
-  <div class="edit-this-page"><a href="https://github.com/ccremer/greposync/edit/master/docs/modules/ROOT/pages/how-tos/comment-files.adoc">Edit this Page</a></div>
+  <div class="edit-this-page"><a href="https://github.com/ccremer/greposync/edit/doc-gen/docs/modules/ROOT/pages/how-tos/inherit-value.adoc">Edit this Page</a></div>
   </div>
   <div class="content">
 <aside class="toc sidebar" data-title="Contents" data-levels="2">
   <div class="toc-menu"></div>
 </aside>
 <article class="doc">
-<h1 class="page">Add comment headers to files</h1>
+<h1 class="page">Inherit values for all files in directory</h1>
 <div class="dlist">
 <dl>
 <dt class="hdlist1">❓ Question</dt>
 <dd>
-<p>For every templated file I want to add a comment header.
-Not all files have the same commenting syntax.
-How can I add such comments?</p>
+<p>When templating, I want to provide default values for all files in a directory.
+How can I inherit a value to my file?</p>
 </dd>
 <dt class="hdlist1">📝 Use case</dt>
 <dd>
-<p>Files should contain comments indicating that users shouldn&#8217;t modify the file at hand.
-If greposync runs again, it would overwrite their changes.</p>
+<p>I have numerous files in <code>.github/workflows</code> but I want all to have the same variable.</p>
+<div class="listingblock">
+<div class="title"><code>config_defaults.yml</code> in template repository</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">.github/workflows/release.yml:
+  defaultBranch: main
+.github/workflows/test.yml:
+  defaultBranch: main
+# etc.</code></pre>
+</div>
+</div>
 </dd>
 </dl>
 </div>
@@ -164,72 +171,31 @@ If greposync runs again, it would overwrite their changes.</p>
 <dl>
 <dt class="hdlist1">💡 Solution</dt>
 <dd>
-<p>Add the <code>_helpers.tpl</code> file to the template directory.
-It could contain the following content:</p>
+<p>You can declare a variable to apply to a directory using the following syntax.</p>
 <div class="listingblock">
-<div class="title">template/_helpers.tpl</div>
+<div class="title"><code>config_defaults.yml</code> in template repository</div>
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">{{- define "comment" -}}
-{{- if .Values.comment.text }}
-{{- with .Values.comment.open -}}
-{{ . }}
-{{ end -}}
-{{- with .Values.comment.text -}}
-{{ $.Values.comment.prefix }}{{ . | splitList "\n" | join (cat "\n" $.Values.comment.prefix | replace "\n " "\n") }}
-{{ end }}
-{{- with .Values.comment.closed -}}
-{{ . }}
-{{ end -}}
-{{- end -}}
-{{- end -}}</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Configure the globals so that it allows flexible prefixes or enclosed comments.</p>
-</div>
-<div class="listingblock">
-<div class="title">config_defaults.yml</div>
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">:globals:
-  comment:
-    text: | <i class="conum" data-value="1"></i><b>(1)</b>
-      This file is managed by greposync.
-      Do not modify manually.
-      Adjust variables in `.sync.yml`.
-    prefix: ""
-    open: &lt;!--
-    closed: --&gt;</code></pre>
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">.github/workflows/: <i class="conum" data-value="1"></i><b>(1)</b>
+  defaultBranch: main <i class="conum" data-value="2"></i><b>(2)</b>
+.github/workflows/build.yml:
+  defaultBranch: develop <i class="conum" data-value="3"></i><b>(3)</b></code></pre>
 </div>
 </div>
 <div class="colist arabic">
 <table>
 <tr>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>Simply setting <code>text=""</code> will disable the comment.</td>
+<td>Specify which directory with <code>/</code> suffix.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Every file within <code>.github/workflows</code> receives the same value for <code>defaultBranch</code>&#8230;&#8203;</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>&#8230;&#8203;unless a specific file overrides this again.</td>
 </tr>
 </table>
-</div>
-<div class="listingblock">
-<div class="title">template/README.md.tpl</div>
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-markdown hljs" data-lang="markdown">{{- template "comment" . -}}
-# managed-repository</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>This results in a file rendered like this:</p>
-</div>
-<div class="listingblock">
-<div class="title">README.md</div>
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-markdown hljs" data-lang="markdown">&lt;!--
-This file is managed by greposync.
-Do not modify manually.
-Adjust variables in `.sync.yml`.
-
---&gt;
-# managed-repository</code></pre>
-</div>
 </div>
 </dd>
 <dt class="hdlist1">🔗 Reference</dt>
@@ -238,9 +204,6 @@ Adjust variables in `.sync.yml`.
 <ul>
 <li>
 <p><a href="../references/sync-config.html" class="page">Sync config syntax</a></p>
-</li>
-<li>
-<p><a href="../references/template.html" class="page">Go template</a></p>
 </li>
 </ul>
 </div>
@@ -255,7 +218,7 @@ Adjust variables in `.sync.yml`.
 This page was built using the Antora default UI.
 The source code for this UI is licensed under the terms of the MPL-2.0 license.
 -->
-<script src="../../../_/js/site.js"></script>
-<script async src="../../../_/js/vendor/highlight.js"></script>
+<script src="../../_/js/site.js"></script>
+<script async src="../../_/js/vendor/highlight.js"></script>
   </body>
 </html>

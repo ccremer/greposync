@@ -3,11 +3,10 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Remove file in a specific repository :: greposync docs</title>
-    <link rel="canonical" href="http://localhost/greposync/latest/how-tos/delete-file.html">
+    <title>Remove obsolete files in all repositories :: greposync docs</title>
     <meta name="generator" content="Antora 2.3.4">
-    <link rel="stylesheet" href="../../../_/css/site.css">
-    <script>var uiRootPath = '../../../_'</script>
+    <link rel="stylesheet" href="../../_/css/site.css">
+    <script>var uiRootPath = '../../_'</script>
   </head>
   <body class="article">
 <header class="header" role="banner">
@@ -20,7 +19,7 @@
   </nav>
 </header>
 <div class="body">
-<div class="nav-container" data-component="greposync" data-version="latest">
+<div class="nav-container" data-component="greposync" data-version="master">
   <aside class="nav">
     <div class="panels">
 <div class="nav-panel-menu is-active" data-panel="menu">
@@ -59,10 +58,10 @@
   <li class="nav-item" data-depth="1">
     <a class="nav-link" href="ignore-file.html">Ignore file in a repository</a>
   </li>
-  <li class="nav-item is-current-page" data-depth="1">
+  <li class="nav-item" data-depth="1">
     <a class="nav-link" href="delete-file.html">Remove file in a specific repository</a>
   </li>
-  <li class="nav-item" data-depth="1">
+  <li class="nav-item is-current-page" data-depth="1">
     <a class="nav-link" href="delete-files.html">Remove files in all repositories</a>
   </li>
   <li class="nav-item" data-depth="1">
@@ -109,14 +108,14 @@
 <div class="nav-panel-explore" data-panel="explore">
   <div class="context">
     <span class="title">greposync</span>
-    <span class="version">latest</span>
+    <span class="version">master</span>
   </div>
   <ul class="components">
     <li class="component is-current">
       <a class="title" href="../index.html">greposync</a>
       <ul class="versions">
         <li class="version is-current is-latest">
-          <a href="../index.html">latest</a>
+          <a href="../index.html">master</a>
         </li>
       </ul>
     </li>
@@ -133,28 +132,28 @@
   <ul>
     <li><a href="../index.html">greposync</a></li>
     <li>How To</li>
-    <li><a href="delete-file.html">Remove file in a specific repository</a></li>
+    <li><a href="delete-files.html">Remove files in all repositories</a></li>
   </ul>
 </nav>
-  <div class="edit-this-page"><a href="https://github.com/ccremer/greposync/edit/master/docs/modules/ROOT/pages/how-tos/delete-file.adoc">Edit this Page</a></div>
+  <div class="edit-this-page"><a href="https://github.com/ccremer/greposync/edit/doc-gen/docs/modules/ROOT/pages/how-tos/delete-files.adoc">Edit this Page</a></div>
   </div>
   <div class="content">
 <aside class="toc sidebar" data-title="Contents" data-levels="2">
   <div class="toc-menu"></div>
 </aside>
 <article class="doc">
-<h1 class="page">Remove file in a specific repository</h1>
+<h1 class="page">Remove obsolete files in all repositories</h1>
 <div class="dlist">
 <dl>
 <dt class="hdlist1">❓ Question</dt>
 <dd>
-<p>In my template, I have a file that I don&#8217;t need in a particular Git repository.
-Rendering an empty file is not sufficient.
-How can tell greposync to not create that file?</p>
+<p>I need to clean up a file in all managed repositories.
+How can I mass-delete it?</p>
 </dd>
 <dt class="hdlist1">📝 Use case</dt>
 <dd>
-<p>Normally I have <code>.github/workflows/test.yml</code> in the template but in <code>example-repository</code> that file shouldn&#8217;t exist.</p>
+<p>I am migrating from Travis CI to GitHub actions.
+I don&#8217;t need <code>.travis.yml</code> anymore.</p>
 </dd>
 </dl>
 </div>
@@ -163,12 +162,12 @@ How can tell greposync to not create that file?</p>
 <dl>
 <dt class="hdlist1">💡 Solution</dt>
 <dd>
-<p>Add the <code>delete: true</code> special value to a file.
-greposync will delete that file when updating.</p>
+<p>Add the <code>delete: true</code> special value to the file.
+greposync will delete that file in each repository when updating.</p>
 <div class="listingblock">
-<div class="title"><code>.sync.yml</code> in <code>example-repository</code></div>
+<div class="title"><code>config_defaults.yml</code> in template repository</div>
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">.github/workflows/test.yml:
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">.travis.yml:
   delete: true</code></pre>
 </div>
 </div>
@@ -180,17 +179,7 @@ greposync will delete that file when updating.</p>
 </td>
 <td class="content">
 <div class="paragraph">
-<p>You can delete whole directories when appending <code>/</code> to the path:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">my-dir/:
-  delete: true</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Be aware though, that it only applies to files that are in the template.
-"Foreign" files are not being deleted.</p>
+<p>Repositories that still need this file (e.g. for legacy reasons) can set <code>delete: false</code> in their <code>.sync.yml</code>.</p>
 </div>
 </td>
 </tr>
@@ -217,7 +206,7 @@ greposync will delete that file when updating.</p>
 This page was built using the Antora default UI.
 The source code for this UI is licensed under the terms of the MPL-2.0 license.
 -->
-<script src="../../../_/js/site.js"></script>
-<script async src="../../../_/js/vendor/highlight.js"></script>
+<script src="../../_/js/site.js"></script>
+<script async src="../../_/js/vendor/highlight.js"></script>
   </body>
 </html>
