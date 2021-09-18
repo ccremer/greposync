@@ -2,7 +2,7 @@ package github
 
 import (
 	"github.com/ccremer/greposync/domain"
-	"github.com/google/go-github/v38/github"
+	"github.com/google/go-github/v39/github"
 )
 
 // LabelSetConverter converts domain.Label to github.Label and vice-versa
