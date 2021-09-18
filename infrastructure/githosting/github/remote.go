@@ -9,7 +9,7 @@ import (
 	"github.com/ccremer/greposync/domain"
 	"github.com/ccremer/greposync/infrastructure/githosting"
 	"github.com/ccremer/greposync/printer"
-	"github.com/google/go-github/v38/github"
+	"github.com/google/go-github/v39/github"
 	"golang.org/x/oauth2"
 )
 

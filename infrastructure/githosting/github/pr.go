@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/ccremer/greposync/domain"
-	"github.com/google/go-github/v38/github"
+	"github.com/google/go-github/v39/github"
 )
 
 func (r *GhRemote) FindPullRequest(url *domain.GitURL, _, commitBranch string) (*domain.PullRequest, error) {
