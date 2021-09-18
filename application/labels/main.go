@@ -7,6 +7,7 @@ import (
 	"github.com/ccremer/go-command-pipeline/parallel"
 	"github.com/ccremer/greposync/cfg"
 	"github.com/ccremer/greposync/domain"
+	"github.com/go-logr/logr"
 	"github.com/hashicorp/go-multierror"
 	"github.com/urfave/cli/v2"
 )
@@ -18,6 +19,7 @@ type (
 		cliCommand *cli.Command
 		appService *AppService
 		repos      []*domain.GitRepository
+		console    logr.Logger
 	}
 )
 

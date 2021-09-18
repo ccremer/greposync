@@ -7,6 +7,7 @@ package main
 
 import (
 	"github.com/ccremer/greposync/application"
+	"github.com/ccremer/greposync/application/initialize"
 	"github.com/ccremer/greposync/application/labels"
 	"github.com/ccremer/greposync/application/update"
 	"github.com/ccremer/greposync/cfg"
@@ -16,6 +17,7 @@ import (
 	"github.com/ccremer/greposync/infrastructure/repositorystore"
 	"github.com/ccremer/greposync/infrastructure/templateengine"
 	"github.com/ccremer/greposync/infrastructure/templateengine/gotemplate"
+	"github.com/ccremer/greposync/infrastructure/ui"
 	"github.com/ccremer/greposync/infrastructure/valuestore"
 )
 
@@ -24,21 +26,29 @@ import (
 func initInjector() *injector {
 	versionInfo := _wireVersionInfoValue
 	configuration := cfg.NewDefaultConfig()
-	repositoryStore := repositorystore.NewRepositoryStore()
-	ghRemote := github.NewRemote()
+	coloredConsole := ui.NewColoredConsole()
+	consoleSink := ui.NewConsoleSink(coloredConsole)
+	consoleLoggerFactory := ui.NewConsoleLoggerFactory(consoleSink)
+	repositoryStoreInstrumentation := repositorystore.NewRepositoryStoreInstrumentation(consoleLoggerFactory)
+	repositoryStore := repositorystore.NewRepositoryStore(repositoryStoreInstrumentation)
+	ghRemote := github.NewRemote(consoleLoggerFactory)
 	providerMap := newGitProviders(ghRemote)
 	labelStore := githosting.NewLabelStore(providerMap)
 	appService := labels.NewConfigurator(repositoryStore, labelStore, configuration)
 	command := labels.NewCommand(configuration, appService)
 	goTemplateEngine := gotemplate.NewEngine()
 	goTemplateStore := gotemplate.NewTemplateStore()
-	koanfValueStore := valuestore.NewValueStore()
+	valueStoreInstrumentation := valuestore.NewValueStoreInstrumentation(consoleLoggerFactory)
+	koanfValueStore := valuestore.NewValueStore(valueStoreInstrumentation)
 	pullRequestStore := githosting.NewPullRequestStore(providerMap)
-	renderServiceInstrumentation := templateengine.NewRenderServiceInstrumentation()
+	renderServiceInstrumentation := templateengine.NewRenderServiceInstrumentation(consoleLoggerFactory)
 	renderService := domain.NewRenderService(renderServiceInstrumentation)
-	updateAppService := update.NewConfigurator(goTemplateEngine, repositoryStore, goTemplateStore, koanfValueStore, pullRequestStore, renderService, configuration)
-	updateCommand := update.NewCommand(configuration, updateAppService)
-	app := application.NewApp(versionInfo, configuration, command, updateCommand)
+	consoleDiffPrinter := ui.NewConsoleDiffPrinter()
+	updateAppService := update.NewConfigurator(goTemplateEngine, repositoryStore, goTemplateStore, koanfValueStore, pullRequestStore, renderService, consoleDiffPrinter, configuration)
+	updateInstrumentation := update.NewUpdateInstrumentation(coloredConsole, consoleLoggerFactory)
+	updateCommand := update.NewCommand(configuration, updateAppService, consoleLoggerFactory, updateInstrumentation)
+	initializeCommand := initialize.NewCommand(configuration, consoleLoggerFactory)
+	app := application.NewApp(versionInfo, configuration, command, updateCommand, initializeCommand, consoleLoggerFactory)
 	mainInjector := NewInjector(app)
 	return mainInjector
 }

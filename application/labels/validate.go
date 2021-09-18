@@ -7,7 +7,7 @@ import (
 	"github.com/ccremer/greposync/application/clierror"
 	"github.com/ccremer/greposync/application/flags"
 	"github.com/ccremer/greposync/cfg"
-	"github.com/ccremer/greposync/printer"
+	"github.com/ccremer/greposync/infrastructure/logging"
 	"github.com/urfave/cli/v2"
 )
 
@@ -36,8 +36,7 @@ func (c *Command) validateCommand(ctx *cli.Context) error {
 		return clierror.AsUsageErrorf("invalid label configuration in '%s': %w", "repositoryLabels", err)
 	}
 
-	c.cfg.Sanitize()
 	j, _ := json.Marshal(c.cfg)
-	printer.DebugF("Using config: %s", j)
+	c.console.V(logging.LevelDebug).Info("Using config", "config", j)
 	return nil
 }

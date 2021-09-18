@@ -1,17 +1,20 @@
 package update
 
 import (
+	"time"
+
 	pipeline "github.com/ccremer/go-command-pipeline"
 	"github.com/ccremer/go-command-pipeline/predicate"
 	"github.com/ccremer/greposync/domain"
-	"github.com/ccremer/greposync/printer"
+	"github.com/ccremer/greposync/infrastructure/ui"
+	"github.com/go-logr/logr"
 )
 
 type pipelineContext struct {
-	log        printer.Printer
+	log        logr.Logger
 	repo       *domain.GitRepository
 	appService *AppService
-	differ     *Differ
+	differ     ui.DiffPrinter
 }
 
 func (c *pipelineContext) clone() pipeline.ActionFunc {
@@ -54,7 +57,7 @@ func (c *pipelineContext) diff() pipeline.ActionFunc {
 		if err != nil {
 			return pipeline.Result{Err: err}
 		}
-		c.differ.PrettyPrint(diff)
+		c.differ.PrintDiff(c.repo.URL.GetFullName(), diff)
 		return pipeline.Result{}
 	}
 }
@@ -76,6 +79,7 @@ func (c *pipelineContext) renderTemplates() pipeline.ActionFunc {
 			TemplateStore: c.appService.templateStore,
 			Engine:        c.appService.engine,
 		})
+		time.Sleep(2 * time.Second)
 		return pipeline.Result{Err: err}
 	}
 }

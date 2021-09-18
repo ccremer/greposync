@@ -9,10 +9,9 @@ git:
   skipPush: false
   skipReset: false
 log:
-  level: debug
+  level: error
 pr:
-  bodyTemplate: This Pull request updates this repository with changes from a greposync
-    template repository.
+  bodyTemplate: This Pull request updates this repository with changes from a greposync template repository.
   create: false
   labels: null
   subject: Update from greposync

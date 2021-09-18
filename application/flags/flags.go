@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/ccremer/greposync/cfg"
-	"github.com/ccremer/greposync/printer"
+	"github.com/ccremer/greposync/infrastructure/logging"
 	"github.com/urfave/cli/v2"
 )
 
@@ -85,7 +85,7 @@ func CombineWithGlobalFlags(flags ...cli.Flag) []cli.Flag {
 func ValidateGlobalFlags(ctx *cli.Context, config *cfg.Configuration) error {
 	if ctx.Bool("verbose") {
 		config.Log.Level = "debug"
-		printer.DefaultLevel = printer.LevelDebug
+		logging.DefaultLevel = logging.LevelDebug
 	}
 	return nil
 }

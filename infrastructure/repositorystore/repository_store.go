@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	"github.com/ccremer/greposync/domain"
-	"github.com/ccremer/greposync/printer"
 	"github.com/knadh/koanf"
 	"github.com/knadh/koanf/parsers/yaml"
 	"github.com/knadh/koanf/providers/file"
@@ -17,8 +16,8 @@ import (
 
 type RepositoryStore struct {
 	StoreConfig
-	log printer.Printer
-	k   *koanf.Koanf
+	k               *koanf.Koanf
+	instrumentation *RepositoryStoreInstrumentation
 }
 
 // ManagedGitRepo is the representation of the managed git repos in the config file.
@@ -37,16 +36,11 @@ var (
 	ManagedReposFileName = "managed_repos.yml"
 )
 
-func NewRepositoryStore() *RepositoryStore {
+func NewRepositoryStore(instrumentation *RepositoryStoreInstrumentation) *RepositoryStore {
 	return &RepositoryStore{
-		log: printer.New(),
-		k:   koanf.New("."),
+		k:               koanf.New("."),
+		instrumentation: instrumentation,
 	}
-}
-
-func (s *RepositoryStore) logArgs(args []string) []string {
-	s.log.InfoF("%s %s", GitBinary, strings.Join(args, " "))
-	return args
 }
 
 func (s *RepositoryStore) deleteFileHandler(file *os.File) {
@@ -66,7 +60,10 @@ func (s *RepositoryStore) FetchGitRepositories() ([]*domain.GitRepository, error
 	gitBase := "git@github.com:"
 
 	for _, repo := range m {
-		u := parseUrl(repo, gitBase, s.DefaultNamespace)
+		u, err := parseUrl(repo, gitBase, s.DefaultNamespace)
+		if err != nil {
+			return list, err
+		}
 
 		// TODO: Reimplement filtering
 
@@ -84,13 +81,11 @@ func (s *RepositoryStore) toLocalFilePath(u *url.URL) string {
 	return filepath.Clean(filepath.Join(s.ParentDir, strings.ReplaceAll(u.Hostname(), ":", "-"), p))
 }
 
-func parseUrl(m ManagedGitRepo, gitBase, defaultNs string) *url.URL {
+func parseUrl(m ManagedGitRepo, gitBase, defaultNs string) (*url.URL, error) {
 	if strings.Contains(m.Name, "/") {
 		u, err := giturls.Parse(fmt.Sprintf("%s/%s", gitBase, m.Name))
-		printer.CheckIfError(err)
-		return u
+		return u, err
 	}
 	u, err := giturls.Parse(fmt.Sprintf("%s/%s/%s", gitBase, defaultNs, m.Name))
-	printer.CheckIfError(err)
-	return u
+	return u, err
 }

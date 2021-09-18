@@ -67,7 +67,6 @@ type Configuration struct {
 
 
 
-
 === ProjectConfig
 [source, go]
 ----

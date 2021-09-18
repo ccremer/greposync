@@ -2,7 +2,6 @@ package repositorystore
 
 import (
 	"errors"
-	"strings"
 
 	"github.com/ccremer/greposync/domain"
 )
@@ -14,14 +13,13 @@ func (s *RepositoryStore) Clone(repository *domain.GitRepository) error {
 	dir := repository.RootDir.String()
 	gitURL := repository.URL
 
-	// Don't want to expose credentials in the log, so we're not calling logArgs().
-	s.log.InfoF("%s %s", GitBinary, strings.Join([]string{"clone", gitURL.Redacted(), dir}, " "))
+	s.instrumentation.attemptCloning(repository)
 
 	out, stderr, err := execGitCommand(repository.RootDir, []string{"clone", gitURL.String(), dir})
 	if err != nil {
 		return mergeWithStdErr(err, stderr)
 	}
-	s.log.PrintF(out)
+	s.instrumentation.logInfo(repository, out)
 	return nil
 }
 
@@ -35,31 +33,31 @@ func (s *RepositoryStore) Checkout(repository *domain.GitRepository) error {
 	}
 	args = append(args, repository.CommitBranch)
 
-	out, stderr, err := execGitCommand(repository.RootDir, s.logArgs(args))
+	out, stderr, err := execGitCommand(repository.RootDir, s.instrumentation.logGitArguments(repository, args))
 	if err != nil {
 		return mergeWithStdErr(err, stderr)
 	}
-	s.log.DebugF(out)
+	s.instrumentation.logDebugInfo(repository, out)
 	return nil
 }
 
 func (s *RepositoryStore) Fetch(repository *domain.GitRepository) error {
-	out, stderr, err := execGitCommand(repository.RootDir, s.logArgs([]string{"fetch"}))
+	out, stderr, err := execGitCommand(repository.RootDir, s.instrumentation.logGitArguments(repository, []string{"fetch"}))
 	if err != nil {
 		return mergeWithStdErr(err, stderr)
 	}
 	if out != "" {
-		s.log.InfoF(out)
+		s.instrumentation.logDebugInfo(repository, out)
 	}
 	return nil
 }
 
 func (s *RepositoryStore) Reset(repository *domain.GitRepository) error {
-	out, stderr, err := execGitCommand(repository.RootDir, s.logArgs([]string{"reset", "--hard"}))
+	out, stderr, err := execGitCommand(repository.RootDir, s.instrumentation.logGitArguments(repository, []string{"reset", "--hard"}))
 	if err != nil {
 		return mergeWithStdErr(err, stderr)
 	}
-	s.log.DebugF(out)
+	s.instrumentation.logDebugInfo(repository, out)
 	return nil
 }
 
@@ -69,11 +67,11 @@ func (s *RepositoryStore) Pull(repository *domain.GitRepository) error {
 		return err
 	}
 	if exists {
-		out, stderr, err := execGitCommand(repository.RootDir, s.logArgs([]string{"pull"}))
+		out, stderr, err := execGitCommand(repository.RootDir, s.instrumentation.logGitArguments(repository, []string{"pull"}))
 		if err != nil {
 			return mergeWithStdErr(err, stderr)
 		}
-		s.log.DebugF(out)
+		s.instrumentation.logDebugInfo(repository, out)
 	}
 	return nil
 }
@@ -83,10 +81,10 @@ func (s *RepositoryStore) Push(repository *domain.GitRepository, options domain.
 	if options.Force {
 		args = append(args, "--force")
 	}
-	out, stderr, err := execGitCommand(repository.RootDir, s.logArgs(args))
+	out, stderr, err := execGitCommand(repository.RootDir, s.instrumentation.logGitArguments(repository, args))
 	if err != nil {
 		return mergeWithStdErr(err, stderr)
 	}
-	s.log.DebugF(out)
+	s.instrumentation.logDebugInfo(repository, out)
 	return nil
 }

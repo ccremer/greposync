@@ -8,7 +8,8 @@ import (
 	"github.com/ccremer/go-command-pipeline/predicate"
 	"github.com/ccremer/greposync/cfg"
 	"github.com/ccremer/greposync/domain"
-	"github.com/ccremer/greposync/printer"
+	"github.com/ccremer/greposync/infrastructure/logging"
+	"github.com/go-logr/logr"
 	"github.com/hashicorp/go-multierror"
 	"github.com/knadh/koanf"
 	"github.com/urfave/cli/v2"
@@ -24,11 +25,14 @@ const (
 type (
 	// Command is a facade service for the update command that holds all dependent services and settings.
 	Command struct {
-		cfg          *cfg.Configuration
-		cliCommand   *cli.Command
-		repositories []*domain.GitRepository
-		globalK      *koanf.Koanf
-		appService   *AppService
+		cfg             *cfg.Configuration
+		cliCommand      *cli.Command
+		repositories    []*domain.GitRepository
+		globalK         *koanf.Koanf
+		appService      *AppService
+		instrumentation *updateInstrumentation
+		log             logr.Logger
+		logFactory      logging.LoggerFactory
 	}
 )
 
@@ -36,29 +40,34 @@ type (
 func NewCommand(
 	cfg *cfg.Configuration,
 	configurator *AppService,
+	factory logging.LoggerFactory,
+	instrumentation *updateInstrumentation,
 ) *Command {
 	c := &Command{
-		globalK:    koanf.New("."),
-		cfg:        cfg,
-		appService: configurator,
+		globalK:         koanf.New("."),
+		cfg:             cfg,
+		appService:      configurator,
+		instrumentation: instrumentation,
+		logFactory:      factory,
 	}
 	return c
 }
 
 func (c *Command) runCommand(_ *cli.Context) error {
-
-	logger := printer.PipelineLogger{Logger: printer.New().SetName("update").SetLevel(printer.DefaultLevel)}
+	logger := c.logFactory.NewPipelineLogger("")
 	p := pipeline.NewPipeline().AddBeforeHook(logger).WithSteps(
 		pipeline.NewStep("configure infrastructure", c.configureInfrastructure()),
 		pipeline.NewStep("fetch managed repos config", c.fetchRepositories()),
 		parallel.NewWorkerPoolStep("update repositories", c.cfg.Project.Jobs, c.updateReposInParallel(), c.errorHandler()),
 	)
+	p.WithFinalizer(func(result pipeline.Result) error {
+		c.instrumentation.batchPipelineCompleted()
+		return result.Err
+	})
 	return p.Run().Err
 }
 
 func (c *Command) createPipeline(r *domain.GitRepository) *pipeline.Pipeline {
-	log := printer.New().SetName(r.URL.GetFullName()).SetLevel(printer.DefaultLevel)
-
 	sc := &cfg.SyncConfig{
 		PullRequest: c.cfg.PullRequest,
 		Template: &cfg.TemplateConfig{
@@ -73,15 +82,15 @@ func (c *Command) createPipeline(r *domain.GitRepository) *pipeline.Pipeline {
 	repoCtx := &pipelineContext{
 		repo:       r,
 		appService: c.appService,
-		differ: &Differ{
-			log:        printer.New().MapColorToLevel(printer.Blue, printer.LevelInfo).SetName(r.URL.GetRepositoryName()),
-			repository: r,
-		},
 	}
 
-	logger := printer.PipelineLogger{Logger: log}
+	logger := c.logFactory.NewPipelineLogger(r.URL.GetFullName())
 	p := pipeline.NewPipeline().AddBeforeHook(logger)
 	p.WithSteps(
+		pipeline.NewStepFromFunc("setup instrumentation", func(_ pipeline.Context) error {
+			c.instrumentation.pipelineForRepositoryStarted(repoCtx.repo)
+			return nil
+		}),
 		pipeline.NewPipeline().AddBeforeHook(logger).
 			WithNestedSteps("prepare workspace",
 				predicate.ToStep("clone repository", repoCtx.clone(), repoCtx.dirMissing()),
@@ -101,17 +110,19 @@ func (c *Command) createPipeline(r *domain.GitRepository) *pipeline.Pipeline {
 		predicate.ToStep("push changes", repoCtx.push(), predicate.And(predicate.Bool(enabledPush), repoCtx.hasCommits())),
 		predicate.ToStep("find existing pull request", repoCtx.fetchPullRequest(), predicate.Bool(sc.PullRequest.Create)),
 		predicate.ToStep("update pull request", repoCtx.ensurePullRequest(), predicate.And(repoCtx.hasCommits(), predicate.Bool(sc.PullRequest.Create))),
-		pipeline.NewStep("end", func(_ pipeline.Context) pipeline.Result {
-			log.InfoF("Pipeline for '%s/%s' finished", r.URL.GetNamespace(), r.URL.GetRepositoryName())
-			return pipeline.Result{}
-		}),
 	)
+	p.WithFinalizer(func(result pipeline.Result) error {
+		c.instrumentation.pipelineForRepositoryCompleted(r, result.Err)
+		result.Name = repoCtx.repo.URL.GetFullName()
+		return result.Err
+	})
 	return p
 }
 
 func (c *Command) updateReposInParallel() parallel.PipelineSupplier {
 	return func(pipelines chan *pipeline.Pipeline) {
 		defer close(pipelines)
+		c.instrumentation.batchPipelineStarted(len(c.repositories))
 		for _, r := range c.repositories {
 			p := c.createPipeline(r)
 			pipelines <- p

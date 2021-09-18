@@ -5,6 +5,7 @@ import (
 	"github.com/ccremer/greposync/domain"
 	"github.com/ccremer/greposync/infrastructure/repositorystore"
 	"github.com/ccremer/greposync/infrastructure/templateengine/gotemplate"
+	"github.com/ccremer/greposync/infrastructure/ui"
 )
 
 type AppService struct {
@@ -14,6 +15,7 @@ type AppService struct {
 	valueStore    domain.ValueStore
 	prStore       domain.PullRequestStore
 	renderService *domain.RenderService
+	diffPrinter   *ui.ConsoleDiffPrinter
 	cfg           *cfg.Configuration
 }
 
@@ -24,6 +26,7 @@ func NewConfigurator(
 	valueStore domain.ValueStore,
 	prStore domain.PullRequestStore,
 	renderService *domain.RenderService,
+	diffPrinter *ui.ConsoleDiffPrinter,
 	cfg *cfg.Configuration,
 ) *AppService {
 	return &AppService{
@@ -33,6 +36,7 @@ func NewConfigurator(
 		valueStore:    valueStore,
 		prStore:       prStore,
 		renderService: renderService,
+		diffPrinter:   diffPrinter,
 		cfg:           cfg,
 	}
 }
@@ -43,4 +47,5 @@ func (c *AppService) ConfigureInfrastructure() {
 	c.repoStore.DefaultNamespace = c.cfg.Git.Namespace
 	c.repoStore.CommitBranch = c.cfg.Git.CommitBranch
 	c.templateStore.RootDir = "template"
+	c.diffPrinter.SuppressDiff = false
 }

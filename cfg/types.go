@@ -113,7 +113,7 @@ func NewDefaultConfig() *Configuration {
 			ConfigDefaultFileName: "config_defaults.yml",
 		},
 		Log: &LogConfig{
-			Level: "debug",
+			Level: "error",
 		},
 		Git: &GitConfig{
 			CommitMessage: "Update from greposync",

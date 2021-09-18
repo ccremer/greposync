@@ -8,7 +8,8 @@ import (
 
 	"github.com/ccremer/greposync/domain"
 	"github.com/ccremer/greposync/infrastructure/githosting"
-	"github.com/ccremer/greposync/printer"
+	"github.com/ccremer/greposync/infrastructure/logging"
+	"github.com/go-logr/logr"
 	"github.com/google/go-github/v39/github"
 	"golang.org/x/oauth2"
 )
@@ -18,7 +19,7 @@ type (
 	GhRemote struct {
 		client     *github.Client
 		ctx        context.Context
-		log        printer.Printer
+		log        logr.Logger
 		m          *sync.Mutex
 		prCache    map[int]*github.PullRequest
 		labelCache map[*domain.GitURL][]*github.Label
@@ -29,10 +30,10 @@ type (
 const ProviderKey githosting.RemoteProvider = "github"
 
 // NewRemote returns a new GitHub provider instance.
-func NewRemote() *GhRemote {
+func NewRemote(factory logging.LoggerFactory) *GhRemote {
 	ctx := context.Background()
 	provider := &GhRemote{
-		log:        printer.New(),
+		log:        factory.NewGenericLogger(""),
 		m:          &sync.Mutex{},
 		ctx:        ctx,
 		client:     createClient(os.Getenv("GITHUB_TOKEN"), ctx),

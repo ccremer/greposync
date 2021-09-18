@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/ccremer/greposync/domain"
+	"github.com/ccremer/greposync/infrastructure/logging"
 	"github.com/google/go-github/v39/github"
 )
 
@@ -22,7 +23,7 @@ func (r *GhRemote) FindPullRequest(url *domain.GitURL, _, commitBranch string) (
 }
 
 func (r *GhRemote) findExistingPr(owner, repo, commitBranch string) (*github.PullRequest, error) {
-	r.log.DebugF("Searching existing PRs with same branch %s...", commitBranch)
+	r.log.V(logging.LevelDebug).Info("Searching existing PRs with same branch...", "branch", commitBranch)
 	list, _, err := r.client.PullRequests.List(context.Background(), owner, repo, &github.PullRequestListOptions{
 		Head: fmt.Sprintf("%s:%s", owner, commitBranch),
 	})
@@ -96,7 +97,7 @@ func (r *GhRemote) createNewPr(url *domain.GitURL, pr *domain.PullRequest) error
 	ghPr, _, err := r.client.PullRequests.Create(context.Background(), url.GetNamespace(), url.GetRepositoryName(), newPR)
 	if err != nil {
 		if strings.Contains(err.Error(), "No commits between") {
-			r.log.InfoF("No pull request created as there are no commits between '%s' and '%s'", pr.BaseBranch, pr.CommitBranch)
+			r.log.Info("No pull request created as there are no commits between branches", "base", pr.BaseBranch, "head", pr.CommitBranch)
 			return nil
 		}
 		return err
@@ -109,7 +110,7 @@ func (r *GhRemote) createNewPr(url *domain.GitURL, pr *domain.PullRequest) error
 		}
 	}
 
-	r.log.InfoF("PR created: %s", ghPr.GetHTMLURL())
+	r.log.Info("PR created", "url", ghPr.GetHTMLURL())
 	return nil
 }
 

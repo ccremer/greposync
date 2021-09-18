@@ -1,9 +1,7 @@
 package application
 
 import (
-	"fmt"
 	"os"
-	"time"
 
 	"github.com/ccremer/greposync/application/clierror"
 	"github.com/ccremer/greposync/application/flags"
@@ -11,7 +9,8 @@ import (
 	"github.com/ccremer/greposync/application/labels"
 	"github.com/ccremer/greposync/application/update"
 	"github.com/ccremer/greposync/cfg"
-	"github.com/ccremer/greposync/printer"
+	"github.com/ccremer/greposync/infrastructure/logging"
+	"github.com/go-logr/logr"
 	"github.com/urfave/cli/v2"
 )
 
@@ -19,11 +18,7 @@ type (
 	App struct {
 		app    *cli.App
 		config *cfg.Configuration
-	}
-	VersionInfo struct {
-		Version string
-		Commit  string
-		Date    string
+		log    logr.Logger
 	}
 )
 
@@ -31,39 +26,35 @@ type (
 func NewApp(info VersionInfo, config *cfg.Configuration,
 	labelCommand *labels.Command,
 	updateCommand *update.Command,
+	initializeCommand *initialize.Command,
+	factory logging.LoggerFactory,
 ) *App {
-	dateLayout := "2006-01-02"
-	t, err := time.Parse(dateLayout, info.Date)
-	if err != nil {
-		printer.DefaultPrinter.ErrorF(err.Error())
-		os.Exit(2)
-	}
-
 	flags.InitGlobalFlags(config)
+	app := &App{
+		log:    factory.NewGenericLogger(""),
+		config: config,
+	}
 	a := &cli.App{
 		Name:                 "greposync",
 		Usage:                "git-repo-sync: Shameless reimplementation of ModuleSync in Go",
-		Version:              fmt.Sprintf("%s, commit %s, date %s", info.Version, info.Commit[0:7], t.Format(dateLayout)),
+		Version:              info.String(),
 		EnableBashCompletion: true,
 		Commands: []*cli.Command{
-			initialize.NewCommand(config).GetCliCommand(),
+			initializeCommand.GetCliCommand(),
 			labelCommand.GetCliCommand(),
 			updateCommand.GetCliCommand(),
 		},
-		Compiled:       t,
-		ExitErrHandler: clierror.ErrorHandler,
+		ExitErrHandler: clierror.NewErrorHandler(app.log),
 	}
-	return &App{
-		app:    a,
-		config: config,
-	}
+	app.app = a
+	return app
 }
 
 // Run the CLI application
 func (a *App) Run() {
 	err := a.app.Run(os.Args)
 	if err != nil {
-		printer.DefaultPrinter.ErrorF(err.Error())
+		a.log.Error(err, "app encountered fatal error")
 		os.Exit(1)
 	}
 }
