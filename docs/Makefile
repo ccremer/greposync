@@ -7,7 +7,7 @@ MAKEFLAGS += --no-builtin-variables
 .SUFFIXES:
 .SECONDARY:
 
-ANTORA_PLAYBOOK_PATH ?= local-antora-playbook.yml
+ANTORA_PLAYBOOK_PATH ?= antora-playbook.yml
 ANTORA_OUTPUT_DIR ?= $(shell grep "dir" $(ANTORA_PLAYBOOK_PATH) | cut -d " " -f 4)
 
 .PHONY: build

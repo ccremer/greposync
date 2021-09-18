@@ -4,12 +4,58 @@ on:
   push:
     branches:
       - master
+      - doc-gen
+    tags:
+      - "*"
 
 jobs:
-  gh-pages:
+  antora:
     runs-on: ubuntu-latest
+    if: ${{ contains(github.ref, 'tags') }}
     steps:
     - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: Parse semver string
+      id: semver
+      uses: booxmedialtd/ws-action-parse-semver@v1
+      with:
+        input_string: ${{ github.ref }}
+        version_extractor_regex: '\/v(.*)$'
+    - name: Configure Git
+      run: |
+        git config user.name "GitHub Actions"
+        git config user.email "actions@github.com"
+    - name: Set branch name
+      run: echo MINOR_VERSION=${{ steps.semver.outputs.major }}.${{ steps.semver.outputs.minor }} >> $GITHUB_ENV
+    - name: Checkout remote branch if exists
+      run: git checkout docs/v${{ env.MINOR_VERSION }}
+      continue-on-error: true
+    - name: Rebase if possible
+      run: git rebase ${GITHUB_REF##*/} docs/v${{ env.MINOR_VERSION }}
+      continue-on-error: true
+      # Don't rebase on prereleases. Users that want to view prereleases are encouraged to run a local preview.
+      if: ${{ steps.semver.outputs.prerelease == '' }}
+    - name: Create new branch if not existing
+      run: git switch --create docs/v${{ env.MINOR_VERSION }}
+      continue-on-error: true
+    - name: Patch Antora file
+      run: yq eval 'del(.prerelease) | del (.display_version) | .version = "${{ env.MINOR_VERSION }}"' -i docs/antora.yml
+    - name: Commit
+      run: git commit -am "Update version for Antora" --author "GitHub Actions <actions@github.com>"
+      continue-on-error: true
+    - name: Push
+      run: git push --atomic --force --set-upstream origin docs/v${{ env.MINOR_VERSION }}
+
+  gh-pages:
+    runs-on: ubuntu-latest
+    needs: antora
+    # This ensure that we still run on master branches
+    if: always()
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
     - name: Configure Git
       run: |
         git remote set-url origin "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}"
