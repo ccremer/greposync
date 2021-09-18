@@ -1,7 +1,7 @@
 name: greposync
 title: greposync
 nav:
-- modules/ROOT/nav.adoc
+  - modules/ROOT/nav.adoc
 
 version: master
 prerelease: true
