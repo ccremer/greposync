@@ -7,6 +7,7 @@ require (
 	github.com/Masterminds/sprig/v3 v3.2.1
 	github.com/ccremer/go-command-pipeline v0.8.0
 	github.com/google/go-github/v38 v38.1.0
+	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/google/wire v0.5.0
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/knadh/koanf v1.2.2
@@ -15,7 +16,9 @@ require (
 	github.com/stretchr/testify v1.7.0
 	github.com/urfave/cli/v2 v2.3.0
 	github.com/whilp/git-urls v1.0.0
+	golang.org/x/crypto v0.0.0-20210817164053-32db794688a5 // indirect
 	golang.org/x/oauth2 v0.0.0-20210810183815-faf39c7919d5
 	golang.org/x/sys v0.0.0-20210809222454-d867a43fc93e
+	google.golang.org/appengine v1.6.7 // indirect
 	sigs.k8s.io/yaml v1.2.0
 )
