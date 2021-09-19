@@ -6,7 +6,6 @@ import (
 	pipeline "github.com/ccremer/go-command-pipeline"
 	"github.com/ccremer/go-command-pipeline/predicate"
 	"github.com/ccremer/greposync/domain"
-	"github.com/ccremer/greposync/infrastructure/ui"
 	"github.com/go-logr/logr"
 )
 
@@ -14,7 +13,6 @@ type pipelineContext struct {
 	log        logr.Logger
 	repo       *domain.GitRepository
 	appService *AppService
-	differ     ui.DiffPrinter
 }
 
 func (c *pipelineContext) clone() pipeline.ActionFunc {
@@ -57,7 +55,7 @@ func (c *pipelineContext) diff() pipeline.ActionFunc {
 		if err != nil {
 			return pipeline.Result{Err: err}
 		}
-		c.differ.PrintDiff(c.repo.URL.GetFullName(), diff)
+		c.appService.diffPrinter.PrintDiff("Diff: "+c.repo.URL.GetFullName(), diff)
 		return pipeline.Result{}
 	}
 }

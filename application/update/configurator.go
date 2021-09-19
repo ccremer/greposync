@@ -47,5 +47,4 @@ func (c *AppService) ConfigureInfrastructure() {
 	c.repoStore.DefaultNamespace = c.cfg.Git.Namespace
 	c.repoStore.CommitBranch = c.cfg.Git.CommitBranch
 	c.templateStore.RootDir = "template"
-	c.diffPrinter.SuppressDiff = false
 }

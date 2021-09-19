@@ -16,10 +16,11 @@ import (
 )
 
 const (
-	dryRunFlagName   = "dry-run"
-	prCreateFlagName = "pr-create"
-	prBodyFlagName   = "pr-bodyTemplate"
+	dryRunFlagName       = "dry-run"
+	prCreateFlagName     = "pr-create"
+	prBodyFlagName       = "pr-bodyTemplate"
 	amendFlagName    = "git-amend"
+	showDiffFlagName = "log-showDiff"
 )
 
 type (
@@ -78,6 +79,7 @@ func (c *Command) createPipeline(r *domain.GitRepository) *pipeline.Pipeline {
 	resetRepo := !c.cfg.Git.SkipReset
 	enabledCommits := !c.cfg.Git.SkipCommit
 	enabledPush := !c.cfg.Git.SkipPush
+	showDiff := c.cfg.Log.ShowDiff
 
 	repoCtx := &pipelineContext{
 		repo:       r,
@@ -104,7 +106,7 @@ func (c *Command) createPipeline(r *domain.GitRepository) *pipeline.Pipeline {
 			WithNestedSteps("commit changes",
 				pipeline.NewStep("add", repoCtx.add()),
 				pipeline.NewStep("commit", repoCtx.commit()),
-				pipeline.NewStep("show diff", repoCtx.diff()),
+				predicate.ToStep("show diff", repoCtx.diff(), predicate.Bool(showDiff)),
 			),
 			predicate.And(predicate.Bool(enabledCommits), repoCtx.isDirty())),
 		predicate.ToStep("push changes", repoCtx.push(), predicate.And(predicate.Bool(enabledPush), repoCtx.hasCommits())),

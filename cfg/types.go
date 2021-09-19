@@ -33,7 +33,8 @@ type (
 
 	// LogConfig configures the logging options
 	LogConfig struct {
-		Level string `json:"level" koanf:"level"`
+		Level    string `json:"level" koanf:"level"`
+		ShowDiff bool   `json:"showDiff" koanf:"showDiff"`
 	}
 	// PullRequestConfig configures the pull request feature
 	PullRequestConfig struct {
