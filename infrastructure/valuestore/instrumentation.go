@@ -6,8 +6,7 @@ import (
 )
 
 type ValueStoreInstrumentation struct {
-	log   logr.Logger
-	scope string
+	log logr.Logger
 }
 
 func NewValueStoreInstrumentation(factory logging.LoggerFactory) *ValueStoreInstrumentation {
@@ -23,12 +22,12 @@ func (i *ValueStoreInstrumentation) attemptingLoadConfig(scope string, fileName 
 	i.log.WithName(scope).V(logging.LevelDebug).Info("Loading config", "file", fileName)
 }
 
-func (i *ValueStoreInstrumentation) loadedConfigIfNil(scope string, fileName string, err error) error {
+func (i *ValueStoreInstrumentation) loadedConfigIfNil(scope string, err error) error {
 	if i == nil {
 		return nil
 	}
 	if err != nil {
-		i.log.WithName(scope).V(logging.LevelWarn).Info("file not loaded", "file", fileName, "error", err.Error())
+		i.log.WithName(scope).V(logging.LevelWarn).Info("file not loaded", "error", err.Error())
 	}
 	return nil
 }

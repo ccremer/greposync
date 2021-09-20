@@ -75,7 +75,6 @@ func (k *KoanfValueStore) FetchFilesToDelete(config *domain.GitRepository) ([]do
 }
 
 func (k *KoanfValueStore) prepareRepoKoanf(repository *domain.GitRepository) (*koanf.Koanf, error) {
-	k.instrumentation.scope = repository.URL.GetRepositoryName()
 	if repoKoanf, exists := k.cache[repository.URL]; exists {
 		return repoKoanf, nil
 	}
@@ -98,7 +97,7 @@ func (k *KoanfValueStore) loadAndMergeConfig(repository *domain.GitRepository) (
 	k.instrumentation.attemptingLoadConfig(repository.URL.GetFullName(), syncFile)
 	// Load the config from .sync.yml
 	err = repoKoanf.Load(file.Provider(syncFile), yaml.Parser())
-	return repoKoanf, k.instrumentation.loadedConfigIfNil(repository.URL.GetFullName(), syncFile, err)
+	return repoKoanf, k.instrumentation.loadedConfigIfNil(repository.URL.GetFullName(), err)
 }
 
 func (k *KoanfValueStore) loadDataForTemplate(repoKoanf *koanf.Koanf, templateFileName string) (domain.Values, error) {
@@ -131,13 +130,10 @@ func (k *KoanfValueStore) loadGlobals() {
 	if k.globalKoanf != nil {
 		return
 	}
-	scope := k.instrumentation.scope
-	k.instrumentation.scope = ""
-	defer func() { k.instrumentation.scope = scope }()
 
 	k.globalKoanf = koanf.New(".")
 	k.instrumentation.attemptingLoadConfig("", GlobalConfigFileName)
 	// Load the config from global config file, but ignore errors.
 	err := k.globalKoanf.Load(file.Provider(GlobalConfigFileName), yaml.Parser())
-	_ = k.instrumentation.loadedConfigIfNil("", GlobalConfigFileName, err)
+	_ = k.instrumentation.loadedConfigIfNil("", err)
 }

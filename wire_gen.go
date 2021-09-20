@@ -44,7 +44,7 @@ func initInjector() *injector {
 	renderServiceInstrumentation := templateengine.NewRenderServiceInstrumentation(consoleLoggerFactory)
 	renderService := domain.NewRenderService(renderServiceInstrumentation)
 	consoleDiffPrinter := ui.NewConsoleDiffPrinter()
-	updateAppService := update.NewConfigurator(goTemplateEngine, repositoryStore, goTemplateStore, koanfValueStore, pullRequestStore, renderService, consoleDiffPrinter, configuration)
+	updateAppService := update.NewConfigurator(goTemplateEngine, repositoryStore, goTemplateStore, koanfValueStore, pullRequestStore, renderService, consoleDiffPrinter, configuration, consoleSink, coloredConsole)
 	updateInstrumentation := update.NewUpdateInstrumentation(coloredConsole, consoleLoggerFactory)
 	updateCommand := update.NewCommand(configuration, updateAppService, consoleLoggerFactory, updateInstrumentation)
 	initializeCommand := initialize.NewCommand(configuration, consoleLoggerFactory)

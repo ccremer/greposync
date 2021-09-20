@@ -49,11 +49,11 @@ func (t *ConsoleSink) Enabled(level int) bool {
 func (t *ConsoleSink) Info(level int, msg string, keysAndValues ...interface{}) {
 	buf := &bytes.Buffer{}
 	t.ptermSink.WithOutput(buf).Info(level, msg, keysAndValues...)
-	if t.ptermSink.GetName() == "" || !t.console.Quiet {
+	if t.ptermSink.Name() == "" || !t.console.Quiet {
 		_, _ = buf.WriteTo(os.Stdout)
 		return
 	}
-	t.console.AddToBuffer(t.ptermSink.GetName(), buf)
+	t.console.AddToBuffer(t.ptermSink.Name(), buf)
 	t.console.RefreshProgressBar()
 }
 
@@ -63,11 +63,11 @@ func (t *ConsoleSink) Info(level int, msg string, keysAndValues ...interface{}) 
 func (t *ConsoleSink) Error(err error, msg string, keysAndValues ...interface{}) {
 	buf := &bytes.Buffer{}
 	t.ptermSink.WithOutput(buf).Error(err, msg, keysAndValues...)
-	if t.ptermSink.GetName() == "" || !t.console.Quiet {
+	if t.ptermSink.Name() == "" || !t.console.Quiet {
 		_, _ = buf.WriteTo(os.Stdout)
 		return
 	}
-	t.console.AddToBuffer(t.ptermSink.GetName(), buf)
+	t.console.AddToBuffer(t.ptermSink.Name(), buf)
 	t.console.RefreshProgressBar()
 }
 
@@ -87,4 +87,10 @@ func (t *ConsoleSink) WithName(name string) logr.LogSink {
 		console:   t.console,
 	}
 	return newSink
+}
+
+// WithLevelEnabled enables or disables the given log level, if existing.
+func (t *ConsoleSink) WithLevelEnabled(level logging.LogLevel, enabled bool) *ConsoleSink {
+	t.ptermSink.LevelEnabled[int(level)] = enabled
+	return t
 }

@@ -29,12 +29,16 @@ type (
 		// Exclude is similar to Include, only that matching repository URLs are skipped.
 		// This option is not configurable in `greposync.yml`.
 		Exclude string `json:"-" koanf:"exclude"`
+
+		SkipBroken bool `json:"-" koanf:"skipBroken"`
 	}
 
 	// LogConfig configures the logging options
 	LogConfig struct {
 		Level    string `json:"level" koanf:"level"`
 		ShowDiff bool   `json:"showDiff" koanf:"showDiff"`
+		// Shows the full log in real-time rather than keeping it hidden until an error occurred.
+		ShowLog bool `json:"showLog" koanf:"showLog"`
 	}
 	// PullRequestConfig configures the pull request feature
 	PullRequestConfig struct {
@@ -114,7 +118,7 @@ func NewDefaultConfig() *Configuration {
 			ConfigDefaultFileName: "config_defaults.yml",
 		},
 		Log: &LogConfig{
-			Level: "error",
+			Level: "info",
 		},
 		Git: &GitConfig{
 			CommitMessage: "Update from greposync",

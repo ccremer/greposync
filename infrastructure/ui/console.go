@@ -38,7 +38,7 @@ func (c *ColoredConsole) PrintProgressbarMessage(scope string, err error) {
 			Printfln("Update finished for repository")
 	} else {
 		pterm.Error.WithScope(pterm.Scope{Text: scope, Style: pterm.Error.Scope.Style}).
-			Println(err)
+			Println("Update failed for repository")
 	}
 	c.BatchProgressbar.Increment()
 }
@@ -73,7 +73,7 @@ func (c *ColoredConsole) Flush(scope, header string) {
 	defer c.m.Unlock()
 	buf, exists := c.buffers[scope]
 	if exists {
-		pterm.DefaultHeader.Println(header)
+		pterm.DefaultHeader.WithBackgroundStyle(pterm.NewStyle(pterm.BgCyan)).Println(header)
 		_, _ = buf.WriteTo(os.Stdout)
 	}
 }

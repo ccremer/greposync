@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/ccremer/greposync/cfg"
-	"github.com/ccremer/greposync/infrastructure/logging"
 	"github.com/urfave/cli/v2"
 )
 
@@ -15,6 +14,9 @@ const (
 	ProjectExcludeFlagName = "project-exclude"
 	// ProjectJobsFlagName is the name on the CLI
 	ProjectJobsFlagName = "project-jobs"
+
+	ProjectSkipBrokenFlagName = "project-skipBroken"
+	LogShowLogFlagName        = "log-showLog"
 
 	projectRootFlagName = "project-root"
 	logLevelFlagName    = "log-level"
@@ -49,6 +51,14 @@ func InitGlobalFlags(config *cfg.Configuration) []cli.Flag {
 			Usage:   "Jobs is the number of parallel jobs to run. 1 basically means that jobs are run in sequence.",
 			Aliases: []string{"j"},
 			Value:   1,
+		},
+		&cli.BoolFlag{
+			Name:  ProjectSkipBrokenFlagName,
+			Usage: "Skip abort if a repository update encounters an error",
+		},
+		&cli.BoolFlag{
+			Name:  LogShowLogFlagName,
+			Usage: "Shows the full log in real-time rather than keeping it hidden until an error occurred.",
 		},
 		NewProjectIncludeFlag(),
 		NewProjectExcludeFlag(),
@@ -85,7 +95,6 @@ func CombineWithGlobalFlags(flags ...cli.Flag) []cli.Flag {
 func ValidateGlobalFlags(ctx *cli.Context, config *cfg.Configuration) error {
 	if ctx.Bool("verbose") {
 		config.Log.Level = "debug"
-		logging.DefaultLevel = logging.LevelDebug
 	}
 	return nil
 }

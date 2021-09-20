@@ -77,6 +77,7 @@ type ProjectConfig struct {
     Jobs                     int
     Include                  string
     Exclude                  string
+    SkipBroken               bool
 }
 ----
 
@@ -107,16 +108,25 @@ This option is not configurable in `greposync.yml`.
 
 
 
+
+
 === LogConfig
 [source, go]
 ----
 type LogConfig struct {
-    Level    string
+    Level       string
+    ShowDiff    bool
+    ShowLog     bool
 }
 ----
 
 
 
+
+
+
+ShowLog::
+Shows the full log in real-time rather than keeping it hidden until an error occurred.
 
 
 
@@ -310,11 +320,16 @@ type (
         // Exclude is similar to Include, only that matching repository URLs are skipped.
         // This option is not configurable in `greposync.yml`.
         Exclude string `json:"-" koanf:"exclude"`
+
+        SkipBroken bool `json:"-" koanf:"skipBroken"`
     }
 
     // LogConfig configures the logging options
     LogConfig struct {
-        Level string `json:"level" koanf:"level"`
+        Level    string `json:"level" koanf:"level"`
+        ShowDiff bool   `json:"showDiff" koanf:"showDiff"`
+        // Shows the full log in real-time rather than keeping it hidden until an error occurred.
+        ShowLog bool `json:"showLog" koanf:"showLog"`
     }
     // PullRequestConfig configures the pull request feature
     PullRequestConfig struct {

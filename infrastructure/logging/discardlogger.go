@@ -13,9 +13,9 @@ func NewDiscardLoggerFactory() LoggerFactory {
 	return &DiscardLoggerFactory{}
 }
 
-func (d *DiscardLoggerFactory) NewGenericLogger(name string) logr.Logger { return logr.Discard() }
+func (d *DiscardLoggerFactory) NewGenericLogger(_ string) logr.Logger { return logr.Discard() }
 
-func (d *DiscardLoggerFactory) NewRepositoryLogger(repository *domain.GitRepository) logr.Logger {
+func (d *DiscardLoggerFactory) NewRepositoryLogger(_ *domain.GitRepository) logr.Logger {
 	return logr.Discard()
 }
 

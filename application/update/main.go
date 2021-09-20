@@ -9,16 +9,14 @@ import (
 	"github.com/ccremer/greposync/cfg"
 	"github.com/ccremer/greposync/domain"
 	"github.com/ccremer/greposync/infrastructure/logging"
-	"github.com/go-logr/logr"
 	"github.com/hashicorp/go-multierror"
-	"github.com/knadh/koanf"
 	"github.com/urfave/cli/v2"
 )
 
 const (
-	dryRunFlagName       = "dry-run"
-	prCreateFlagName     = "pr-create"
-	prBodyFlagName       = "pr-bodyTemplate"
+	dryRunFlagName   = "dry-run"
+	prCreateFlagName = "pr-create"
+	prBodyFlagName   = "pr-bodyTemplate"
 	amendFlagName    = "git-amend"
 	showDiffFlagName = "log-showDiff"
 )
@@ -27,12 +25,9 @@ type (
 	// Command is a facade service for the update command that holds all dependent services and settings.
 	Command struct {
 		cfg             *cfg.Configuration
-		cliCommand      *cli.Command
 		repositories    []*domain.GitRepository
-		globalK         *koanf.Koanf
 		appService      *AppService
-		instrumentation *updateInstrumentation
-		log             logr.Logger
+		instrumentation *UpdateInstrumentation
 		logFactory      logging.LoggerFactory
 	}
 )
@@ -42,10 +37,9 @@ func NewCommand(
 	cfg *cfg.Configuration,
 	configurator *AppService,
 	factory logging.LoggerFactory,
-	instrumentation *updateInstrumentation,
+	instrumentation *UpdateInstrumentation,
 ) *Command {
 	c := &Command{
-		globalK:         koanf.New("."),
 		cfg:             cfg,
 		appService:      configurator,
 		instrumentation: instrumentation,
@@ -59,10 +53,10 @@ func (c *Command) runCommand(_ *cli.Context) error {
 	p := pipeline.NewPipeline().AddBeforeHook(logger).WithSteps(
 		pipeline.NewStep("configure infrastructure", c.configureInfrastructure()),
 		pipeline.NewStep("fetch managed repos config", c.fetchRepositories()),
-		parallel.NewWorkerPoolStep("update repositories", c.cfg.Project.Jobs, c.updateReposInParallel(), c.errorHandler()),
+		parallel.NewWorkerPoolStep("update repositories", c.cfg.Project.Jobs, c.updateReposInParallel(), c.collectErrors()),
 	)
 	p.WithFinalizer(func(result pipeline.Result) error {
-		c.instrumentation.batchPipelineCompleted()
+		c.instrumentation.batchPipelineCompleted(c.repositories)
 		return result.Err
 	})
 	return p.Run().Err
@@ -132,8 +126,16 @@ func (c *Command) updateReposInParallel() parallel.PipelineSupplier {
 	}
 }
 
-func (c *Command) errorHandler() parallel.ResultHandler {
+func (c *Command) collectErrors() parallel.ResultHandler {
+	if c.cfg.Project.SkipBroken {
+		// Do not propagate update errors from single repositories up the stack
+		return func(results map[uint64]pipeline.Result) pipeline.Result {
+			c.instrumentation.results = results
+			return pipeline.Result{}
+		}
+	}
 	return func(results map[uint64]pipeline.Result) pipeline.Result {
+		c.instrumentation.results = results
 		var err error
 		for index, repo := range c.repositories {
 			if result := results[uint64(index)]; result.Err != nil {

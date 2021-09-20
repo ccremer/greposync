@@ -9,12 +9,14 @@ import (
 // ConsoleLoggerFactory creates logr.Logger optimized for console CLI.
 type ConsoleLoggerFactory struct {
 	rootLogger logr.Logger
+	sink       *ConsoleSink
 }
 
 // NewConsoleLoggerFactory wraps the given log sink.
-func NewConsoleLoggerFactory(sink logr.LogSink) *ConsoleLoggerFactory {
+func NewConsoleLoggerFactory(sink *ConsoleSink) *ConsoleLoggerFactory {
 	return &ConsoleLoggerFactory{
 		rootLogger: logr.New(sink),
+		sink:       sink,
 	}
 }
 

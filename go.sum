@@ -55,8 +55,8 @@ github.com/atomicgo/cursor v0.0.1/go.mod h1:cBON2QmmrysudxNBFthvMtN32r3jxVRIvzkU
 github.com/bgentry/speakeasy v0.1.0/go.mod h1:+zsyZBPWlz7T6j88CTgSN5bM796AkVf0kBD4zp0CCIs=
 github.com/ccremer/go-command-pipeline v0.8.0 h1:y6pmLjdlOWLZkyd3shpuseNiEZd2kF5CJWyR3ovwpNE=
 github.com/ccremer/go-command-pipeline v0.8.0/go.mod h1:/z7VzRQR5FtUeH/bCDYwHgP+Hojkn754hdS5U1Aw5Pw=
-github.com/ccremer/plogr v0.3.0 h1:wR1YOx0r61xBNTvxslyyYrLsjoIASBf5zENazDYeZX0=
-github.com/ccremer/plogr v0.3.0/go.mod h1:P6oXuOE3C9WUP4ChVD62Y47YlWriUB/m42of2DPtCJg=
+github.com/ccremer/plogr v0.3.1-0.20210920222255-0e7ec590769f h1:kEjpz6wiEwSC857ELLKbWE+gn0EhfWAJVMs5ttbtRdk=
+github.com/ccremer/plogr v0.3.1-0.20210920222255-0e7ec590769f/go.mod h1:P6oXuOE3C9WUP4ChVD62Y47YlWriUB/m42of2DPtCJg=
 github.com/census-instrumentation/opencensus-proto v0.2.1/go.mod h1:f6KPmirojxKA12rnyqOA5BBL4O983OfeGPqjHWSTneU=
 github.com/chzyer/logex v1.1.10/go.mod h1:+Ywpsq7O8HXn0nuIou7OrIPyXbp3wmkHB+jjWRnGsAI=
 github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e/go.mod h1:nSuG5e5PlCu98SY8svDHJxuZscDgtXS6KTTbou5AhLI=
