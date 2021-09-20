@@ -32,8 +32,7 @@ jobs:
         echo "BRANCH_NAME=docs/v${{ steps.semver.outputs.major }}.${{ steps.semver.outputs.minor }}" >> $GITHUB_ENV
     - name: Set branch name for Prerelease
       if: ${{ steps.semver.outputs.prerelease != '' }}
-      # Cover all prereleases in one single rc branch. Administrator should manually delete the docs/vX.Y-rc branches from time to time for cleanup
-      run: echo "BRANCH_NAME=docs/v${{ env.MINOR_VERSION}}-rc" >> $GITHUB_ENV
+      run: echo "BRANCH_NAME=${{ env.BRANCH_NAME }}-rc" >> $GITHUB_ENV
 
     - name: Checkout remote branch if exists
       run: git checkout ${{ env.BRANCH_NAME }}
@@ -57,6 +56,11 @@ jobs:
       continue-on-error: true
     - name: Push
       run: git push --atomic --force --set-upstream origin ${{ env.BRANCH_NAME }}
+
+    - name: Cleanup prerelease branch if existing
+      if: ${{ steps.semver.outputs.prerelease == '' }}
+      run: git push origin --delete ${{ env.BRANCH_NAME }}-rc
+      continue-on-error: true
 
   gh-pages:
     runs-on: ubuntu-latest
