@@ -1,6 +1,7 @@
 package application
 
 import (
+	"errors"
 	"os"
 
 	"github.com/ccremer/greposync/application/clierror"
@@ -54,7 +55,12 @@ func NewApp(info VersionInfo, config *cfg.Configuration,
 func (a *App) Run() {
 	err := a.app.Run(os.Args)
 	if err != nil {
-		a.log.Error(err, "app encountered fatal error")
+		if errors.Is(err, clierror.ErrPipeline) {
+			// Ignore pipeline errors as they are printed separately
+			a.log.Error(nil, "An error occurred in one of the repositories. See the log printed above")
+		} else {
+			a.log.Error(nil, err.Error())
+		}
 		os.Exit(1)
 	}
 }

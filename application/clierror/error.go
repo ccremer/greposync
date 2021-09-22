@@ -11,6 +11,9 @@ import (
 var (
 	// ErrUsage is an error that is caused by an incorrect usage by the user.
 	ErrUsage = errors.New("usage error")
+
+	// ErrPipeline is an error that is caused by an action aborting a pipeline.
+	ErrPipeline = errors.New("pipeline error")
 )
 
 // NewErrorHandler will print the CLI help and exit with code 2 if the given error is a ErrUsage.

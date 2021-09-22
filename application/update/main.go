@@ -6,6 +6,7 @@ import (
 	pipeline "github.com/ccremer/go-command-pipeline"
 	"github.com/ccremer/go-command-pipeline/parallel"
 	"github.com/ccremer/go-command-pipeline/predicate"
+	"github.com/ccremer/greposync/application/clierror"
 	"github.com/ccremer/greposync/cfg"
 	"github.com/ccremer/greposync/domain"
 	"github.com/ccremer/greposync/infrastructure/logging"
@@ -128,12 +129,20 @@ func (c *Command) updateReposInParallel() parallel.PipelineSupplier {
 
 func (c *Command) collectErrors() parallel.ResultHandler {
 	if c.cfg.Project.SkipBroken {
-		// Do not propagate update errors from single repositories up the stack
-		return func(results map[uint64]pipeline.Result) pipeline.Result {
-			c.instrumentation.results = results
-			return pipeline.Result{}
-		}
+		return c.ignoreErrors()
 	}
+	return c.reduceErrors()
+}
+
+func (c *Command) ignoreErrors() parallel.ResultHandler {
+	// Do not propagate update errors from single repositories up the stack
+	return func(results map[uint64]pipeline.Result) pipeline.Result {
+		c.instrumentation.results = results
+		return pipeline.Result{}
+	}
+}
+
+func (c *Command) reduceErrors() parallel.ResultHandler {
 	return func(results map[uint64]pipeline.Result) pipeline.Result {
 		c.instrumentation.results = results
 		var err error
@@ -142,7 +151,7 @@ func (c *Command) collectErrors() parallel.ResultHandler {
 				err = multierror.Append(err, fmt.Errorf("%s: %w", repo.URL.GetRepositoryName(), result.Err))
 			}
 		}
-		return pipeline.Result{Err: err}
+		return pipeline.Result{Err: fmt.Errorf("%w: %s", clierror.ErrPipeline, err)}
 	}
 }
 

@@ -34,6 +34,7 @@ func (t *ConsoleSink) Init(info logr.RuntimeInfo) {
 	sink.LevelPrinters[logging.LevelInfo] = plogr.DefaultLevelPrinters[0]
 	sink.LevelPrinters[logging.LevelSuccess] = pterm.Success
 	sink.LevelPrinters[logging.LevelWarn] = pterm.Warning
+	sink.ErrorPrinter = *sink.ErrorPrinter.WithLineNumberOffset(3)
 
 	t.ptermSink = &sink
 }
