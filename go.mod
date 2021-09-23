@@ -17,5 +17,5 @@ require (
 	github.com/whilp/git-urls v1.0.0
 	golang.org/x/oauth2 v0.0.0-20210810183815-faf39c7919d5
 	golang.org/x/sys v0.0.0-20210809222454-d867a43fc93e
-	sigs.k8s.io/yaml v1.2.0
+	sigs.k8s.io/yaml v1.3.0
 )
