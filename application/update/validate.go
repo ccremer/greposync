@@ -48,7 +48,7 @@ func (c *Command) validateUpdateCommand(ctx *cli.Context) error {
 			return clierror.AsFlagUsageErrorf(dryRunFlagName, "unrecognized: %s", dryRunMode)
 		}
 	}
-
+	c.logFactory.SetLogLevel(logging.ParseLevelOrDefault(c.cfg.Log.Level, logging.LevelInfo))
 	j, _ := json.Marshal(c.cfg)
 	c.logFactory.NewGenericLogger("").V(logging.LevelDebug).Info("Using config", "config", string(j))
 	return nil

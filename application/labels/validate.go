@@ -35,8 +35,8 @@ func (c *Command) validateCommand(ctx *cli.Context) error {
 	if err != nil {
 		return clierror.AsUsageErrorf("invalid label configuration in '%s': %w", "repositoryLabels", err)
 	}
-
+	c.appService.factory.SetLogLevel(logging.ParseLevelOrDefault(c.cfg.Log.Level, logging.LevelInfo))
 	j, _ := json.Marshal(c.cfg)
-	c.console.V(logging.LevelDebug).Info("Using config", "config", j)
+	c.appService.factory.NewGenericLogger("").V(logging.LevelDebug).Info("Using config", "config", string(j))
 	return nil
 }

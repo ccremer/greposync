@@ -9,4 +9,5 @@ type LoggerFactory interface {
 	NewGenericLogger(name string) logr.Logger
 	NewRepositoryLogger(repository *domain.GitRepository) logr.Logger
 	NewPipelineLogger(name string) *PipelineLogger
+	SetLogLevel(level LogLevel)
 }

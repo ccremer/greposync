@@ -36,3 +36,22 @@ func (f *ConsoleLoggerFactory) NewPipelineLogger(name string) *logging.PipelineL
 		Logger: f.NewGenericLogger(name),
 	}
 }
+
+// SetLogLevel implements logging.LoggerFactory.
+func (f *ConsoleLoggerFactory) SetLogLevel(level logging.LogLevel) {
+	s := f.sink
+	switch level {
+	case logging.LevelWarn:
+		s.
+			WithLevelEnabled(logging.LevelSuccess, false).
+			WithLevelEnabled(logging.LevelInfo, false).
+			WithLevelEnabled(logging.LevelDebug, false)
+	case logging.LevelSuccess:
+		s.
+			WithLevelEnabled(logging.LevelInfo, false).
+			WithLevelEnabled(logging.LevelDebug, false)
+	case logging.LevelInfo:
+		s.
+			WithLevelEnabled(logging.LevelDebug, false)
+	}
+}
