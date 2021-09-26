@@ -2,6 +2,7 @@
 * https://github.com/ccremer/greposync/releases[Changelog,window=_blank]
 
 .Tutorials
+* xref:tutorials/installation.adoc[Installation]
 * xref:tutorials/getting-started.adoc[Getting started]
 * xref:tutorials/create-pr.adoc[Create a PR]
 

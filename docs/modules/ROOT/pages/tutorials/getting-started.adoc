@@ -13,7 +13,7 @@
 You need the following tools installed in your `$PATH`.
 
 * `git`
-* `gsync`
+* `gsync` (See xref:tutorials/installation.adoc[Installation])
 * `editor` (Your favorite text editor)
 
 Additionally, you need the following.
