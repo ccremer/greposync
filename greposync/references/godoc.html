@@ -158,7 +158,9 @@
   skipPush: false
   skipReset: false
 log:
-  level: debug
+  level: info
+  showDiff: false
+  showLog: false
 pr:
   bodyTemplate: This Pull request updates this repository with changes from a greposync
     template repository.
@@ -223,6 +225,7 @@ template:
     Jobs                     int
     Include                  string
     Exclude                  string
+    SkipBroken               bool
 }</code></pre>
 </div>
 </div>
@@ -258,9 +261,19 @@ This option is not configurable in <code>greposync.yml</code>.</p>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">type LogConfig struct {
-    Level    string
+    Level       string
+    ShowDiff    bool
+    ShowLog     bool
 }</code></pre>
 </div>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">ShowLog</dt>
+<dd>
+<p>Shows the full log in real-time rather than keeping it hidden until an error occurred.</p>
+</dd>
+</dl>
 </div>
 </div>
 <div class="sect2">
@@ -451,11 +464,16 @@ This is often a user or organization name in GitHub.com or GitLab.com.</p>
         // Exclude is similar to Include, only that matching repository URLs are skipped.
         // This option is not configurable in `greposync.yml`.
         Exclude string `json:"-" koanf:"exclude"`
+
+        SkipBroken bool `json:"-" koanf:"skipBroken"`
     }
 
     // LogConfig configures the logging options
     LogConfig struct {
-        Level string `json:"level" koanf:"level"`
+        Level    string `json:"level" koanf:"level"`
+        ShowDiff bool   `json:"showDiff" koanf:"showDiff"`
+        // Shows the full log in real-time rather than keeping it hidden until an error occurred.
+        ShowLog bool `json:"showLog" koanf:"showLog"`
     }
     // PullRequestConfig configures the pull request feature
     PullRequestConfig struct {
@@ -543,7 +561,9 @@ This is often a user or organization name in GitHub.com or GitLab.com.</p>
   skipPush: false
   skipReset: false
 log:
-  level: debug
+  level: info
+  showDiff: false
+  showLog: false
 pr:
   bodyTemplate: This Pull request updates this repository with changes from a greposync
     template repository.
