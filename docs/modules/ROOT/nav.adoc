@@ -17,7 +17,6 @@
 
 .Technical reference
 * xref:references/template.adoc[Template]
-* xref:references/godoc.adoc[Godoc]
 * xref:references/sync-config.adoc[Sync configuration]
 
 .Explanation

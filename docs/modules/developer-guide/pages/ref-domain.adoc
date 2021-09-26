@@ -1,0 +1,1124 @@
+
+= package domain
+
+
+
+== Interfaces
+
+=== GitRepositoryStore
+[source, go]
+----
+type GitRepositoryStore interface {
+    FetchGitRepositories() ([]*GitRepository, error)
+    Clone(repository *GitRepository) error
+    Checkout(repository *GitRepository) error
+    Fetch(repository *GitRepository) error
+    Reset(repository *GitRepository) error
+    Pull(repository *GitRepository) error
+    Add(repository *GitRepository) error
+    Commit(repository *GitRepository, options CommitOptions) error
+    Diff(repository *GitRepository) (string, error)
+    Push(repository *GitRepository, options PushOptions) error
+}
+----
+
+
+
+.FetchGitRepositories
+[source, go]
+----
+func FetchGitRepositories() ([]*GitRepository, error)
+----
+
+
+.Clone
+[source, go]
+----
+func Clone(repository *GitRepository) error
+----
+
+
+.Checkout
+[source, go]
+----
+func Checkout(repository *GitRepository) error
+----
+
+
+.Fetch
+[source, go]
+----
+func Fetch(repository *GitRepository) error
+----
+
+
+.Reset
+[source, go]
+----
+func Reset(repository *GitRepository) error
+----
+
+
+.Pull
+[source, go]
+----
+func Pull(repository *GitRepository) error
+----
+
+
+.Add
+[source, go]
+----
+func Add(repository *GitRepository) error
+----
+
+
+.Commit
+[source, go]
+----
+func Commit(repository *GitRepository, options CommitOptions) error
+----
+
+
+.Diff
+[source, go]
+----
+func Diff(repository *GitRepository) (string, error)
+----
+
+
+.Push
+[source, go]
+----
+func Push(repository *GitRepository, options PushOptions) error
+----
+
+
+'''
+
+=== LabelStore
+[source, go]
+----
+type LabelStore interface {
+    FetchLabelsForRepository(url *GitURL) (LabelSet, error)
+    EnsureLabelsForRepository(url *GitURL, labels LabelSet) error
+    RemoveLabelsFromRepository(url *GitURL, labels LabelSet) error
+}
+----
+
+
+
+.FetchLabelsForRepository
+[source, go]
+----
+func FetchLabelsForRepository(url *GitURL) (LabelSet, error)
+----
+
+
+.EnsureLabelsForRepository
+[source, go]
+----
+func EnsureLabelsForRepository(url *GitURL, labels LabelSet) error
+----
+
+
+.RemoveLabelsFromRepository
+[source, go]
+----
+func RemoveLabelsFromRepository(url *GitURL, labels LabelSet) error
+----
+
+
+'''
+
+=== PullRequestStore
+[source, go]
+----
+type PullRequestStore interface {
+    FindMatchingPullRequest(repository *GitRepository) (*PullRequest, error)
+    EnsurePullRequest(repository *GitRepository) error
+}
+----
+
+
+
+.FindMatchingPullRequest
+[source, go]
+----
+func FindMatchingPullRequest(repository *GitRepository) (*PullRequest, error)
+----
+FindMatchingPullRequest returns the PullRequest that has the same branch as GitRepository.CommitBranch.
+If not found, it returns nil without error.
+
+.EnsurePullRequest
+[source, go]
+----
+func EnsurePullRequest(repository *GitRepository) error
+----
+EnsurePullRequest creates or updates the GitRepository.PullRequest in the repository.
+
+ * This operation does not alter any properties of existing labels.
+ * Existing labels are left untouched, but any extraneous labels are removed.
+ * Title and Body are updated.
+ * Existing Commit and Base branches are left untouched.
+
+The first error encountered aborts the operation.
+
+'''
+
+=== RenderServiceInstrumentationFactory
+[source, go]
+----
+type RenderServiceInstrumentationFactory interface {
+    NewRenderServiceInstrumentation(repository *GitRepository) RenderServiceInstrumentation
+}
+----
+
+
+
+.NewRenderServiceInstrumentation
+[source, go]
+----
+func NewRenderServiceInstrumentation(repository *GitRepository) RenderServiceInstrumentation
+----
+NewRenderServiceInstrumentation creates a new RenderServiceInstrumentation instance using the given GitRepository as context.
+
+'''
+
+=== RenderServiceInstrumentation
+[source, go]
+----
+type RenderServiceInstrumentation interface {
+    FetchedTemplatesFromStore(fetchErr error) error
+    FetchedValuesForTemplate(fetchErr error, template *Template) error
+    AttemptingToRenderTemplate(template *Template)
+    WrittenRenderResultToFile(template *Template, targetPath Path, writeErr error) error
+}
+----
+
+
+
+.FetchedTemplatesFromStore
+[source, go]
+----
+func FetchedTemplatesFromStore(fetchErr error) error
+----
+FetchedTemplatesFromStore logs a message indicating that fetching templates from TemplateStore was successful, but only if fetchErr is nil.
+Returns fetchErr unmodified for method chaining.
+
+.FetchedValuesForTemplate
+[source, go]
+----
+func FetchedValuesForTemplate(fetchErr error, template *Template) error
+----
+FetchedValuesForTemplate logs a message indicating that fetching Values from ValueStore was successful but only if fetchErr is nil.
+Returns fetchErr unmodified for method chaining.
+
+.AttemptingToRenderTemplate
+[source, go]
+----
+func AttemptingToRenderTemplate(template *Template)
+----
+AttemptingToRenderTemplate logs a message indicating that the actual rendering is about to begin.
+
+.WrittenRenderResultToFile
+[source, go]
+----
+func WrittenRenderResultToFile(template *Template, targetPath Path, writeErr error) error
+----
+
+
+'''
+
+=== TemplateEngine
+[source, go]
+----
+type TemplateEngine interface {
+    Execute(template *Template, values Values) (RenderResult, error)
+}
+----
+
+
+
+.Execute
+[source, go]
+----
+func Execute(template *Template, values Values) (RenderResult, error)
+----
+
+
+'''
+
+=== TemplateStore
+[source, go]
+----
+type TemplateStore interface {
+    FetchTemplates() ([]*Template, error)
+}
+----
+
+
+
+.FetchTemplates
+[source, go]
+----
+func FetchTemplates() ([]*Template, error)
+----
+
+
+'''
+
+=== ValueStore
+[source, go]
+----
+type ValueStore interface {
+    FetchValuesForTemplate(template *Template, repository *GitRepository) (Values, error)
+    FetchUnmanagedFlag(template *Template, repository *GitRepository) (bool, error)
+    FetchTargetPath(template *Template, repository *GitRepository) (Path, error)
+    FetchFilesToDelete(repository *GitRepository) ([]Path, error)
+}
+----
+
+
+
+.FetchValuesForTemplate
+[source, go]
+----
+func FetchValuesForTemplate(template *Template, repository *GitRepository) (Values, error)
+----
+FetchValuesForTemplate retrieves the Values for the given template.
+
+.FetchUnmanagedFlag
+[source, go]
+----
+func FetchUnmanagedFlag(template *Template, repository *GitRepository) (bool, error)
+----
+FetchUnmanagedFlag returns true if the given template should not be rendered.
+The implementation may return ErrKeyNotFound if the flag is undefined, as the boolean 'false' is ambiguous.
+
+.FetchTargetPath
+[source, go]
+----
+func FetchTargetPath(template *Template, repository *GitRepository) (Path, error)
+----
+FetchTargetPath returns an alternative output path for the given template relative to the Git repository.
+An empty string indicates that there is no alternative path configured.
+
+.FetchFilesToDelete
+[source, go]
+----
+func FetchFilesToDelete(repository *GitRepository) ([]Path, error)
+----
+FetchFilesToDelete returns a slice of Path that should be deleted in the Git repository.
+The paths are relative to the Git root directory.
+
+'''
+
+
+== Structs
+
+=== CleanupService
+[source, go]
+----
+type CleanupService struct {
+}
+----
+
+
+
+
+**Receivers**
+
+.CleanupUnwantedFiles
+[source, go]
+----
+func (s *CleanupService) CleanupUnwantedFiles(ctx CleanupContext) error
+----
+
+
+
+
+'''
+
+=== CleanupContext
+[source, go]
+----
+type CleanupContext struct {
+    Repository    *GitRepository
+    ValueStore    ValueStore
+}
+----
+
+
+
+
+
+
+
+
+
+**Receivers**
+
+
+'''
+
+=== GitRepository
+[source, go]
+----
+type GitRepository struct {
+    RootDir          Path
+    URL              *GitURL
+    PullRequest      *PullRequest
+    Labels           LabelSet
+    CommitBranch     string
+    DefaultBranch    string
+}
+----
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+**Receivers**
+
+.SetLabels
+[source, go]
+----
+func (r *GitRepository) SetLabels(labels LabelSet) error
+----
+
+
+
+
+'''
+
+=== CommitOptions
+[source, go]
+----
+type CommitOptions struct {
+    Message    string
+    Amend      bool
+}
+----
+
+
+
+
+
+
+
+
+
+'''
+
+=== PushOptions
+[source, go]
+----
+type PushOptions struct {
+    Force    bool
+}
+----
+
+
+
+
+
+
+
+'''
+
+=== Label
+[source, go]
+----
+type Label struct {
+    Name           string
+    Description    string
+}
+----
+
+
+
+
+
+
+
+
+
+**Receivers**
+
+.GetColor
+[source, go]
+----
+func (l Label) GetColor() Color
+----
+
+
+
+.SetColor
+[source, go]
+----
+func (l *Label) SetColor(color Color) error
+----
+
+
+
+.IsSameAs
+[source, go]
+----
+func (l Label) IsSameAs(label Label) bool
+----
+
+IsSameAs returns true if each Label.Name is equal.
+
+.IsEqualTo
+[source, go]
+----
+func (l Label) IsEqualTo(label Label) bool
+----
+
+IsEqualTo returns true if all properties of Label are equal.
+
+
+'''
+
+=== PullRequest
+[source, go]
+----
+type PullRequest struct {
+    CommitBranch    string
+    BaseBranch      string
+}
+----
+
+
+
+
+
+
+
+
+
+
+
+
+**Receivers**
+
+.GetLabels
+[source, go]
+----
+func (pr *PullRequest) GetLabels() LabelSet
+----
+
+
+
+.SetNumber
+[source, go]
+----
+func (pr *PullRequest) SetNumber(nr *PullRequestNumber) error
+----
+
+
+
+.GetNumber
+[source, go]
+----
+func (pr *PullRequest) GetNumber() *PullRequestNumber
+----
+
+
+
+.GetTitle
+[source, go]
+----
+func (pr *PullRequest) GetTitle() string
+----
+
+
+
+.GetBody
+[source, go]
+----
+func (pr *PullRequest) GetBody() string
+----
+
+
+
+.ChangeDescription
+[source, go]
+----
+func (pr *PullRequest) ChangeDescription(title, body string) error
+----
+
+
+
+.AttachLabels
+[source, go]
+----
+func (pr *PullRequest) AttachLabels(labels LabelSet) error
+----
+
+
+
+
+'''
+
+=== RenderService
+[source, go]
+----
+type RenderService struct {
+}
+----
+
+
+
+
+
+**Receivers**
+
+.RenderTemplates
+[source, go]
+----
+func (s *RenderService) RenderTemplates(ctx RenderContext) error
+----
+
+
+
+
+'''
+
+=== RenderContext
+[source, go]
+----
+type RenderContext struct {
+    Repository       *GitRepository
+    ValueStore       ValueStore
+    TemplateStore    TemplateStore
+    Engine           TemplateEngine
+}
+----
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+**Receivers**
+
+
+'''
+
+=== Template
+[source, go]
+----
+type Template struct {
+    RelativePath       Path
+    FilePermissions    Permissions
+}
+----
+
+
+
+
+
+
+
+
+**Receivers**
+
+.Render
+[source, go]
+----
+func (t *Template) Render(values Values, engine TemplateEngine) (RenderResult, error)
+----
+
+
+
+
+'''
+
+
+== Variable Typedefinitions
+
+=== Color
+[source, go]
+----
+type Color string
+----
+
+Color is a 6-digit uppercase hexadecimal string value with '#' prefix
+
+**Receivers**
+
+.String
+[source, go]
+----
+func (c Color) String() string
+----
+
+
+
+.CheckValue
+[source, go]
+----
+func (c Color) CheckValue() error
+----
+
+
+
+
+'''
+
+=== LabelSet
+[source, go]
+----
+type LabelSet []Label
+----
+
+
+
+**Receivers**
+
+.CheckForEmptyLabelNames
+[source, go]
+----
+func (s LabelSet) CheckForEmptyLabelNames() error
+----
+
+
+
+.CheckForDuplicates
+[source, go]
+----
+func (s LabelSet) CheckForDuplicates() error
+----
+
+
+
+.FindLabelByName
+[source, go]
+----
+func (s LabelSet) FindLabelByName(label string) (Label, bool)
+----
+
+
+
+.Merge
+[source, go]
+----
+func (s LabelSet) Merge(other LabelSet) LabelSet
+----
+
+Merge returns a new copy of LabelSet that contains the Label from other if they are missing in the original slice, and replaces existing ones.
+A label to replace is determined by equality of LabelSet.FindLabelByName.
+
+No validation checks are performed.
+The original order is not preserved.
+Duplicates are removed from the result.
+
+.Without
+[source, go]
+----
+func (s LabelSet) Without(other LabelSet) LabelSet
+----
+
+Without returns a new LabelSet that contain only the labels that do not exist in other set.
+A label is not included in the result if the name matches.
+
+No validation checks are performed.
+The original order is preserved.
+
+
+'''
+
+=== Path
+[source, go]
+----
+type Path string
+----
+
+
+
+**Receivers**
+
+.Exists
+[source, go]
+----
+func (p Path) Exists() bool
+----
+
+Exists returns true if the path exists in the local file system.
+
+.FileExists
+[source, go]
+----
+func (p Path) FileExists() bool
+----
+
+FileExists returns true if the path exists in the local file system and is a file.
+
+.DirExists
+[source, go]
+----
+func (p Path) DirExists() bool
+----
+
+DirExists returns true if the path exists in the local file system and is a directory.
+
+.Join
+[source, go]
+----
+func (p Path) Join(elems ...Path) Path
+----
+
+Join takes this Path as root and makes a new Path with given elements.
+
+.Delete
+[source, go]
+----
+func (p Path) Delete()
+----
+
+Delete removes the path (and possibly all children if it's a directory), ignoring any errors.
+If you need error handling, use os.RemoveAll directly.
+
+.String
+[source, go]
+----
+func (p Path) String() string
+----
+
+String returns a string representation of itself.
+
+
+'''
+
+=== PullRequestNumber
+[source, go]
+----
+type PullRequestNumber int
+----
+
+
+
+**Receivers**
+
+.String
+[source, go]
+----
+func (nr PullRequestNumber) String() string
+----
+
+
+
+.Int
+[source, go]
+----
+func (nr *PullRequestNumber) Int() *int
+----
+
+
+
+
+'''
+
+=== RenderResult
+[source, go]
+----
+type RenderResult string
+----
+
+
+
+**Receivers**
+
+.WriteToFile
+[source, go]
+----
+func (r RenderResult) WriteToFile(path Path, permissions Permissions) error
+----
+
+
+
+
+'''
+
+=== Permissions
+[source, go]
+----
+type Permissions fs.FileMode
+----
+
+
+
+**Receivers**
+
+.FileMode
+[source, go]
+----
+func (p Permissions) FileMode() fs.FileMode
+----
+
+
+
+
+'''
+
+=== GitURL
+[source, go]
+----
+type GitURL url.URL
+----
+
+GitURL is the same as url.URL but with additional helper methods.
+
+**Receivers**
+
+.GetRepositoryName
+[source, go]
+----
+func (u *GitURL) GetRepositoryName() string
+----
+
+GetRepositoryName returns the last element of the Git URL.
+Strips the name from any .git extensions in the URL.
+
+.GetNamespace
+[source, go]
+----
+func (u *GitURL) GetNamespace() string
+----
+
+GetNamespace returns the middle element(s) of the Git URL.
+Depending on the Git hosting service, this name may contain multiple slashes.
+Any leading "/" is removed.
+
+.Redacted
+[source, go]
+----
+func (u *GitURL) Redacted() string
+----
+
+Redacted returns the same as url.URL:Redacted().
+
+.String
+[source, go]
+----
+func (u *GitURL) String() string
+----
+
+String returns the same as url.URL:String().
+
+.GetFullName
+[source, go]
+----
+func (u *GitURL) GetFullName() string
+----
+
+GetFullName returns the hostname (or host:port) joined by GetNamespace and GetRepositoryName delimited by slashes.
+
+.AsURL
+[source, go]
+----
+func (u *GitURL) AsURL() *url.URL
+----
+
+
+
+
+'''
+
+=== Values
+[source, go]
+----
+type Values map[string]interface{}
+----
+
+
+
+
+'''
+
+
+== Variables
+
+
+=== ErrInvalidArgument
+[source, go]
+----
+var ErrInvalidArgument = errors.New("invalid argument")
+----
+ErrInvalidArgument is an error that indicates that a particular field is invalid.
+
+
+=== ErrKeyNotFound
+[source, go]
+----
+var ErrKeyNotFound = errors.New("key not found")
+----
+ErrKeyNotFound is an error that indicates that a particular key was not found.
+
+
+== Functions
+
+=== NewCleanupService
+[source, go]
+----
+func NewCleanupService() *CleanupService
+----
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+=== NewGitRepository
+[source, go]
+----
+func NewGitRepository(u *GitURL, root Path) *GitRepository
+----
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+=== NewPath
+[source, go]
+----
+func NewPath(elems ...string) Path
+----
+
+
+
+
+=== NewFilePath
+[source, go]
+----
+func NewFilePath(elems ...string) Path
+----
+
+
+
+
+
+
+
+
+
+
+=== NewPullRequest
+[source, go]
+----
+func NewPullRequest(
+    number *PullRequestNumber, title, body, commitBranch, baseBranch string,
+    labels LabelSet,
+) (*PullRequest, error)
+----
+
+
+
+
+
+
+
+
+
+
+
+
+
+=== NewPullRequestNumber
+[source, go]
+----
+func NewPullRequestNumber(nr *int) *PullRequestNumber
+----
+
+
+
+
+
+
+=== NewRenderService
+[source, go]
+----
+func NewRenderService(analyticsFactory RenderServiceInstrumentationFactory) *RenderService
+----
+
+
+
+
+
+
+
+
+
+
+
+
+=== NewTemplate
+[source, go]
+----
+func NewTemplate(relPath Path, perms Permissions) *Template
+----
+
+
+
+
+
+
+
+
+
+
+
+
+=== FromURL
+[source, go]
+----
+func FromURL(url *url.URL) *GitURL
+----
+
+FromURL converts the given url.URL into a GitURL.
+
+
+

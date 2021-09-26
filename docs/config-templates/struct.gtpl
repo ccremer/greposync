@@ -17,3 +17,4 @@
 {{end}}{{end}}
 {{range .Struct.Fields}}{{if or .Exported $.Config.Private }}{{if .Nested}}{{render $ .Nested}}{{end}}{{end}}{{end}}
 {{if hasReceivers . .Struct.Name}}{{renderReceivers . .Struct.Name}}{{end}}
+'''

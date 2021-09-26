@@ -1,0 +1,4 @@
+= Introduction
+
+This guide is aimed at developers that want to contribute to the project.
+The intend is to make the internals easier to understand.

@@ -6,6 +6,7 @@ type PullRequestStore interface {
 	FindMatchingPullRequest(repository *GitRepository) (*PullRequest, error)
 
 	// EnsurePullRequest creates or updates the GitRepository.PullRequest in the repository.
+	//
 	//  * This operation does not alter any properties of existing labels.
 	//  * Existing labels are left untouched, but any extraneous labels are removed.
 	//  * Title and Body are updated.

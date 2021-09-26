@@ -1,0 +1,27 @@
+git:
+  commitBranch: ""
+  commitMessage: Update from greposync
+  defaultBranch: ""
+  forcePush: false
+  name: ""
+  namespace: ""
+  skipCommit: false
+  skipPush: false
+  skipReset: false
+log:
+  level: info
+  showDiff: false
+  showLog: false
+pr:
+  bodyTemplate: This Pull request updates this repository with changes from a greposync
+    template repository.
+  create: false
+  labels: null
+  subject: Update from greposync
+  targetBranch: ""
+project:
+  jobs: 1
+  rootDir: repos
+repositoryLabels: null
+template:
+  rootDir: template

@@ -1,2 +1,1 @@
-= {{ .Index.Title }}
-:kroki-default-format: svg
+{{/* Do not render index */}}
