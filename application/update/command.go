@@ -34,6 +34,10 @@ func (c *Command) createCliCommand() *cli.Command {
 				Name:  prBodyFlagName,
 				Usage: "Markdown-enabled body of the PullRequest. It will load from an existing file if this is a path. Content can be templated. Defaults to commit message.",
 			},
+			&cli.BoolFlag{
+				Name:  showDiffFlagName,
+				Usage: "Show the Git Diff for each repository after updating.",
+			},
 		),
 	}
 }

@@ -1,6 +1,7 @@
 package valuestore
 
 import (
+	"net/url"
 	"path/filepath"
 	"testing"
 
@@ -39,9 +40,13 @@ func TestKoanfValueStore_loadAndMergeConfig(t *testing.T) {
 	}
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
-			s := NewValueStore()
+			s := NewValueStore(nil)
+			u, err := url.Parse("https://github.com/ccremer/greposync")
+			require.NoError(t, err)
 			s.globalKoanf = koanf.New("")
-			result, err := s.loadAndMergeConfig(filepath.Join("testdata", tt.givenSyncFile))
+			SyncConfigFileName = tt.givenSyncFile
+			repo := &domain.GitRepository{URL: domain.FromURL(u), RootDir: domain.NewFilePath("testdata")}
+			result, err := s.loadAndMergeConfig(repo)
 			require.NoError(t, err)
 			assert.Equal(t, tt.expectedConf, result.Raw())
 		})
@@ -74,7 +79,7 @@ func TestKoanfValueStore_loadDataForTemplate(t *testing.T) {
 	}
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
-			s := NewValueStore()
+			s := NewValueStore(nil)
 			k := koanf.New(".")
 			require.NoError(t, k.Load(file.Provider(filepath.Join("testdata", tt.givenSyncFile)), yaml.Parser()))
 			result, err := s.loadDataForTemplate(k, tt.givenTemplateFileName)

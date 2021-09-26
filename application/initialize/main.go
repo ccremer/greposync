@@ -3,7 +3,7 @@ package initialize
 import (
 	pipeline "github.com/ccremer/go-command-pipeline"
 	"github.com/ccremer/greposync/cfg"
-	"github.com/ccremer/greposync/printer"
+	"github.com/ccremer/greposync/infrastructure/logging"
 	"github.com/urfave/cli/v2"
 )
 
@@ -14,13 +14,15 @@ type (
 		cliCommand    *cli.Command
 		configFiles   map[string][]byte
 		templateFiles map[string][]byte
+		plog          *logging.PipelineLogger
 	}
 )
 
 // NewCommand returns a new instance.
-func NewCommand(cfg *cfg.Configuration) *Command {
+func NewCommand(cfg *cfg.Configuration, factory logging.LoggerFactory) *Command {
 	c := &Command{
-		cfg: cfg,
+		cfg:  cfg,
+		plog: factory.NewPipelineLogger("init"),
 		configFiles: map[string][]byte{
 			"greposync.yml":       grepoSyncYml,
 			"config_defaults.yml": configDefaultsYml,
@@ -48,8 +50,7 @@ func (c *Command) createCommand() *cli.Command {
 }
 
 func (c *Command) runCommand(_ *cli.Context) error {
-	logger := printer.PipelineLogger{Logger: printer.New().SetLevel(printer.DefaultLevel)}
-	result := pipeline.NewPipeline().AddBeforeHook(logger).WithSteps(
+	result := pipeline.NewPipeline().AddBeforeHook(c.plog).WithSteps(
 		pipeline.NewStep("create main config files", c.createMainConfigFiles()),
 		pipeline.NewStep("create template dir", c.createTemplateDir()),
 		pipeline.NewStep("create template files", c.createTemplateFiles()),

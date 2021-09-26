@@ -33,21 +33,21 @@ func (s *RepositoryStore) Commit(repository *domain.GitRepository, options domai
 	}
 
 	// Commit
-	out, stderr, err := execGitCommand(repository.RootDir, s.logArgs(args))
+	out, stderr, err := execGitCommand(repository.RootDir, s.instrumentation.logGitArguments(repository, args))
 	if err != nil {
-		s.log.InfoF(out)
+		s.instrumentation.logInfo(repository, out)
 		return mergeWithStdErr(err, stderr)
 	}
-	s.log.DebugF(out)
+	s.instrumentation.logDebugInfo(repository, out)
 	return nil
 }
 
 func (s *RepositoryStore) Add(repository *domain.GitRepository) error {
-	out, stderr, err := execGitCommand(repository.RootDir, s.logArgs([]string{"add", "-A"}))
+	out, stderr, err := execGitCommand(repository.RootDir, s.instrumentation.logGitArguments(repository, []string{"add", "-A"}))
 	if err != nil {
 		return mergeWithStdErr(err, stderr)
 	}
-	s.log.DebugF(out)
+	s.instrumentation.logDebugInfo(repository, out)
 	return nil
 }
 
@@ -55,7 +55,7 @@ func (s *RepositoryStore) Diff(repository *domain.GitRepository) (string, error)
 	out, stderr, err := execGitCommand(repository.RootDir, []string{"diff", "HEAD~1"})
 	if err != nil {
 		if strings.Contains(stderr, "ambiguous argument 'HEAD~1': unknown revision or path not in the working tree.") {
-			s.log.InfoF("This is the first commit, no diff available.")
+			s.instrumentation.logInfo(repository, "This is the first commit, no diff available.")
 			return "", nil
 		}
 		return "", mergeWithStdErr(err, stderr)
@@ -66,11 +66,11 @@ func (s *RepositoryStore) Diff(repository *domain.GitRepository) (string, error)
 func (s *RepositoryStore) IsDirty(repository *domain.GitRepository) bool {
 	out, stderr, err := execGitCommand(repository.RootDir, []string{"status", "--short"})
 	if err != nil {
-		s.log.WarnF("Could not determine working tree status: %s: %w", stderr, err)
+		s.instrumentation.logWarning(repository, stderr)
 		return true
 	}
 	if out == "" {
-		s.log.InfoF("Nothing to commit, working tree clean")
+		s.instrumentation.logInfo(repository, "Nothing to commit, working tree clean")
 		return false
 	}
 	return true

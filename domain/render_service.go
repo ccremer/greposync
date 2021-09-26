@@ -66,7 +66,9 @@ func (ctx *RenderContext) renderTemplates() error {
 		if err := ctx.loadValues(template); err != nil {
 			return err
 		}
-		return ctx.renderTemplate(template)
+		if err := ctx.renderTemplate(template); err != nil {
+			return err
+		}
 	}
 	return nil
 }

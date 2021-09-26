@@ -4,16 +4,21 @@ package main
 
 import (
 	"github.com/ccremer/greposync/application"
+	"github.com/ccremer/greposync/application/initialize"
+	"github.com/ccremer/greposync/application/instrumentation"
 	"github.com/ccremer/greposync/application/labels"
 	"github.com/ccremer/greposync/application/update"
 	"github.com/ccremer/greposync/cfg"
 	"github.com/ccremer/greposync/domain"
 	"github.com/ccremer/greposync/infrastructure/githosting"
 	"github.com/ccremer/greposync/infrastructure/githosting/github"
+	"github.com/ccremer/greposync/infrastructure/logging"
 	"github.com/ccremer/greposync/infrastructure/repositorystore"
 	"github.com/ccremer/greposync/infrastructure/templateengine"
 	"github.com/ccremer/greposync/infrastructure/templateengine/gotemplate"
+	"github.com/ccremer/greposync/infrastructure/ui"
 	"github.com/ccremer/greposync/infrastructure/valuestore"
+	"github.com/go-logr/logr"
 	"github.com/google/wire"
 )
 
@@ -46,6 +51,8 @@ func initInjector() *injector {
 		labels.NewCommand,
 		labels.NewConfigurator,
 		update.NewCommand,
+		initialize.NewCommand,
+		wire.NewSet(ui.NewConsoleDiffPrinter, wire.Bind(new(ui.DiffPrinter), new(*ui.ConsoleDiffPrinter))),
 
 		// Template Engine
 		wire.NewSet(gotemplate.NewEngine, wire.Bind(new(domain.TemplateEngine), new(*gotemplate.GoTemplateEngine))),
@@ -60,6 +67,16 @@ func initInjector() *injector {
 
 		// Services
 		domain.NewRenderService,
+
+		// Console & Logging
+		wire.NewSet(ui.NewConsoleSink, wire.Bind(new(logr.LogSink), new(*ui.ConsoleSink))),
+		wire.NewSet(ui.NewConsoleLoggerFactory, wire.Bind(new(logging.LoggerFactory), new(*ui.ConsoleLoggerFactory))),
+		ui.NewColoredConsole,
+
+		// Instrumentation
+		valuestore.NewValueStoreInstrumentation,
+		wire.NewSet(instrumentation.NewUpdateInstrumentation, wire.Bind(new(instrumentation.BatchInstrumentation), new(*instrumentation.CommonBatchInstrumentation))),
+		repositorystore.NewRepositoryStoreInstrumentation,
 
 		// Git providers
 		newGitProviders,

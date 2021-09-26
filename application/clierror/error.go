@@ -4,22 +4,28 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/ccremer/greposync/printer"
+	"github.com/go-logr/logr"
 	"github.com/urfave/cli/v2"
 )
 
 var (
 	// ErrUsage is an error that is caused by an incorrect usage by the user.
 	ErrUsage = errors.New("usage error")
-	// ErrorHandler will print the CLI help and exit with code 2 if the given error is a ErrUsage.
-	ErrorHandler cli.ExitErrHandlerFunc = func(context *cli.Context, err error) {
+
+	// ErrPipeline is an error that is caused by an action aborting a pipeline.
+	ErrPipeline = errors.New("pipeline error")
+)
+
+// NewErrorHandler will print the CLI help and exit with code 2 if the given error is a ErrUsage.
+func NewErrorHandler(logger logr.Logger) cli.ExitErrHandlerFunc {
+	return func(context *cli.Context, err error) {
 		if errors.Is(err, ErrUsage) {
-			printer.DefaultPrinter.ErrorF("%v\n", err.Error())
+			logger.Error(err, "user error")
 			cli.ShowCommandHelpAndExit(context, context.Command.Name, 2)
 			return
 		}
 	}
-)
+}
 
 // AsUsageError returns the given error wrapped in a ErrUsage.
 func AsUsageError(err error) error {

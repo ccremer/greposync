@@ -4,7 +4,6 @@ import (
 	"strings"
 
 	"github.com/ccremer/greposync/cfg/flag"
-	"github.com/ccremer/greposync/printer"
 	"github.com/knadh/koanf"
 	"github.com/knadh/koanf/parsers/yaml"
 	"github.com/knadh/koanf/providers/env"
@@ -41,13 +40,4 @@ func ParseConfig(configPath string, config *Configuration, ctx *cli.Context) err
 	}
 
 	return koanfInstance.Unmarshal("", &config)
-}
-
-// Sanitize does corrective actions on the configuration hierarchy.
-func (config *Configuration) Sanitize() {
-	level, err := printer.ParseLogLevel(config.Log.Level)
-	if err != nil {
-		printer.WarnF("Could not parse log level, fallback to default level")
-	}
-	printer.DefaultPrinter.SetLevel(level)
 }

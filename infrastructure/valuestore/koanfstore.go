@@ -7,7 +7,6 @@ import (
 	"sync"
 
 	"github.com/ccremer/greposync/domain"
-	"github.com/ccremer/greposync/printer"
 	"github.com/knadh/koanf"
 	"github.com/knadh/koanf/parsers/yaml"
 	"github.com/knadh/koanf/providers/file"
@@ -15,10 +14,10 @@ import (
 
 // KoanfValueStore implements domain.ValueStore.
 type KoanfValueStore struct {
-	m           *sync.Mutex
-	globalKoanf *koanf.Koanf
-	log         printer.Printer
-	cache       map[*domain.GitURL]*koanf.Koanf
+	m               *sync.Mutex
+	globalKoanf     *koanf.Koanf
+	instrumentation *ValueStoreInstrumentation
+	cache           map[*domain.GitURL]*koanf.Koanf
 }
 
 var (
@@ -27,11 +26,11 @@ var (
 )
 
 // NewValueStore returns a new instance of domain.ValueStore.
-func NewValueStore() *KoanfValueStore {
+func NewValueStore(instrumentation *ValueStoreInstrumentation) *KoanfValueStore {
 	return &KoanfValueStore{
-		log:   printer.New(),
-		cache: map[*domain.GitURL]*koanf.Koanf{},
-		m:     &sync.Mutex{},
+		instrumentation: instrumentation,
+		cache:           map[*domain.GitURL]*koanf.Koanf{},
+		m:               &sync.Mutex{},
 	}
 }
 
@@ -76,11 +75,10 @@ func (k *KoanfValueStore) FetchFilesToDelete(config *domain.GitRepository) ([]do
 }
 
 func (k *KoanfValueStore) prepareRepoKoanf(repository *domain.GitRepository) (*koanf.Koanf, error) {
-	k.log.SetName(repository.URL.GetRepositoryName())
 	if repoKoanf, exists := k.cache[repository.URL]; exists {
 		return repoKoanf, nil
 	}
-	repoKoanf, err := k.loadAndMergeConfig(path.Join(repository.RootDir.String(), SyncConfigFileName))
+	repoKoanf, err := k.loadAndMergeConfig(repository)
 	if err != nil {
 		return nil, err
 	}
@@ -88,20 +86,18 @@ func (k *KoanfValueStore) prepareRepoKoanf(repository *domain.GitRepository) (*k
 	return repoKoanf, nil
 }
 
-func (k *KoanfValueStore) loadAndMergeConfig(syncFile string) (*koanf.Koanf, error) {
+func (k *KoanfValueStore) loadAndMergeConfig(repository *domain.GitRepository) (*koanf.Koanf, error) {
+	syncFile := path.Join(repository.RootDir.String(), SyncConfigFileName)
 	repoKoanf := koanf.New(".")
 	// Load the config from config_defaults.yml
 	err := repoKoanf.Merge(k.globalKoanf)
 	if err != nil {
 		return repoKoanf, err
 	}
-	k.log.DebugF("Loading sync config '%s'", syncFile)
+	k.instrumentation.attemptingLoadConfig(repository.URL.GetFullName(), syncFile)
 	// Load the config from .sync.yml
 	err = repoKoanf.Load(file.Provider(syncFile), yaml.Parser())
-	if err != nil {
-		k.log.WarnF("file '%s' not loaded: %s", syncFile, err)
-	}
-	return repoKoanf, nil
+	return repoKoanf, k.instrumentation.loadedConfigIfNil(repository.URL.GetFullName(), err)
 }
 
 func (k *KoanfValueStore) loadDataForTemplate(repoKoanf *koanf.Koanf, templateFileName string) (domain.Values, error) {
@@ -134,11 +130,10 @@ func (k *KoanfValueStore) loadGlobals() {
 	if k.globalKoanf != nil {
 		return
 	}
+
 	k.globalKoanf = koanf.New(".")
-	k.log.DebugF("Loading config '%s'", GlobalConfigFileName)
+	k.instrumentation.attemptingLoadConfig("", GlobalConfigFileName)
 	// Load the config from global config file, but ignore errors.
 	err := k.globalKoanf.Load(file.Provider(GlobalConfigFileName), yaml.Parser())
-	if err != nil {
-		k.log.WarnF("file '%s' not loaded: %s", GlobalConfigFileName, err)
-	}
+	_ = k.instrumentation.loadedConfigIfNil("", err)
 }

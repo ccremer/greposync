@@ -5,6 +5,6 @@
 package tools
 
 import (
+	_ "github.com/google/wire"
 	_ "github.com/mariotoffia/goasciidoc"
-	_ "github.com/maxbrunsfeld/counterfeiter/v6"
 )

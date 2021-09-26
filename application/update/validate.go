@@ -7,7 +7,7 @@ import (
 	"github.com/ccremer/greposync/application/clierror"
 	"github.com/ccremer/greposync/application/flags"
 	"github.com/ccremer/greposync/cfg"
-	"github.com/ccremer/greposync/printer"
+	"github.com/ccremer/greposync/infrastructure/logging"
 	"github.com/urfave/cli/v2"
 )
 
@@ -48,9 +48,8 @@ func (c *Command) validateUpdateCommand(ctx *cli.Context) error {
 			return clierror.AsFlagUsageErrorf(dryRunFlagName, "unrecognized: %s", dryRunMode)
 		}
 	}
-
-	c.cfg.Sanitize()
+	c.logFactory.SetLogLevel(logging.ParseLevelOrDefault(c.cfg.Log.Level, logging.LevelInfo))
 	j, _ := json.Marshal(c.cfg)
-	printer.DebugF("Using config: %s", j)
+	c.logFactory.NewGenericLogger("").V(logging.LevelDebug).Info("Using config", "config", string(j))
 	return nil
 }

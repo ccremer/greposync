@@ -1,31 +1,37 @@
 package labels
 
 import (
-	"fmt"
-
 	pipeline "github.com/ccremer/go-command-pipeline"
 	"github.com/ccremer/go-command-pipeline/parallel"
+	"github.com/ccremer/greposync/application/instrumentation"
 	"github.com/ccremer/greposync/cfg"
 	"github.com/ccremer/greposync/domain"
-	"github.com/hashicorp/go-multierror"
+	"github.com/go-logr/logr"
 	"github.com/urfave/cli/v2"
 )
 
 type (
 	// Command contains the logic to keep repository labels in sync.
 	Command struct {
-		cfg        *cfg.Configuration
-		cliCommand *cli.Command
-		appService *AppService
-		repos      []*domain.GitRepository
+		cfg             *cfg.Configuration
+		cliCommand      *cli.Command
+		appService      *AppService
+		repos           []*domain.GitRepository
+		console         logr.Logger
+		instrumentation instrumentation.BatchInstrumentation
 	}
 )
 
 // NewCommand returns a new instance.
-func NewCommand(cfg *cfg.Configuration, appService *AppService) *Command {
+func NewCommand(
+	cfg *cfg.Configuration,
+	appService *AppService,
+	instrumentation instrumentation.BatchInstrumentation,
+) *Command {
 	c := &Command{
-		cfg:        cfg,
-		appService: appService,
+		cfg:             cfg,
+		appService:      appService,
+		instrumentation: instrumentation,
 	}
 	return c
 }
@@ -34,7 +40,7 @@ func (c *Command) runCommand(_ *cli.Context) error {
 	result := pipeline.NewPipeline().WithSteps(
 		pipeline.NewStepFromFunc("configure infrastructure", c.configureInfrastructure),
 		pipeline.NewStepFromFunc("fetch repositories", c.fetchRepositories),
-		parallel.NewWorkerPoolStep("update labels for all repos", c.cfg.Project.Jobs, c.updateRepos(), c.errorHandler()),
+		parallel.NewWorkerPoolStep("update labels for all repos", c.cfg.Project.Jobs, c.updateRepos(), c.instrumentation.NewCollectErrorHandler(c.repos, c.cfg.Project.SkipBroken)),
 	).Run()
 	return result.Err
 }
@@ -42,6 +48,7 @@ func (c *Command) runCommand(_ *cli.Context) error {
 func (c *Command) updateRepos() parallel.PipelineSupplier {
 	return func(pipelines chan *pipeline.Pipeline) {
 		defer close(pipelines)
+		c.instrumentation.BatchPipelineStarted(c.repos)
 		for _, r := range c.repos {
 			p := c.createPipeline(r)
 			pipelines <- p
@@ -49,29 +56,25 @@ func (c *Command) updateRepos() parallel.PipelineSupplier {
 	}
 }
 
-func (c *Command) errorHandler() parallel.ResultHandler {
-	return func(results map[uint64]pipeline.Result) pipeline.Result {
-		var err error
-		for index, repo := range c.repos {
-			if result := results[uint64(index)]; result.Err != nil {
-				err = multierror.Append(err, fmt.Errorf("%s: %w", repo.URL.GetRepositoryName(), result.Err))
-			}
-		}
-		return pipeline.Result{Err: err}
-	}
-}
-
 func (c *Command) createPipeline(r *domain.GitRepository) *pipeline.Pipeline {
 	uc := &labelUseCase{
 		appService: c.appService,
 	}
-	return pipeline.NewPipeline().WithSteps(
+	return pipeline.NewPipeline().AddBeforeHook(c.appService.factory.NewPipelineLogger("")).WithSteps(
+		pipeline.NewStepFromFunc("setup instrumentation", func(_ pipeline.Context) error {
+			c.instrumentation.PipelineForRepositoryStarted(r)
+			return nil
+		}),
 		pipeline.NewStep("fetch labels", uc.fetchLabelsForRepository(r)),
 		pipeline.NewStep("determine which labels to modify", c.determineLabelsToModify(uc, r)),
 		pipeline.NewStep("determine which labels to delete", c.determineLabelsToDelete(uc, r)),
 		pipeline.NewStep("update existing labels", uc.updateLabelsForRepositoryAction(r)),
 		pipeline.NewStep("delete unwanted labels", uc.deleteLabelsForRepository(r)),
-	)
+	).WithFinalizer(func(result pipeline.Result) error {
+		c.instrumentation.PipelineForRepositoryCompleted(r, result.Err)
+		result.Name = r.URL.GetFullName()
+		return result.Err
+	})
 }
 
 func (c *Command) determineLabelsToModify(uc *labelUseCase, r *domain.GitRepository) pipeline.ActionFunc {

@@ -2,45 +2,51 @@ package templateengine
 
 import (
 	"github.com/ccremer/greposync/domain"
-	"github.com/ccremer/greposync/printer"
+	"github.com/ccremer/greposync/infrastructure/logging"
+	"github.com/go-logr/logr"
 )
 
 type RenderServiceInstrumentation struct {
-	log printer.Printer
+	factory logging.LoggerFactory
+	log     logr.Logger
+	scope   string
 }
 
-func NewRenderServiceInstrumentation() *RenderServiceInstrumentation {
-	i := &RenderServiceInstrumentation{}
+func NewRenderServiceInstrumentation(factory logging.LoggerFactory) *RenderServiceInstrumentation {
+	i := &RenderServiceInstrumentation{
+		factory: factory,
+	}
 	return i
 }
 
 func (r *RenderServiceInstrumentation) NewRenderServiceInstrumentation(repository *domain.GitRepository) domain.RenderServiceInstrumentation {
-	newCopy := NewRenderServiceInstrumentation()
-	newCopy.log = printer.New().SetName(repository.URL.GetFullName()).SetLevel(printer.DefaultLevel)
+	newCopy := NewRenderServiceInstrumentation(r.factory)
+	newCopy.log = r.factory.NewRepositoryLogger(repository)
+	r.scope = repository.URL.GetFullName()
 	return newCopy
 }
 
 func (r *RenderServiceInstrumentation) FetchedTemplatesFromStore(fetchErr error) error {
 	if fetchErr != nil {
-		r.log.DebugF("Fetched templates")
+		r.log.V(logging.LevelDebug).Info("Fetched templates")
 	}
 	return fetchErr
 }
 
 func (r *RenderServiceInstrumentation) FetchedValuesForTemplate(fetchErr error, template *domain.Template) error {
 	if fetchErr == nil {
-		r.log.DebugF("Fetched Values for template '%s'", template.RelativePath)
+		r.log.V(logging.LevelDebug).Info("Fetched Values", "template", template.RelativePath)
 	}
 	return fetchErr
 }
 
 func (r *RenderServiceInstrumentation) AttemptingToRenderTemplate(template *domain.Template) {
-	r.log.DebugF("Rendering template '%s'...", template.RelativePath)
+	r.log.V(logging.LevelDebug).Info("Rendering template...", "template", template.RelativePath)
 }
 
 func (r *RenderServiceInstrumentation) WrittenRenderResultToFile(template *domain.Template, targetPath domain.Path, writeErr error) error {
 	if writeErr == nil {
-		r.log.InfoF("Rendered '%s' to '%s'", template.RelativePath, targetPath)
+		r.log.V(logging.LevelDebug).Info("Rendered file", "template", template.RelativePath, "target", targetPath)
 	}
 	return writeErr
 }

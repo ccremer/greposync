@@ -71,7 +71,7 @@ func TestKoanfValueStore_FetchFilesToDelete(t *testing.T) {
 	}
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
-			s := NewValueStore()
+			s := NewValueStore(nil)
 			k := koanf.New(".")
 			require.NoError(t, k.Load(file.Provider(path.Join("testdata", tt.givenSyncFile)), yaml.Parser()))
 			result, err := s.loadFilesToDelete(k)
@@ -88,7 +88,7 @@ func TestKoanfValueStore_loadBooleanFlag(t *testing.T) {
 	for _, flagName := range []string{"delete", "unmanaged"} {
 		for name, tt := range specialFlagsCases {
 			t.Run(name+"_With_"+flagName, func(t *testing.T) {
-				s := NewValueStore()
+				s := NewValueStore(nil)
 				k := koanf.New(".")
 				require.NoError(t, k.Load(file.Provider(path.Join("testdata", "specialflags.yml")), yaml.Parser()))
 				result, err := s.loadBooleanFlag(k, tt.givenTemplateFileName, flagName)
@@ -107,7 +107,7 @@ func TestKoanfValueStore_loadBooleanFlag(t *testing.T) {
 func TestKoanfValueStore_FetchTargetPath(t *testing.T) {
 	for name, tt := range specialFlagsCases {
 		t.Run(name, func(t *testing.T) {
-			s := NewValueStore()
+			s := NewValueStore(nil)
 			k := koanf.New(".")
 			require.NoError(t, k.Load(file.Provider(path.Join("testdata", "specialflags.yml")), yaml.Parser()))
 			result, err := s.loadTargetPath(k, tt.givenTemplateFileName)

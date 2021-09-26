@@ -9,7 +9,9 @@ git:
   skipPush: false
   skipReset: false
 log:
-  level: debug
+  level: info
+  showDiff: false
+  showLog: false
 pr:
   bodyTemplate: This Pull request updates this repository with changes from a greposync
     template repository.
