@@ -1,16 +1,13 @@
 package update
 
 import (
-	"fmt"
-
 	pipeline "github.com/ccremer/go-command-pipeline"
 	"github.com/ccremer/go-command-pipeline/parallel"
 	"github.com/ccremer/go-command-pipeline/predicate"
-	"github.com/ccremer/greposync/application/clierror"
+	instrumentation2 "github.com/ccremer/greposync/application/instrumentation"
 	"github.com/ccremer/greposync/cfg"
 	"github.com/ccremer/greposync/domain"
 	"github.com/ccremer/greposync/infrastructure/logging"
-	"github.com/hashicorp/go-multierror"
 	"github.com/urfave/cli/v2"
 )
 
@@ -28,7 +25,7 @@ type (
 		cfg             *cfg.Configuration
 		repositories    []*domain.GitRepository
 		appService      *AppService
-		instrumentation *UpdateInstrumentation
+		instrumentation instrumentation2.BatchInstrumentation
 		logFactory      logging.LoggerFactory
 	}
 )
@@ -38,7 +35,7 @@ func NewCommand(
 	cfg *cfg.Configuration,
 	configurator *AppService,
 	factory logging.LoggerFactory,
-	instrumentation *UpdateInstrumentation,
+	instrumentation instrumentation2.BatchInstrumentation,
 ) *Command {
 	c := &Command{
 		cfg:             cfg,
@@ -54,10 +51,10 @@ func (c *Command) runCommand(_ *cli.Context) error {
 	p := pipeline.NewPipeline().AddBeforeHook(logger).WithSteps(
 		pipeline.NewStep("configure infrastructure", c.configureInfrastructure()),
 		pipeline.NewStep("fetch managed repos config", c.fetchRepositories()),
-		parallel.NewWorkerPoolStep("update repositories", c.cfg.Project.Jobs, c.updateReposInParallel(), c.collectErrors()),
+		parallel.NewWorkerPoolStep("update repositories", c.cfg.Project.Jobs, c.updateReposInParallel(), c.instrumentation.NewCollectErrorHandler(c.repositories, c.cfg.Project.SkipBroken)),
 	)
 	p.WithFinalizer(func(result pipeline.Result) error {
-		c.instrumentation.batchPipelineCompleted(c.repositories)
+		c.instrumentation.BatchPipelineCompleted(c.repositories)
 		return result.Err
 	})
 	return p.Run().Err
@@ -85,7 +82,7 @@ func (c *Command) createPipeline(r *domain.GitRepository) *pipeline.Pipeline {
 	p := pipeline.NewPipeline().AddBeforeHook(logger)
 	p.WithSteps(
 		pipeline.NewStepFromFunc("setup instrumentation", func(_ pipeline.Context) error {
-			c.instrumentation.pipelineForRepositoryStarted(repoCtx.repo)
+			c.instrumentation.PipelineForRepositoryStarted(repoCtx.repo)
 			return nil
 		}),
 		pipeline.NewPipeline().AddBeforeHook(logger).
@@ -109,8 +106,8 @@ func (c *Command) createPipeline(r *domain.GitRepository) *pipeline.Pipeline {
 		predicate.ToStep("update pull request", repoCtx.ensurePullRequest(), predicate.And(repoCtx.hasCommits(), predicate.Bool(sc.PullRequest.Create))),
 	)
 	p.WithFinalizer(func(result pipeline.Result) error {
-		c.instrumentation.pipelineForRepositoryCompleted(r, result.Err)
-		result.Name = repoCtx.repo.URL.GetFullName()
+		c.instrumentation.PipelineForRepositoryCompleted(r, result.Err)
+		result.Name = r.URL.GetFullName()
 		return result.Err
 	})
 	return p
@@ -119,39 +116,11 @@ func (c *Command) createPipeline(r *domain.GitRepository) *pipeline.Pipeline {
 func (c *Command) updateReposInParallel() parallel.PipelineSupplier {
 	return func(pipelines chan *pipeline.Pipeline) {
 		defer close(pipelines)
-		c.instrumentation.batchPipelineStarted(len(c.repositories))
+		c.instrumentation.BatchPipelineStarted(c.repositories)
 		for _, r := range c.repositories {
 			p := c.createPipeline(r)
 			pipelines <- p
 		}
-	}
-}
-
-func (c *Command) collectErrors() parallel.ResultHandler {
-	if c.cfg.Project.SkipBroken {
-		return c.ignoreErrors()
-	}
-	return c.reduceErrors()
-}
-
-func (c *Command) ignoreErrors() parallel.ResultHandler {
-	// Do not propagate update errors from single repositories up the stack
-	return func(results map[uint64]pipeline.Result) pipeline.Result {
-		c.instrumentation.results = results
-		return pipeline.Result{}
-	}
-}
-
-func (c *Command) reduceErrors() parallel.ResultHandler {
-	return func(results map[uint64]pipeline.Result) pipeline.Result {
-		c.instrumentation.results = results
-		var err error
-		for index, repo := range c.repositories {
-			if result := results[uint64(index)]; result.Err != nil {
-				err = multierror.Append(err, fmt.Errorf("%s: %w", repo.URL.GetRepositoryName(), result.Err))
-			}
-		}
-		return pipeline.Result{Err: fmt.Errorf("%w: %s", clierror.ErrPipeline, err)}
 	}
 }
 

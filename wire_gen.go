@@ -8,6 +8,7 @@ package main
 import (
 	"github.com/ccremer/greposync/application"
 	"github.com/ccremer/greposync/application/initialize"
+	"github.com/ccremer/greposync/application/instrumentation"
 	"github.com/ccremer/greposync/application/labels"
 	"github.com/ccremer/greposync/application/update"
 	"github.com/ccremer/greposync/cfg"
@@ -35,7 +36,8 @@ func initInjector() *injector {
 	providerMap := newGitProviders(ghRemote)
 	labelStore := githosting.NewLabelStore(providerMap)
 	appService := labels.NewConfigurator(repositoryStore, labelStore, configuration, consoleLoggerFactory)
-	command := labels.NewCommand(configuration, appService)
+	commonBatchInstrumentation := instrumentation.NewUpdateInstrumentation(coloredConsole, consoleLoggerFactory)
+	command := labels.NewCommand(configuration, appService, commonBatchInstrumentation)
 	goTemplateEngine := gotemplate.NewEngine()
 	goTemplateStore := gotemplate.NewTemplateStore()
 	valueStoreInstrumentation := valuestore.NewValueStoreInstrumentation(consoleLoggerFactory)
@@ -45,8 +47,7 @@ func initInjector() *injector {
 	renderService := domain.NewRenderService(renderServiceInstrumentation)
 	consoleDiffPrinter := ui.NewConsoleDiffPrinter()
 	updateAppService := update.NewConfigurator(goTemplateEngine, repositoryStore, goTemplateStore, koanfValueStore, pullRequestStore, renderService, consoleDiffPrinter, configuration, coloredConsole)
-	updateInstrumentation := update.NewUpdateInstrumentation(coloredConsole, consoleLoggerFactory)
-	updateCommand := update.NewCommand(configuration, updateAppService, consoleLoggerFactory, updateInstrumentation)
+	updateCommand := update.NewCommand(configuration, updateAppService, consoleLoggerFactory, commonBatchInstrumentation)
 	initializeCommand := initialize.NewCommand(configuration, consoleLoggerFactory)
 	app := application.NewApp(versionInfo, configuration, command, updateCommand, initializeCommand, consoleLoggerFactory)
 	mainInjector := NewInjector(app)

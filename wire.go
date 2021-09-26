@@ -5,6 +5,7 @@ package main
 import (
 	"github.com/ccremer/greposync/application"
 	"github.com/ccremer/greposync/application/initialize"
+	"github.com/ccremer/greposync/application/instrumentation"
 	"github.com/ccremer/greposync/application/labels"
 	"github.com/ccremer/greposync/application/update"
 	"github.com/ccremer/greposync/cfg"
@@ -74,7 +75,7 @@ func initInjector() *injector {
 
 		// Instrumentation
 		valuestore.NewValueStoreInstrumentation,
-		update.NewUpdateInstrumentation,
+		wire.NewSet(instrumentation.NewUpdateInstrumentation, wire.Bind(new(instrumentation.BatchInstrumentation), new(*instrumentation.CommonBatchInstrumentation))),
 		repositorystore.NewRepositoryStoreInstrumentation,
 
 		// Git providers
