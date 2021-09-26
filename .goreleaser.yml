@@ -23,14 +23,14 @@ archives:
   name_template: "{{ .Binary }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}"
 
 checksum:
-  name_template: 'checksums.txt'
+  name_template: "checksums.txt"
 
 snapshot:
   name_template: "{{ .Tag }}-snapshot"
 
-# signs:
-# - artifacts: checksum
-#   args: ["-u", "3E0B9A63FF344E7CB445BD84ED35499391B64DB4", "--output", "${signature}", "--detach-sign", "${artifact}"]
+signs:
+- artifacts: checksum
+  args: ["-u", "4E74BD9589869F6CB8A73D279533207D7E3143FC", "--output", "${signature}", "--detach-sign", "${artifact}"]
 
 dockers:
 - image_templates:
@@ -55,6 +55,3 @@ nfpms:
 
 release:
   prerelease: auto
-  github:
-    owner: ccremer
-    name: greposync
