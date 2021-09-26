@@ -3,7 +3,7 @@
 IMG_TAG ?= latest
 
 # Image URL to use all building/pushing image targets
-QUAY_IMG ?= quay.io/ccremer/greposync:$(IMG_TAG)
+CONTAINER_IMG ?= ghcr.io/ccremer/greposync:$(IMG_TAG)
 
 GOASCIIDOC_OUT_ROOT ?= docs/modules/ROOT
 GOASCIIDOC_OUT_GODOC_PATH ?= $(GOASCIIDOC_OUT_ROOT)/pages/references/godoc.adoc
