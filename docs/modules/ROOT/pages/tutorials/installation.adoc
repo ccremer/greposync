@@ -1,0 +1,108 @@
+= Installation
+:origin-url: https://github.com/{gh-owner}/{gh-repo}
+:download-url: {origin-url}/releases/latest/download
+:raw-download-url: https://raw.githubusercontent.com/{gh-owner}/{gh-repo}
+:wget: wget -nv --show-progress
+
+Several installation methods are supported.
+Choose one that fits best your workflow.
+
+[NOTE]
+====
+All snippets are made for `linux` with `amd64` architecture.
+Please adapt the links and commands to your OS and platform.
+====
+
+Tools used::
+* `wget` (for downloading artifacts)
+* `grep` (to extract information from files)
+* `gpg` (for verifying downloaded artifacts)
+* `docker` (for Docker installation method)
+* `sudo` (to gain elevated privileges for installing)
+
+== Download binary
+:artifact: gsync_linux_amd64
+
+. Download binary
++
+[source,bash,subs="attributes+"]
+----
+include::example$code/download-artifact.sh[]
+----
+
+. _Optional_: Verify download
++
+[source,bash,subs="attributes+"]
+----
+include::example$code/verify-download.sh[]
+----
+
+. Install binary
++
+[source,bash,subs="attributes+"]
+----
+echo "⚙️ Installing {gh-repo}..."
+chmod +x {artifact}
+sudo mv {artifact} /usr/local/bin/gsync
+rm -f checksums.txt checksums.txt.sig signature.asc
+----
+
+== Install package
+
+=== Debian/Ubuntu
+:install-cmd: dpkg -i
+:artifact: greposync_linux_amd64.deb
+
+[source,bash,subs="attributes+"]
+----
+include::example$code/download-artifact.sh[]
+include::example$code/verify-download.sh[]
+include::example$code/install-download.sh[]
+----
+
+=== CentOS/RHEL
+:install-cmd: rpm -i
+:artifact: greposync_linux_amd64.rpm
+
+[source,bash,subs="attributes+"]
+----
+include::example$code/download-artifact.sh[]
+include::example$code/verify-download.sh[]
+include::example$code/install-download.sh[]
+----
+
+=== Alpine
+:install-cmd: apk add --allow-untrusted
+:artifact: greposync_linux_amd64.apk
+
+[source,bash,subs="attributes+"]
+----
+include::example$code/download-artifact.sh[]
+include::example$code/verify-download.sh[]
+include::example$code/install-download.sh[]
+----
+
+== Run in Docker
+
+. Create alias
++
+[source,bash,subs="attributes+"]
+----
+gsync() {
+  docker run \
+    --interactive \
+    --tty \
+    --rm \
+    --user="$(id -u)" \
+    --env GITHUB_TOKEN \
+    --env SSH_AUTH_SOCK=/tmp/ssh_agent.sock \
+    --volume "$\{SSH_AUTH_SOCK}:/tmp/ssh_agent.sock" \
+    --volume "$\{HOME}/.ssh/config:/app/.ssh/config:ro" \
+    --volume "$\{HOME}/.ssh/known_hosts:/app/.ssh/known_hosts:ro" \
+    --volume "$\{HOME}/.gitconfig:/app/.gitconfig:ro" \
+    --volume "$\{PWD}:/app/data" \
+    --workdir /app/data \
+    ghcr.io/{gh-owner}/{gh-repo}:${GREPOSYNC_VERSION:=latest} \
+    $*
+}
+----

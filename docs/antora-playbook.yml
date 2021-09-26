@@ -17,3 +17,7 @@ ui:
 output:
   dir: public/
   clean: true
+asciidoc:
+  attributes:
+    gh-owner: ccremer
+    gh-repo: greposync
