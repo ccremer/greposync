@@ -50,7 +50,7 @@ lint: generate fmt vet ## Invokes the fmt and vet targets
 build\:docker: export CGO_ENABLED = 0
 build\:docker:
 build\:docker: build ## Build the docker image
-	docker build . -t $(QUAY_IMG)
+	docker build . -t $(CONTAINER_IMG)
 
 .PHONY: clean
 clean: ## Clean the project
