@@ -2,3 +2,15 @@
 
 This guide is aimed at developers that want to contribute to the project.
 The intend is to make the internals easier to understand.
+
+== Domain-Driven Design
+
+This project follows the Domain-Driven Design principles.
+This architecture is also commonly known as "Clean", "Onion" or "Hexagonal" architecture.
+There are sometimes subtle differences, but the general characteristics are as following:
+
+* Dependency Inversion
+* Ubiquitous Language
+* Rich domain models
+
+image::ddd.drawio.svg[]
