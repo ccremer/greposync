@@ -82,6 +82,16 @@ func (c *pipelineContext) renderTemplates() pipeline.ActionFunc {
 	}
 }
 
+func (c *pipelineContext) cleanupUnwantedFiles() pipeline.ActionFunc {
+	return func(_ pipeline.Context) pipeline.Result {
+		err := c.appService.cleanupService.CleanupUnwantedFiles(domain.CleanupContext{
+			Repository: c.repo,
+			ValueStore: c.appService.valueStore,
+		})
+		return pipeline.Result{Err: err}
+	}
+}
+
 func (c *pipelineContext) ensurePullRequest() pipeline.ActionFunc {
 	return func(_ pipeline.Context) pipeline.Result {
 		err := c.appService.prStore.EnsurePullRequest(c.repo)

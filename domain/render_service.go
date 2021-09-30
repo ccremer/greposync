@@ -9,7 +9,7 @@ import (
 
 // RenderService is a domain service that helps rendering templates.
 type RenderService struct {
-	instrumentationFactory RenderServiceInstrumentationFactory
+	instrumentation RenderServiceInstrumentation
 }
 
 // RenderContext represents a single rendering context for a GitRepository.
@@ -24,15 +24,15 @@ type RenderContext struct {
 	values          Values
 }
 
-func NewRenderService(analyticsFactory RenderServiceInstrumentationFactory) *RenderService {
+func NewRenderService(instrumentation RenderServiceInstrumentation) *RenderService {
 	return &RenderService{
-		instrumentationFactory: analyticsFactory,
+		instrumentation: instrumentation,
 	}
 }
 
 // RenderTemplates loads the Templates and renders them in the GitRepository.RootDir of the given RenderContext.Repository.
 func (s *RenderService) RenderTemplates(ctx RenderContext) error {
-	ctx.instrumentation = s.instrumentationFactory.NewRenderServiceInstrumentation(ctx.Repository)
+	ctx.instrumentation = s.instrumentation.WithRepository(ctx.Repository)
 	result := pipeline.NewPipeline().WithSteps(
 		pipeline.NewStep("preflight check", ctx.preFlightCheck()),
 		pipeline.NewStep("load templates", ctx.toAction(ctx.loadTemplates)),

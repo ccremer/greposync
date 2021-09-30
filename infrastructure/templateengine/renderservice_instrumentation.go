@@ -9,7 +9,6 @@ import (
 type RenderServiceInstrumentation struct {
 	factory logging.LoggerFactory
 	log     logr.Logger
-	scope   string
 }
 
 func NewRenderServiceInstrumentation(factory logging.LoggerFactory) *RenderServiceInstrumentation {
@@ -19,10 +18,9 @@ func NewRenderServiceInstrumentation(factory logging.LoggerFactory) *RenderServi
 	return i
 }
 
-func (r *RenderServiceInstrumentation) NewRenderServiceInstrumentation(repository *domain.GitRepository) domain.RenderServiceInstrumentation {
+func (r *RenderServiceInstrumentation) WithRepository(repository *domain.GitRepository) domain.RenderServiceInstrumentation {
 	newCopy := NewRenderServiceInstrumentation(r.factory)
 	newCopy.log = r.factory.NewRepositoryLogger(repository)
-	r.scope = repository.URL.GetFullName()
 	return newCopy
 }
 
