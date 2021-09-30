@@ -1,5 +1,8 @@
 package domain
 
+// PullRequestStore provides methods to interact with PullRequest on a Git hosting service.
+//
+// In Domain-Driven Design language, the term `Store` corresponds to `Repository`, but to avoid name clash it was named `Store`.
 type PullRequestStore interface {
 	// FindMatchingPullRequest returns the PullRequest that has the same branch as GitRepository.CommitBranch.
 	// If not found, it returns nil without error.

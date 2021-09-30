@@ -2,8 +2,10 @@ package domain
 
 import "fmt"
 
+// LabelSet is a set of Label.
 type LabelSet []Label
 
+// CheckForEmptyLabelNames returns an error if there's a Label in the set that is an empty string.
 func (s LabelSet) CheckForEmptyLabelNames() error {
 	for _, label := range s {
 		if label.Name == "" {
@@ -13,6 +15,7 @@ func (s LabelSet) CheckForEmptyLabelNames() error {
 	return nil
 }
 
+// CheckForDuplicates returns an error if two or more Label have the same Label.Name.
 func (s LabelSet) CheckForDuplicates() error {
 	m := make(map[string]int, len(s))
 	for _, label := range s {
@@ -25,6 +28,7 @@ func (s LabelSet) CheckForDuplicates() error {
 	return nil
 }
 
+// FindLabelByName returns the Label by given Name, if there is one matching.
 func (s LabelSet) FindLabelByName(label string) (Label, bool) {
 	for _, l := range s {
 		if l.Name == label {

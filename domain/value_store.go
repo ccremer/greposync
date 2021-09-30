@@ -1,5 +1,8 @@
 package domain
 
+// ValueStore provides methods to query Values from a configuration.
+//
+// In Domain-Driven Design language, the term `Store` corresponds to `Repository`, but to avoid name clash it was named `Store`.
 type ValueStore interface {
 	// FetchValuesForTemplate retrieves the Values for the given template.
 	FetchValuesForTemplate(template *Template, repository *GitRepository) (Values, error)

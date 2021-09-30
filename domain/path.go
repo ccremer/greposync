@@ -6,12 +6,17 @@ import (
 	"path/filepath"
 )
 
+// Path is a Value object identifying a file path.
 type Path string
 
+// NewPath constructs a new Path joined by the given elements.
+// Paths are joined with path.Join.
 func NewPath(elems ...string) Path {
 	return Path(path.Join(elems...))
 }
 
+// NewFilePath constructs a new Path joined by the given elements.
+// Paths are joined with filepath.Join.
 func NewFilePath(elems ...string) Path {
 	return Path(filepath.Join(elems...))
 }
