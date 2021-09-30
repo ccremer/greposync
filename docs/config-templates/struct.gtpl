@@ -9,6 +9,7 @@
 ----
 
 {{.Struct.Doc}}
+
 {{range .Struct.Fields}}{{if not .Nested}}{{if or .Exported $.Config.Private }}
 {{- if .Doc}}{{.Name}}::
 {{.Doc}}
@@ -17,3 +18,4 @@
 {{end}}{{end}}
 {{range .Struct.Fields}}{{if or .Exported $.Config.Private }}{{if .Nested}}{{render $ .Nested}}{{end}}{{end}}{{end}}
 {{if hasReceivers . .Struct.Name}}{{renderReceivers . .Struct.Name}}{{end}}
+'''

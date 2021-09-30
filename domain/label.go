@@ -1,15 +1,21 @@
 package domain
 
+// Label is a Value object containing the properties of labels in a Git hosting service.
 type Label struct {
-	Name        string
+	// Name is the label name
+	Name string
+	// Description adds additional details to the label.
 	Description string
 	color       Color
 }
 
+// GetColor returns the color of the Label.
 func (l Label) GetColor() Color {
 	return l.color
 }
 
+// SetColor sets the color of the Label.
+// If Color.CheckValue fails, then that error is returned.
 func (l *Label) SetColor(color Color) error {
 	if err := color.CheckValue(); hasFailed(err) {
 		return err

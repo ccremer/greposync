@@ -7,10 +7,12 @@ import (
 	"golang.org/x/sys/unix"
 )
 
+// RenderService is a domain service that helps rendering templates.
 type RenderService struct {
 	instrumentationFactory RenderServiceInstrumentationFactory
 }
 
+// RenderContext represents a single rendering context for a GitRepository.
 type RenderContext struct {
 	Repository    *GitRepository
 	ValueStore    ValueStore
@@ -28,6 +30,7 @@ func NewRenderService(analyticsFactory RenderServiceInstrumentationFactory) *Ren
 	}
 }
 
+// RenderTemplates loads the Templates and renders them in the GitRepository.RootDir of the given RenderContext.Repository.
 func (s *RenderService) RenderTemplates(ctx RenderContext) error {
 	ctx.instrumentation = s.instrumentationFactory.NewRenderServiceInstrumentation(ctx.Repository)
 	result := pipeline.NewPipeline().WithSteps(

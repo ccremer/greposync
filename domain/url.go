@@ -39,6 +39,7 @@ func (u *GitURL) GetFullName() string {
 	return strings.Join([]string{u.Host, u.GetNamespace(), u.GetRepositoryName()}, "/")
 }
 
+// AsURL converts GitURL to url.URL
 func (u *GitURL) AsURL() *url.URL {
 	plain := url.URL(*u)
 	return &plain

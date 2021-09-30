@@ -1,7 +1,7 @@
 site:
   title: greposync docs
   start_page: greposync::index.adoc
-  url: http://localhost
+  url: https://ccremer.github.io/greposync
 content:
   sources:
     - url: ../

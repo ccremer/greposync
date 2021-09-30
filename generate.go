@@ -18,7 +18,7 @@ import (
 )
 
 func main() {
-	createExampleConfig()
+	//createExampleConfig()
 }
 
 func createExampleConfig() {

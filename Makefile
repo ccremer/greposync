@@ -27,10 +27,9 @@ gomodtidy:
 	go get github.com/google/wire/cmd/wire@v0.5.0
 
 .PHONY: generate
-generate: export GODOC_YAML_DEFAULTS_PATH = $(GOASCIIDOC_OUT_YAML_EXAMPLE_PATH)
 generate: gomodtidy
 	go generate -tags=generate generate.go
-	$(GOASCIIDOC_CMD) cfg
+	$(GOASCIIDOC_CMD) domain
 	cp application/initialize/_helpers.tpl docs/modules/ROOT/examples/comment/helpers.tpl
 
 .PHONY: fmt
