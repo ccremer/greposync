@@ -20,10 +20,9 @@ build: export GOOS = linux
 build: generate fmt vet ## Build the Go binary
 	@go build -o gsync .
 
-# Using GOFLAGS here to workaround a broken import (https://github.com/google/wire/issues/299)
 .PHONY: generate
 generate:
-	GOFLAGS=-mod=mod go generate -tags=generate generate.go
+	go generate -tags=generate generate.go
 	$(GOASCIIDOC_CMD) domain
 	cp application/initialize/_helpers.tpl docs/modules/ROOT/examples/comment/helpers.tpl
 
