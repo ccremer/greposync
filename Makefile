@@ -20,15 +20,10 @@ build: export GOOS = linux
 build: generate fmt vet ## Build the Go binary
 	@go build -o gsync .
 
-.PHONY: gomodtidy
-gomodtidy:
-	go mod tidy
-	# Hack to get the missing go.sum entry...
-	go get github.com/google/wire/cmd/wire@v0.5.0
-
+# Using GOFLAGS here to workaround a broken import (https://github.com/google/wire/issues/299)
 .PHONY: generate
-generate: gomodtidy
-	go generate -tags=generate generate.go
+generate:
+	GOFLAGS=-mod=mod go generate -tags=generate generate.go
 	$(GOASCIIDOC_CMD) domain
 	cp application/initialize/_helpers.tpl docs/modules/ROOT/examples/comment/helpers.tpl
 
