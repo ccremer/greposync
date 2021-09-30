@@ -169,6 +169,50 @@
 <h2 id="_interfaces"><a class="anchor" href="#_interfaces"></a>Interfaces</h2>
 <div class="sectionbody">
 <div class="sect2">
+<h3 id="_cleanupserviceinstrumentation"><a class="anchor" href="#_cleanupserviceinstrumentation"></a>CleanupServiceInstrumentation</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">type CleanupServiceInstrumentation interface {
+    FetchedFilesToDelete(fetchErr error, files []Path) error
+    DeletedFile(file Path)
+    WithRepository(repository *GitRepository) CleanupServiceInstrumentation
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>CleanupServiceInstrumentation provides methods for domain observability.</p>
+</div>
+<div class="listingblock">
+<div class="title">FetchedFilesToDelete</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func FetchedFilesToDelete(fetchErr error, files []Path) error</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>FetchedFilesToDelete logs a message indicating that fetching file paths to delete from ValueStore was successful but only if fetchErr is nil.
+Returns fetchErr unmodified for method chaining.</p>
+</div>
+<div class="listingblock">
+<div class="title">DeletedFile</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func DeletedFile(file Path)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>DeletedFile logs a message indicating that deleting file occurred.</p>
+</div>
+<div class="listingblock">
+<div class="title">WithRepository</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func WithRepository(repository *GitRepository) CleanupServiceInstrumentation</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>WithRepository returns an instance that has the given repository as scope.</p>
+</div>
+<hr>
+</div>
+<div class="sect2">
 <h3 id="_gitrepositorystore"><a class="anchor" href="#_gitrepositorystore"></a>GitRepositoryStore</h3>
 <div class="listingblock">
 <div class="content">
@@ -397,29 +441,6 @@ If not found, it returns nil without error.</p>
 <hr>
 </div>
 <div class="sect2">
-<h3 id="_renderserviceinstrumentationfactory"><a class="anchor" href="#_renderserviceinstrumentationfactory"></a>RenderServiceInstrumentationFactory</h3>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">type RenderServiceInstrumentationFactory interface {
-    NewRenderServiceInstrumentation(repository *GitRepository) RenderServiceInstrumentation
-}</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>RenderServiceInstrumentationFactory provides factory methods to create new instances.</p>
-</div>
-<div class="listingblock">
-<div class="title">NewRenderServiceInstrumentation</div>
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func NewRenderServiceInstrumentation(repository *GitRepository) RenderServiceInstrumentation</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>NewRenderServiceInstrumentation creates a new RenderServiceInstrumentation instance using the given GitRepository as context.</p>
-</div>
-<hr>
-</div>
-<div class="sect2">
 <h3 id="_renderserviceinstrumentation"><a class="anchor" href="#_renderserviceinstrumentation"></a>RenderServiceInstrumentation</h3>
 <div class="listingblock">
 <div class="content">
@@ -428,6 +449,7 @@ If not found, it returns nil without error.</p>
     FetchedValuesForTemplate(fetchErr error, template *Template) error
     AttemptingToRenderTemplate(template *Template)
     WrittenRenderResultToFile(template *Template, targetPath Path, writeErr error) error
+    WithRepository(repository *GitRepository) RenderServiceInstrumentation
 }</code></pre>
 </div>
 </div>
@@ -468,6 +490,15 @@ Returns fetchErr unmodified for method chaining.</p>
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func WrittenRenderResultToFile(template *Template, targetPath Path, writeErr error) error</code></pre>
 </div>
+</div>
+<div class="listingblock">
+<div class="title">WithRepository</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func WithRepository(repository *GitRepository) RenderServiceInstrumentation</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>WithRepository creates a new RenderServiceInstrumentation instance using the given GitRepository as context.</p>
 </div>
 <hr>
 </div>
@@ -1364,7 +1395,9 @@ Any leading "/" is removed.</p>
 <h3 id="_newcleanupservice"><a class="anchor" href="#_newcleanupservice"></a>NewCleanupService</h3>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func NewCleanupService() *CleanupService</code></pre>
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func NewCleanupService(
+    instrumentation CleanupServiceInstrumentation,
+) *CleanupService</code></pre>
 </div>
 </div>
 </div>
@@ -1434,7 +1467,7 @@ If nr is nil, then nil is returned.</p>
 <h3 id="_newrenderservice"><a class="anchor" href="#_newrenderservice"></a>NewRenderService</h3>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func NewRenderService(analyticsFactory RenderServiceInstrumentationFactory) *RenderService</code></pre>
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func NewRenderService(instrumentation RenderServiceInstrumentation) *RenderService</code></pre>
 </div>
 </div>
 </div>
