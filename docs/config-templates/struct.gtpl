@@ -9,6 +9,7 @@
 ----
 
 {{.Struct.Doc}}
+
 {{range .Struct.Fields}}{{if not .Nested}}{{if or .Exported $.Config.Private }}
 {{- if .Doc}}{{.Name}}::
 {{.Doc}}

@@ -22,77 +22,83 @@ type GitRepositoryStore interface {
 }
 ----
 
+GitRepositoryStore provides methods to interact with GitRepository on the local filesystem.
+Most methods described follow the corresponding Git operations.
 
+In Domain-Driven Design language, the term `Store` corresponds to `Repository`, but to avoid name clash it was named `Store`.
 
 .FetchGitRepositories
 [source, go]
 ----
 func FetchGitRepositories() ([]*GitRepository, error)
 ----
-
+FetchGitRepositories loads a list of GitRepository from a configuration set.
+Returns an empty list on first error.
 
 .Clone
 [source, go]
 ----
 func Clone(repository *GitRepository) error
 ----
-
+Clone will download the given GitRepository to local filesystem.
+The location is specified in GitRepository.RootDir.
 
 .Checkout
 [source, go]
 ----
 func Checkout(repository *GitRepository) error
 ----
-
+Checkout checks out the GitRepository.CommitBranch.
 
 .Fetch
 [source, go]
 ----
 func Fetch(repository *GitRepository) error
 ----
-
+Fetch retrieves the objects and refs from remote.
 
 .Reset
 [source, go]
 ----
 func Reset(repository *GitRepository) error
 ----
-
+Reset current HEAD to GitRepository.CommitBranch.
 
 .Pull
 [source, go]
 ----
 func Pull(repository *GitRepository) error
 ----
-
+Pull integrates objects from remote.
 
 .Add
 [source, go]
 ----
 func Add(repository *GitRepository) error
 ----
-
+Add stages all files in GitRepository.RootDir.
 
 .Commit
 [source, go]
 ----
 func Commit(repository *GitRepository, options CommitOptions) error
 ----
-
+Commit records changes in the repository.
 
 .Diff
 [source, go]
 ----
 func Diff(repository *GitRepository) (string, error)
 ----
-
+Diff returns a `patch`-compatible diff between HEAD and previous commit as string.
+The diff may be empty.
 
 .Push
 [source, go]
 ----
 func Push(repository *GitRepository, options PushOptions) error
 ----
-
+Push updates remote refs.
 
 '''
 
@@ -106,28 +112,35 @@ type LabelStore interface {
 }
 ----
 
+LabelStore provides methods to interact with labels on a Git hosting service.
 
+In Domain-Driven Design language, the term `Store` corresponds to `Repository`, but to avoid name clash it was named `Store`.
 
 .FetchLabelsForRepository
 [source, go]
 ----
 func FetchLabelsForRepository(url *GitURL) (LabelSet, error)
 ----
-
+FetchLabelsForRepository retrieves a LabelSet for the given repository.
 
 .EnsureLabelsForRepository
 [source, go]
 ----
 func EnsureLabelsForRepository(url *GitURL, labels LabelSet) error
 ----
+EnsureLabelsForRepository creates or updates the given LabelSet in the given repository.
+Labels that exist remotely, but not in the given LabelSet are ignored.
+Remote labels have to be updated when Label.GetColor or Label.Description are not matching.
 
+Renaming labels are currently not supported.
 
 .RemoveLabelsFromRepository
 [source, go]
 ----
 func RemoveLabelsFromRepository(url *GitURL, labels LabelSet) error
 ----
-
+RemoveLabelsFromRepository remotely removes all labels in the given LabelSet.
+Only the Label.Name is relevant to determine label equality.
 
 '''
 
@@ -140,7 +153,9 @@ type PullRequestStore interface {
 }
 ----
 
+PullRequestStore provides methods to interact with PullRequest on a Git hosting service.
 
+In Domain-Driven Design language, the term `Store` corresponds to `Repository`, but to avoid name clash it was named `Store`.
 
 .FindMatchingPullRequest
 [source, go]
@@ -174,7 +189,7 @@ type RenderServiceInstrumentationFactory interface {
 }
 ----
 
-
+RenderServiceInstrumentationFactory provides factory methods to create new instances.
 
 .NewRenderServiceInstrumentation
 [source, go]
@@ -196,7 +211,7 @@ type RenderServiceInstrumentation interface {
 }
 ----
 
-
+RenderServiceInstrumentation provides methods for domain observability.
 
 .FetchedTemplatesFromStore
 [source, go]
@@ -238,14 +253,14 @@ type TemplateEngine interface {
 }
 ----
 
-
+TemplateEngine provides methods to process a Template.
 
 .Execute
 [source, go]
 ----
 func Execute(template *Template, values Values) (RenderResult, error)
 ----
-
+Execute renders the given Template with the given Values.
 
 '''
 
@@ -257,14 +272,17 @@ type TemplateStore interface {
 }
 ----
 
+TemplateStore provides methods to load Template from template root directory.
 
+In Domain-Driven Design language, the term `Store` corresponds to `Repository`, but to avoid name clash it was named `Store`.
 
 .FetchTemplates
 [source, go]
 ----
 func FetchTemplates() ([]*Template, error)
 ----
-
+FetchTemplates lists all templates.
+It aborts on first error.
 
 '''
 
@@ -279,7 +297,9 @@ type ValueStore interface {
 }
 ----
 
+ValueStore provides methods to query Values from a configuration.
 
+In Domain-Driven Design language, the term `Store` corresponds to `Repository`, but to avoid name clash it was named `Store`.
 
 .FetchValuesForTemplate
 [source, go]
@@ -327,6 +347,7 @@ type CleanupService struct {
 
 
 
+
 **Receivers**
 
 .CleanupUnwantedFiles
@@ -357,6 +378,7 @@ type CleanupContext struct {
 
 
 
+
 **Receivers**
 
 
@@ -375,18 +397,29 @@ type GitRepository struct {
 }
 ----
 
+GitRepository is the heart of the domain.
 
+The model itself doesn't feature common actions like Commit.
+It was decided against adding those rich functionalities since that would mean implementing a replayable history of actions to keep in memory.
+This was considered too complicated, thus these actions are to be implemented in Stores.
 
+RootDir::
+RootDir is the full path to the Git root directory in the local filesystem.
 
+URL::
+URL is the remote URL of origin.
 
+PullRequest::
+PullRequest is the associated PullRequest for this repository in the remote Git hosting service.
 
+Labels::
+Labels contains the LabelSet that is present in the remote Git hosting service.
 
+CommitBranch::
+CommitBranch in the branch name of the current branch the working tree is in.
 
-
-
-
-
-
+DefaultBranch::
+DefaultBranch is the branch name of the remote default branch (usually `master` or `main`).
 
 
 
@@ -398,7 +431,8 @@ type GitRepository struct {
 func (r *GitRepository) SetLabels(labels LabelSet) error
 ----
 
-
+SetLabels validates and sets the new LabelSet.
+Returns nil if there are no empty Label names or duplicates.
 
 
 '''
@@ -412,10 +446,13 @@ type CommitOptions struct {
 }
 ----
 
+CommitOptions contains settings to influence the GitRepositoryStore.Commit action.
 
+Message::
+Message contains the commit message.
 
-
-
+Amend::
+Amend will edit the last commit instead of creating a new one.
 
 
 
@@ -430,8 +467,10 @@ type PushOptions struct {
 }
 ----
 
+PushOptions contains settings to influence the GitRepositoryStore.Push action.
 
-
+Force::
+Force overwrites the remote state when pushing.
 
 
 
@@ -447,10 +486,13 @@ type Label struct {
 }
 ----
 
+Label is a Value object containing the properties of labels in a Git hosting service.
 
+Name::
+Name is the label name
 
-
-
+Description::
+Description adds additional details to the label.
 
 
 
@@ -463,7 +505,7 @@ type Label struct {
 func (l Label) GetColor() Color
 ----
 
-
+GetColor returns the color of the Label.
 
 .SetColor
 [source, go]
@@ -471,7 +513,8 @@ func (l Label) GetColor() Color
 func (l *Label) SetColor(color Color) error
 ----
 
-
+SetColor sets the color of the Label.
+If Color.CheckValue fails, then that error is returned.
 
 .IsSameAs
 [source, go]
@@ -501,13 +544,16 @@ type PullRequest struct {
 }
 ----
 
+PullRequest is a model that represents a pull request in a remote Git hosting service.
 
 
 
 
+CommitBranch::
+CommitBranch is the branch name of the current working tree.
 
-
-
+BaseBranch::
+BaseBranch is the branch name into which CommitBranch should be merged into.
 
 
 
@@ -520,7 +566,7 @@ type PullRequest struct {
 func (pr *PullRequest) GetLabels() LabelSet
 ----
 
-
+GetLabels returns the LabelSet of this PR.
 
 .SetNumber
 [source, go]
@@ -528,7 +574,7 @@ func (pr *PullRequest) GetLabels() LabelSet
 func (pr *PullRequest) SetNumber(nr *PullRequestNumber) error
 ----
 
-
+SetNumber sets the pull request number.
 
 .GetNumber
 [source, go]
@@ -536,7 +582,8 @@ func (pr *PullRequest) SetNumber(nr *PullRequestNumber) error
 func (pr *PullRequest) GetNumber() *PullRequestNumber
 ----
 
-
+GetNumber returns the pull request number.
+It returns nil if this PullRequest does not yet exist in remote.
 
 .GetTitle
 [source, go]
@@ -544,7 +591,7 @@ func (pr *PullRequest) GetNumber() *PullRequestNumber
 func (pr *PullRequest) GetTitle() string
 ----
 
-
+GetTitle returns the PR title.
 
 .GetBody
 [source, go]
@@ -552,7 +599,7 @@ func (pr *PullRequest) GetTitle() string
 func (pr *PullRequest) GetBody() string
 ----
 
-
+GetBody returns the PR description.
 
 .ChangeDescription
 [source, go]
@@ -560,7 +607,8 @@ func (pr *PullRequest) GetBody() string
 func (pr *PullRequest) ChangeDescription(title, body string) error
 ----
 
-
+ChangeDescription changes the title and body of this PR.
+An error is returned if the title is empty.
 
 .AttachLabels
 [source, go]
@@ -568,7 +616,8 @@ func (pr *PullRequest) ChangeDescription(title, body string) error
 func (pr *PullRequest) AttachLabels(labels LabelSet) error
 ----
 
-
+AttachLabels sets the LabelSet of this PR.
+There cannot be duplicates or labels with no name.
 
 
 '''
@@ -580,6 +629,7 @@ type RenderService struct {
 }
 ----
 
+RenderService is a domain service that helps rendering templates.
 
 
 
@@ -592,7 +642,7 @@ type RenderService struct {
 func (s *RenderService) RenderTemplates(ctx RenderContext) error
 ----
 
-
+RenderTemplates loads the Templates and renders them in the GitRepository.RootDir of the given RenderContext.Repository.
 
 
 '''
@@ -608,6 +658,7 @@ type RenderContext struct {
 }
 ----
 
+RenderContext represents a single rendering context for a GitRepository.
 
 
 
@@ -636,10 +687,14 @@ type Template struct {
 }
 ----
 
+Template is a reference to a file that contains special syntax.
 
+RelativePath::
+RelativePath is the Path reference to where the template file is contained within the template root directory.
 
-
-
+FilePermissions::
+FilePermissions defines what file permissions this template file has.
+Rendered files should have the same permissions as template files.
 
 
 
@@ -651,7 +706,7 @@ type Template struct {
 func (t *Template) Render(values Values, engine TemplateEngine) (RenderResult, error)
 ----
 
-
+Render takes the given Values and returns a RenderResult from the given TemplateEngine.
 
 
 '''
@@ -675,7 +730,7 @@ Color is a 6-digit uppercase hexadecimal string value with '#' prefix
 func (c Color) String() string
 ----
 
-
+String returns the color in hexadecimal RGB format
 
 .CheckValue
 [source, go]
@@ -683,7 +738,8 @@ func (c Color) String() string
 func (c Color) CheckValue() error
 ----
 
-
+CheckValue returns ErrInvalidArgument in case the string is not in an acceptable format.
+Returns nil otherwise.
 
 
 '''
@@ -694,7 +750,7 @@ func (c Color) CheckValue() error
 type LabelSet []Label
 ----
 
-
+LabelSet is a set of Label.
 
 **Receivers**
 
@@ -704,7 +760,7 @@ type LabelSet []Label
 func (s LabelSet) CheckForEmptyLabelNames() error
 ----
 
-
+CheckForEmptyLabelNames returns an error if there's a Label in the set that is an empty string.
 
 .CheckForDuplicates
 [source, go]
@@ -712,7 +768,7 @@ func (s LabelSet) CheckForEmptyLabelNames() error
 func (s LabelSet) CheckForDuplicates() error
 ----
 
-
+CheckForDuplicates returns an error if two or more Label have the same Label.Name.
 
 .FindLabelByName
 [source, go]
@@ -720,7 +776,7 @@ func (s LabelSet) CheckForDuplicates() error
 func (s LabelSet) FindLabelByName(label string) (Label, bool)
 ----
 
-
+FindLabelByName returns the Label by given Name, if there is one matching.
 
 .Merge
 [source, go]
@@ -756,7 +812,7 @@ The original order is preserved.
 type Path string
 ----
 
-
+Path is a Value object identifying a file path.
 
 **Receivers**
 
@@ -818,7 +874,7 @@ String returns a string representation of itself.
 type PullRequestNumber int
 ----
 
-
+PullRequestNumber identifies a PullRequest by a number in a Git hosting service.
 
 **Receivers**
 
@@ -828,7 +884,7 @@ type PullRequestNumber int
 func (nr PullRequestNumber) String() string
 ----
 
-
+String returns the number prefixed with `#`.
 
 .Int
 [source, go]
@@ -836,7 +892,8 @@ func (nr PullRequestNumber) String() string
 func (nr *PullRequestNumber) Int() *int
 ----
 
-
+Int returns nil if nr is also nil.
+Otherwise, it returns an int pointer.
 
 
 '''
@@ -847,7 +904,7 @@ func (nr *PullRequestNumber) Int() *int
 type RenderResult string
 ----
 
-
+RenderResult represents the string value after rendering from a Template.
 
 **Receivers**
 
@@ -857,7 +914,8 @@ type RenderResult string
 func (r RenderResult) WriteToFile(path Path, permissions Permissions) error
 ----
 
-
+WriteToFile writes the content to the given Path with given Permissions.
+Otherwise, an error is returned.
 
 
 '''
@@ -868,7 +926,7 @@ func (r RenderResult) WriteToFile(path Path, permissions Permissions) error
 type Permissions fs.FileMode
 ----
 
-
+Permissions is an alias for file permissions.
 
 **Receivers**
 
@@ -878,7 +936,7 @@ type Permissions fs.FileMode
 func (p Permissions) FileMode() fs.FileMode
 ----
 
-
+FileMode converts Permissions to fs.FileMode.
 
 
 '''
@@ -942,7 +1000,7 @@ GetFullName returns the hostname (or host:port) joined by GetNamespace and GetRe
 func (u *GitURL) AsURL() *url.URL
 ----
 
-
+AsURL converts GitURL to url.URL
 
 
 '''
@@ -953,7 +1011,7 @@ func (u *GitURL) AsURL() *url.URL
 type Values map[string]interface{}
 ----
 
-
+Values contain a tree of properties to be consumed by a TemplateEngine.
 
 
 '''
@@ -1008,7 +1066,7 @@ func NewCleanupService() *CleanupService
 func NewGitRepository(u *GitURL, root Path) *GitRepository
 ----
 
-
+NewGitRepository creates a new instance.
 
 
 
@@ -1028,7 +1086,8 @@ func NewGitRepository(u *GitURL, root Path) *GitRepository
 func NewPath(elems ...string) Path
 ----
 
-
+NewPath constructs a new Path joined by the given elements.
+Paths are joined with path.Join.
 
 
 === NewFilePath
@@ -1037,7 +1096,8 @@ func NewPath(elems ...string) Path
 func NewFilePath(elems ...string) Path
 ----
 
-
+NewFilePath constructs a new Path joined by the given elements.
+Paths are joined with filepath.Join.
 
 
 
@@ -1055,7 +1115,8 @@ func NewPullRequest(
 ) (*PullRequest, error)
 ----
 
-
+NewPullRequest returns a new instance.
+An error is returned if the given properties do not satisfy constraints.
 
 
 
@@ -1073,7 +1134,8 @@ func NewPullRequest(
 func NewPullRequestNumber(nr *int) *PullRequestNumber
 ----
 
-
+NewPullRequestNumber takes the given number and returns a new instance.
+If nr is nil, then nil is returned.
 
 
 
@@ -1101,7 +1163,7 @@ func NewRenderService(analyticsFactory RenderServiceInstrumentationFactory) *Ren
 func NewTemplate(relPath Path, perms Permissions) *Template
 ----
 
-
+NewTemplate returns a new instance.
 
 
 

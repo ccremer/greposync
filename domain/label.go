@@ -3,7 +3,7 @@ package domain
 // Label is a Value object containing the properties of labels in a Git hosting service.
 type Label struct {
 	// Name is the label name
-	Name        string
+	Name string
 	// Description adds additional details to the label.
 	Description string
 	color       Color
