@@ -6,21 +6,28 @@ import (
 	pipeline "github.com/ccremer/go-command-pipeline"
 )
 
-type CleanupService struct{}
+type CleanupService struct {
+	instrumentation CleanupServiceInstrumentation
+}
 
 type CleanupContext struct {
 	Repository *GitRepository
 	ValueStore ValueStore
 
-	files []Path
+	files           []Path
+	instrumentation CleanupServiceInstrumentation
 }
 
-func NewCleanupService() *CleanupService {
-	return &CleanupService{}
+func NewCleanupService(
+	instrumentation CleanupServiceInstrumentation,
+) *CleanupService {
+	return &CleanupService{
+		instrumentation: instrumentation,
+	}
 }
 
 func (s *CleanupService) CleanupUnwantedFiles(ctx CleanupContext) error {
-
+	ctx.instrumentation = s.instrumentation.WithRepository(ctx.Repository)
 	result := pipeline.NewPipeline().WithSteps(
 		pipeline.NewStep("preflight check", ctx.preFlightCheck()),
 		pipeline.NewStep("load files", ctx.toAction(ctx.loadFiles)),
@@ -48,7 +55,7 @@ func (ctx *CleanupContext) toAction(action func() error) pipeline.ActionFunc {
 func (ctx *CleanupContext) loadFiles() error {
 	files, err := ctx.ValueStore.FetchFilesToDelete(ctx.Repository)
 	ctx.files = files
-	return err
+	return ctx.instrumentation.FetchedFilesToDelete(err, files)
 }
 
 func (ctx *CleanupContext) deleteFiles() error {
@@ -58,6 +65,7 @@ func (ctx *CleanupContext) deleteFiles() error {
 			if err := os.Remove(absoluteFile.String()); hasFailed(err) {
 				return err
 			}
+			ctx.instrumentation.DeletedFile(absoluteFile)
 		}
 	}
 	return nil

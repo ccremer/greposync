@@ -85,6 +85,7 @@ func (c *Command) createPipeline(r *domain.GitRepository) *pipeline.Pipeline {
 			c.instrumentation.PipelineForRepositoryStarted(repoCtx.repo)
 			return nil
 		}),
+
 		pipeline.NewPipeline().AddBeforeHook(logger).
 			WithNestedSteps("prepare workspace",
 				predicate.ToStep("clone repository", repoCtx.clone(), repoCtx.dirMissing()),
@@ -93,7 +94,13 @@ func (c *Command) createPipeline(r *domain.GitRepository) *pipeline.Pipeline {
 				predicate.ToStep("checkout branch", repoCtx.checkout(), predicate.Bool(resetRepo)),
 				predicate.ToStep("pull", repoCtx.fetch(), predicate.Bool(resetRepo)),
 			),
-		pipeline.NewStep("render templates", repoCtx.renderTemplates()),
+
+		pipeline.NewPipeline().AddBeforeHook(logger).
+			WithNestedSteps("render",
+				pipeline.NewStep("render templates", repoCtx.renderTemplates()),
+				pipeline.NewStep("cleanup unwanted files", repoCtx.cleanupUnwantedFiles()),
+			),
+
 		predicate.WrapIn(pipeline.NewPipeline().AddBeforeHook(logger).
 			WithNestedSteps("commit changes",
 				pipeline.NewStep("add", repoCtx.add()),
@@ -101,6 +108,7 @@ func (c *Command) createPipeline(r *domain.GitRepository) *pipeline.Pipeline {
 				predicate.ToStep("show diff", repoCtx.diff(), predicate.Bool(showDiff)),
 			),
 			predicate.And(predicate.Bool(enabledCommits), repoCtx.isDirty())),
+
 		predicate.ToStep("push changes", repoCtx.push(), predicate.And(predicate.Bool(enabledPush), repoCtx.hasCommits())),
 		predicate.ToStep("find existing pull request", repoCtx.fetchPullRequest(), predicate.Bool(sc.PullRequest.Create)),
 		predicate.ToStep("update pull request", repoCtx.ensurePullRequest(), predicate.And(repoCtx.hasCommits(), predicate.Bool(sc.PullRequest.Create))),

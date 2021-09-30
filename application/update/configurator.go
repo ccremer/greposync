@@ -9,15 +9,16 @@ import (
 )
 
 type AppService struct {
-	engine        *gotemplate.GoTemplateEngine
-	repoStore     *repositorystore.RepositoryStore
-	templateStore *gotemplate.GoTemplateStore
-	valueStore    domain.ValueStore
-	prStore       domain.PullRequestStore
-	renderService *domain.RenderService
-	diffPrinter   *ui.ConsoleDiffPrinter
-	cfg           *cfg.Configuration
-	console       *ui.ColoredConsole
+	engine         *gotemplate.GoTemplateEngine
+	repoStore      *repositorystore.RepositoryStore
+	templateStore  *gotemplate.GoTemplateStore
+	valueStore     domain.ValueStore
+	prStore        domain.PullRequestStore
+	renderService  *domain.RenderService
+	diffPrinter    *ui.ConsoleDiffPrinter
+	cfg            *cfg.Configuration
+	console        *ui.ColoredConsole
+	cleanupService *domain.CleanupService
 }
 
 func NewConfigurator(
@@ -27,20 +28,22 @@ func NewConfigurator(
 	valueStore domain.ValueStore,
 	prStore domain.PullRequestStore,
 	renderService *domain.RenderService,
+	cleanupService *domain.CleanupService,
 	diffPrinter *ui.ConsoleDiffPrinter,
 	cfg *cfg.Configuration,
 	console *ui.ColoredConsole,
 ) *AppService {
 	return &AppService{
-		engine:        engine,
-		repoStore:     repoStore,
-		templateStore: templateStore,
-		valueStore:    valueStore,
-		prStore:       prStore,
-		renderService: renderService,
-		diffPrinter:   diffPrinter,
-		cfg:           cfg,
-		console:       console,
+		engine:         engine,
+		repoStore:      repoStore,
+		templateStore:  templateStore,
+		valueStore:     valueStore,
+		prStore:        prStore,
+		renderService:  renderService,
+		cleanupService: cleanupService,
+		diffPrinter:    diffPrinter,
+		cfg:            cfg,
+		console:        console,
 	}
 }
 

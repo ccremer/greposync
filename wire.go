@@ -57,7 +57,8 @@ func initInjector() *injector {
 		// Template Engine
 		wire.NewSet(gotemplate.NewEngine, wire.Bind(new(domain.TemplateEngine), new(*gotemplate.GoTemplateEngine))),
 		wire.NewSet(gotemplate.NewTemplateStore, wire.Bind(new(domain.TemplateStore), new(*gotemplate.GoTemplateStore))),
-		wire.NewSet(templateengine.NewRenderServiceInstrumentation, wire.Bind(new(domain.RenderServiceInstrumentationFactory), new(*templateengine.RenderServiceInstrumentation))),
+		wire.NewSet(templateengine.NewRenderServiceInstrumentation, wire.Bind(new(domain.RenderServiceInstrumentation), new(*templateengine.RenderServiceInstrumentation))),
+		wire.NewSet(templateengine.NewCleanupServiceInstrumentation, wire.Bind(new(domain.CleanupServiceInstrumentation), new(*templateengine.CleanupServiceInstrumentation))),
 
 		// Stores
 		wire.NewSet(repositorystore.NewRepositoryStore, wire.Bind(new(domain.GitRepositoryStore), new(*repositorystore.RepositoryStore))),
@@ -67,6 +68,7 @@ func initInjector() *injector {
 
 		// Services
 		domain.NewRenderService,
+		domain.NewCleanupService,
 
 		// Console & Logging
 		wire.NewSet(ui.NewConsoleSink, wire.Bind(new(logr.LogSink), new(*ui.ConsoleSink))),
