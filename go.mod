@@ -18,6 +18,6 @@ require (
 	github.com/urfave/cli/v2 v2.3.0
 	github.com/whilp/git-urls v1.0.0
 	golang.org/x/oauth2 v0.0.0-20210819190943-2bc19b11175f
-	golang.org/x/sys v0.0.0-20210809222454-d867a43fc93e
+	golang.org/x/sys v0.0.0-20210930141918-969570ce7c6c
 	sigs.k8s.io/yaml v1.3.0
 )
