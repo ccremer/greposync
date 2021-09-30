@@ -5,6 +5,6 @@
 package tools
 
 import (
-	_ "github.com/google/wire"
+	_ "github.com/google/wire/cmd/wire"
 	_ "github.com/mariotoffia/goasciidoc"
 )
