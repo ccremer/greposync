@@ -91,7 +91,7 @@ func (ctx *RenderContext) renderTemplate(template *Template) error {
 		return err
 	}
 
-	targetPath := template.RelativePath
+	targetPath := template.CleanPath()
 	if alternativePath != "" {
 		targetPath = alternativePath
 	}

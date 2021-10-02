@@ -735,6 +735,14 @@ func (t *Template) Render(values Values, engine TemplateEngine) (RenderResult, e
 
 Render takes the given Values and returns a RenderResult from the given TemplateEngine.
 
+.CleanPath
+[source, go]
+----
+func (t *Template) CleanPath() Path
+----
+
+CleanPath returns a new Path with the first occurrence of ".tpl" in the base file name removed.
+
 
 '''
 
@@ -1193,6 +1201,7 @@ func NewTemplate(relPath Path, perms Permissions) *Template
 ----
 
 NewTemplate returns a new instance.
+
 
 
 

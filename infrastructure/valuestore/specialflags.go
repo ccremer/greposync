@@ -39,7 +39,7 @@ func pathIsFile(filePath string) bool {
 }
 
 func (k *KoanfValueStore) loadBooleanFlag(repoKoanf *koanf.Koanf, relativePath, flagName string) (bool, error) {
-	values, err := k.loadDataForTemplate(repoKoanf, relativePath)
+	values, err := k.loadValuesForTemplate(repoKoanf, relativePath)
 	if err != nil {
 		return false, err
 	}
@@ -51,7 +51,7 @@ func (k *KoanfValueStore) loadBooleanFlag(repoKoanf *koanf.Koanf, relativePath, 
 }
 
 func (k *KoanfValueStore) loadTargetPath(repoKoanf *koanf.Koanf, relativePath string) (domain.Path, error) {
-	values, err := k.loadDataForTemplate(repoKoanf, relativePath)
+	values, err := k.loadValuesForTemplate(repoKoanf, relativePath)
 	if err != nil {
 		return "", err
 	}

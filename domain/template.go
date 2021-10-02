@@ -2,6 +2,8 @@ package domain
 
 import (
 	"io/fs"
+	"path"
+	"strings"
 )
 
 // Permissions is an alias for file permissions.
@@ -28,6 +30,14 @@ func NewTemplate(relPath Path, perms Permissions) *Template {
 func (t *Template) Render(values Values, engine TemplateEngine) (RenderResult, error) {
 	content, err := engine.Execute(t, values)
 	return content, err
+}
+
+// CleanPath returns a new Path with the first occurrence of ".tpl" in the base file name removed.
+func (t *Template) CleanPath() Path {
+	dirName := path.Dir(t.RelativePath.String())
+	baseName := path.Base(t.RelativePath.String())
+	newName := strings.Replace(baseName, ".tpl", "", 1)
+	return NewPath(dirName, newName)
 }
 
 // FileMode converts Permissions to fs.FileMode.
