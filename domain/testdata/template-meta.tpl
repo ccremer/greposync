@@ -1,0 +1,2 @@
+{{ .RelativePath }}
+{{ .Permissions }}

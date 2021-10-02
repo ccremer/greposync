@@ -109,8 +109,11 @@ func (ctx *RenderContext) loadTemplates() error {
 func (ctx *RenderContext) loadValues(template *Template) error {
 	values, err := ctx.ValueStore.FetchValuesForTemplate(template, ctx.Repository)
 	ctx.values = Values{
-		"Values":   values,
-		"Metadata": ctx.Repository,
+		"Values": values,
+		"Metadata": Values{
+			"Repository": ctx.Repository.AsValues(),
+			"Template":   template.AsValues(),
+		},
 	}
 	return ctx.instrumentation.FetchedValuesForTemplate(err, template)
 }

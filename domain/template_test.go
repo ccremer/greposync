@@ -1,9 +1,15 @@
 package domain
 
 import (
+	"bytes"
+	"fmt"
+	"os"
+	"path"
 	"testing"
+	"text/template"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestTemplate_CleanPath(t *testing.T) {
@@ -43,4 +49,21 @@ func TestTemplate_CleanPath(t *testing.T) {
 			assert.Equal(t, tt.expectedPath, result)
 		})
 	}
+}
+
+func TestTemplate_AsValues(t *testing.T) {
+	file := "testdata/template-meta.tpl"
+	info, err := os.Stat(file)
+	require.NoError(t, err)
+	subject := NewTemplate(NewPath(file), Permissions(info.Mode()))
+	values := subject.AsValues()
+
+	tpl, err := template.New(path.Base(file)).ParseFiles(file)
+	require.NoError(t, err)
+
+	buf := &bytes.Buffer{}
+	err = tpl.Execute(buf, values)
+	require.NoError(t, err)
+
+	assert.Equal(t, fmt.Sprintf("%s\n%s\n", file, "0644"), buf.String())
 }
