@@ -111,7 +111,7 @@ func (c *Command) createPipeline(r *domain.GitRepository) *pipeline.Pipeline {
 
 		predicate.ToStep("push changes", repoCtx.push(), predicate.And(predicate.Bool(enabledPush), repoCtx.hasCommits())),
 		predicate.ToStep("find existing pull request", repoCtx.fetchPullRequest(), predicate.Bool(sc.PullRequest.Create)),
-		predicate.ToStep("update pull request", repoCtx.ensurePullRequest(), predicate.And(repoCtx.hasCommits(), predicate.Bool(sc.PullRequest.Create))),
+		predicate.ToStep("ensure pull request", repoCtx.ensurePullRequest(), predicate.And(repoCtx.hasCommits(), predicate.Bool(sc.PullRequest.Create))),
 	)
 	p.WithFinalizer(func(ctx pipeline.Context, result pipeline.Result) error {
 		c.instrumentation.PipelineForRepositoryCompleted(r, result.Err)

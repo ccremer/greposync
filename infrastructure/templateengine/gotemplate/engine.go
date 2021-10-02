@@ -40,6 +40,20 @@ func (e *GoTemplateEngine) Execute(template *domain.Template, values domain.Valu
 	return domain.RenderResult(buf.String()), err
 }
 
+func (e *GoTemplateEngine) ExecuteString(templateString string, values domain.Values) (domain.RenderResult, error) {
+	buf := &bytes.Buffer{}
+	tpl, err := template.
+		New("").
+		Option(ErrorOnMissingKey).
+		Funcs(templateFunctions).
+		Parse(templateString)
+	if err != nil {
+		return "", err
+	}
+	err = tpl.Execute(buf, values)
+	return domain.RenderResult(buf.String()), err
+}
+
 func (e *GoTemplateEngine) loadGoTemplate(template *domain.Template) (*template.Template, error) {
 	if tpl, exists := e.cache[template.RelativePath]; exists {
 		return tpl, nil

@@ -91,6 +91,18 @@ func (c *pipelineContext) cleanupUnwantedFiles() pipeline.ActionFunc {
 
 func (c *pipelineContext) ensurePullRequest() pipeline.ActionFunc {
 	return func(_ pipeline.Context) pipeline.Result {
+		if c.repo.PullRequest == nil {
+			err := c.appService.prService.NewPullRequestForRepository(domain.PullRequestServiceContext{
+				Repository:     c.repo,
+				TemplateEngine: c.appService.engine,
+				Body:           c.appService.cfg.PullRequest.BodyTemplate,
+				Title:          c.appService.cfg.PullRequest.Subject,
+				TargetBranch:   c.repo.DefaultBranch,
+			})
+			if err != nil {
+				return pipeline.Result{Err: err}
+			}
+		}
 		err := c.appService.prStore.EnsurePullRequest(c.repo)
 		return pipeline.Result{Err: err}
 	}

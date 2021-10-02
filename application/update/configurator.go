@@ -19,6 +19,7 @@ type AppService struct {
 	cfg            *cfg.Configuration
 	console        *ui.ColoredConsole
 	cleanupService *domain.CleanupService
+	prService      *domain.PullRequestService
 }
 
 func NewConfigurator(
@@ -29,6 +30,7 @@ func NewConfigurator(
 	prStore domain.PullRequestStore,
 	renderService *domain.RenderService,
 	cleanupService *domain.CleanupService,
+	pullRequestService *domain.PullRequestService,
 	diffPrinter *ui.ConsoleDiffPrinter,
 	cfg *cfg.Configuration,
 	console *ui.ColoredConsole,
@@ -41,6 +43,7 @@ func NewConfigurator(
 		prStore:        prStore,
 		renderService:  renderService,
 		cleanupService: cleanupService,
+		prService:      pullRequestService,
 		diffPrinter:    diffPrinter,
 		cfg:            cfg,
 		console:        console,

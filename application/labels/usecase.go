@@ -19,13 +19,13 @@ func (uc *labelUseCase) updateLabelsForRepositoryAction(r *domain.GitRepository)
 }
 
 func (uc *labelUseCase) updateLabelsForRepository(r *domain.GitRepository) error {
-	err := uc.appService.labelStore.EnsureLabelsForRepository(r.URL, r.Labels)
+	err := uc.appService.labelStore.EnsureLabelsForRepository(r, r.Labels)
 	return err
 }
 
 func (uc *labelUseCase) fetchLabelsForRepository(r *domain.GitRepository) pipeline.ActionFunc {
 	return func(_ pipeline.Context) pipeline.Result {
-		labels, err := uc.appService.labelStore.FetchLabelsForRepository(r.URL)
+		labels, err := uc.appService.labelStore.FetchLabelsForRepository(r)
 		if err != nil {
 			return pipeline.Result{Err: err}
 		}
@@ -36,7 +36,7 @@ func (uc *labelUseCase) fetchLabelsForRepository(r *domain.GitRepository) pipeli
 
 func (uc *labelUseCase) deleteLabelsForRepository(r *domain.GitRepository) pipeline.ActionFunc {
 	return func(ctx pipeline.Context) pipeline.Result {
-		err := uc.appService.labelStore.RemoveLabelsFromRepository(r.URL, uc.labelsToDelete)
+		err := uc.appService.labelStore.RemoveLabelsFromRepository(r, uc.labelsToDelete)
 		return pipeline.Result{Err: err}
 	}
 }

@@ -69,6 +69,7 @@ func initInjector() *injector {
 		// Services
 		domain.NewRenderService,
 		domain.NewCleanupService,
+		domain.NewPullRequestService,
 
 		// Console & Logging
 		wire.NewSet(ui.NewConsoleSink, wire.Bind(new(logr.LogSink), new(*ui.ConsoleSink))),
@@ -79,6 +80,7 @@ func initInjector() *injector {
 		valuestore.NewValueStoreInstrumentation,
 		wire.NewSet(instrumentation.NewUpdateInstrumentation, wire.Bind(new(instrumentation.BatchInstrumentation), new(*instrumentation.CommonBatchInstrumentation))),
 		repositorystore.NewRepositoryStoreInstrumentation,
+		github.NewGitHubInstrumentation,
 
 		// Git providers
 		newGitProviders,

@@ -142,9 +142,9 @@ Push updates remote refs.
 [source, go]
 ----
 type LabelStore interface {
-    FetchLabelsForRepository(url *GitURL) (LabelSet, error)
-    EnsureLabelsForRepository(url *GitURL, labels LabelSet) error
-    RemoveLabelsFromRepository(url *GitURL, labels LabelSet) error
+    FetchLabelsForRepository(repository *GitRepository) (LabelSet, error)
+    EnsureLabelsForRepository(repository *GitRepository, labels LabelSet) error
+    RemoveLabelsFromRepository(repository *GitRepository, labels LabelSet) error
 }
 ----
 
@@ -155,14 +155,14 @@ In Domain-Driven Design language, the term `Store` corresponds to `Repository`, 
 .FetchLabelsForRepository
 [source, go]
 ----
-func FetchLabelsForRepository(url *GitURL) (LabelSet, error)
+func FetchLabelsForRepository(repository *GitRepository) (LabelSet, error)
 ----
 FetchLabelsForRepository retrieves a LabelSet for the given repository.
 
 .EnsureLabelsForRepository
 [source, go]
 ----
-func EnsureLabelsForRepository(url *GitURL, labels LabelSet) error
+func EnsureLabelsForRepository(repository *GitRepository, labels LabelSet) error
 ----
 EnsureLabelsForRepository creates or updates the given LabelSet in the given repository.
 Labels that exist remotely, but not in the given LabelSet are ignored.
@@ -173,7 +173,7 @@ Renaming labels are currently not supported.
 .RemoveLabelsFromRepository
 [source, go]
 ----
-func RemoveLabelsFromRepository(url *GitURL, labels LabelSet) error
+func RemoveLabelsFromRepository(repository *GitRepository, labels LabelSet) error
 ----
 RemoveLabelsFromRepository remotely removes all labels in the given LabelSet.
 Only the Label.Name is relevant to determine label equality.
@@ -275,6 +275,7 @@ WithRepository creates a new RenderServiceInstrumentation instance using the giv
 ----
 type TemplateEngine interface {
     Execute(template *Template, values Values) (RenderResult, error)
+    ExecuteString(template string, values Values) (RenderResult, error)
 }
 ----
 
@@ -286,6 +287,13 @@ TemplateEngine provides methods to process a Template.
 func Execute(template *Template, values Values) (RenderResult, error)
 ----
 Execute renders the given Template with the given Values.
+
+.ExecuteString
+[source, go]
+----
+func ExecuteString(template string, values Values) (RenderResult, error)
+----
+ExecuteString renders the given template string with the given Values.
 
 '''
 
@@ -657,6 +665,59 @@ There cannot be duplicates or labels with no name.
 
 '''
 
+=== PullRequestService
+[source, go]
+----
+type PullRequestService struct {
+}
+----
+
+
+
+
+
+**Receivers**
+
+.NewPullRequestForRepository
+[source, go]
+----
+func (prs *PullRequestService) NewPullRequestForRepository(prsCtx PullRequestServiceContext) error
+----
+
+
+
+
+'''
+
+=== PullRequestServiceContext
+[source, go]
+----
+type PullRequestServiceContext struct {
+    Repository        *GitRepository
+    TemplateEngine    TemplateEngine
+    Body              string
+    Title             string
+    TargetBranch      string
+}
+----
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+'''
+
 === RenderService
 [source, go]
 ----
@@ -853,6 +914,14 @@ A label is not included in the result if the name matches.
 
 No validation checks are performed.
 The original order is preserved.
+
+.String
+[source, go]
+----
+func (s LabelSet) String() string
+----
+
+String implements fmt.Stringer.
 
 
 '''
@@ -1084,6 +1153,40 @@ Values contain a tree of properties to be consumed by a TemplateEngine.
 '''
 
 
+== Constants
+
+=== MetadataValueKey
+[source, go]
+----
+MetadataValueKey = "Metadata"
+----
+MetadataValueKey is the root key for the metadata variables.
+
+
+=== RepositoryValueKey
+[source, go]
+----
+RepositoryValueKey = "Repository"
+----
+RepositoryValueKey is the key for the GitRepository variable.
+
+
+=== TemplateValueKey
+[source, go]
+----
+TemplateValueKey = "Template"
+----
+TemplateValueKey is the key for the Template variable.
+
+
+=== ValuesKey
+[source, go]
+----
+ValuesKey = "Values"
+----
+ValuesKey is the key for user-defined variables.
+
+
 == Variables
 
 
@@ -1150,6 +1253,7 @@ NewGitRepository creates a new instance.
 
 
 
+
 === NewPath
 [source, go]
 ----
@@ -1193,6 +1297,16 @@ An error is returned if the given properties do not satisfy constraints.
 
 
 
+
+
+
+
+
+=== NewPullRequestService
+[source, go]
+----
+func NewPullRequestService() *PullRequestService
+----
 
 
 
