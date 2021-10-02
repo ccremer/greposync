@@ -25,6 +25,7 @@ generate:
 	go generate -tags=generate generate.go
 	$(GOASCIIDOC_CMD) domain
 	cp application/initialize/_helpers.tpl docs/modules/ROOT/examples/comment/helpers.tpl
+	cp domain/testdata/golden/metadata.txt docs/modules/ROOT/examples/code/metadata.tpl
 
 .PHONY: fmt
 fmt: ## Run 'go fmt' against code

@@ -968,6 +968,14 @@ func (r RenderResult) WriteToFile(path Path, permissions Permissions) error
 WriteToFile writes the content to the given Path with given Permissions.
 Otherwise, an error is returned.
 
+.String
+[source, go]
+----
+func (r RenderResult) String() string
+----
+
+String implements fmt.Stringer.
+
 
 '''
 
@@ -1207,6 +1215,8 @@ If nr is nil, then nil is returned.
 ----
 func NewRenderService(instrumentation RenderServiceInstrumentation) *RenderService
 ----
+
+
 
 
 

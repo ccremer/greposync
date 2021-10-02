@@ -10,3 +10,8 @@ type RenderResult string
 func (r RenderResult) WriteToFile(path Path, permissions Permissions) error {
 	return os.WriteFile(path.String(), []byte(r), permissions.FileMode())
 }
+
+// String implements fmt.Stringer.
+func (r RenderResult) String() string {
+	return string(r)
+}
