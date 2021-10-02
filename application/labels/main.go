@@ -37,10 +37,10 @@ func NewCommand(
 }
 
 func (c *Command) runCommand(_ *cli.Context) error {
-	result := pipeline.NewPipeline().WithSteps(
+	result := pipeline.NewPipeline().WithContext(c).WithSteps(
 		pipeline.NewStepFromFunc("configure infrastructure", c.configureInfrastructure),
 		pipeline.NewStepFromFunc("fetch repositories", c.fetchRepositories),
-		parallel.NewWorkerPoolStep("update labels for all repos", c.cfg.Project.Jobs, c.updateRepos(), c.instrumentation.NewCollectErrorHandler(c.repos, c.cfg.Project.SkipBroken)),
+		parallel.NewWorkerPoolStep("update labels for all repos", c.cfg.Project.Jobs, c.updateRepos(), c.instrumentation.NewCollectErrorHandler(c.cfg.Project.SkipBroken)),
 	).Run()
 	return result.Err
 }
@@ -116,4 +116,8 @@ func (c *Command) fetchRepositories(_ pipeline.Context) error {
 func (c *Command) configureInfrastructure(_ pipeline.Context) error {
 	c.appService.ConfigureInfrastructure()
 	return nil
+}
+
+func (c *Command) GetRepositories() []*domain.GitRepository {
+	return c.repos
 }
