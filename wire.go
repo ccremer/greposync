@@ -79,6 +79,7 @@ func initInjector() *injector {
 		valuestore.NewValueStoreInstrumentation,
 		wire.NewSet(instrumentation.NewUpdateInstrumentation, wire.Bind(new(instrumentation.BatchInstrumentation), new(*instrumentation.CommonBatchInstrumentation))),
 		repositorystore.NewRepositoryStoreInstrumentation,
+		github.NewGitHubInstrumentation,
 
 		// Git providers
 		newGitProviders,

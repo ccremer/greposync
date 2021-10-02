@@ -155,3 +155,38 @@ func TestLabelSet_Without(t *testing.T) {
 		})
 	}
 }
+
+func TestLabelSet_String(t *testing.T) {
+	tests := map[string]struct {
+		givenLabelSet  LabelSet
+		expectedString string
+	}{
+		"GivenNilSet_ThenExpectEmptyBrackets": {
+			givenLabelSet:  nil,
+			expectedString: "[]",
+		},
+		"GivenEmptySet_ThenExpectEmptyBrackets": {
+			givenLabelSet:  LabelSet{},
+			expectedString: "[]",
+		},
+		"GivenSet_WhenSingleEntry_ThenExpectBracketsWithoutComma": {
+			givenLabelSet: LabelSet{
+				Label{Name: "label"},
+			},
+			expectedString: "[label]",
+		},
+		"GivenSet_WhenMultipleEntry_ThenExpectBracketsCommaSeparated": {
+			givenLabelSet: LabelSet{
+				Label{Name: "label"},
+				Label{Name: "foo"},
+			},
+			expectedString: "[label, foo]",
+		},
+	}
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
+			result := tt.givenLabelSet.String()
+			assert.Equal(t, tt.expectedString, result)
+		})
+	}
+}

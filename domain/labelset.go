@@ -1,6 +1,9 @@
 package domain
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 // LabelSet is a set of Label.
 type LabelSet []Label
@@ -85,4 +88,20 @@ func (s LabelSet) Without(other LabelSet) LabelSet {
 		}
 	}
 	return newSet
+}
+
+// String implements fmt.Stringer.
+func (s LabelSet) String() string {
+	if s == nil || len(s) == 0 {
+		return "[]"
+	}
+	arr := make([]string, len(s))
+	for i, label := range s {
+		arr[i] = label.Name
+	}
+	builder := strings.Builder{}
+	builder.WriteString("[")
+	builder.WriteString(strings.Join(arr, ", "))
+	builder.WriteString("]")
+	return builder.String()
 }

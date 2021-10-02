@@ -19,7 +19,7 @@ func NewPullRequestStore(providers ProviderMap) *PullRequestStore {
 func (p *PullRequestStore) FindMatchingPullRequest(repository *domain.GitRepository) (*domain.PullRequest, error) {
 	for _, remote := range p.providers {
 		if remote.HasSupportFor(repository.URL) {
-			pr, err := remote.FindPullRequest(repository.URL, repository.DefaultBranch, repository.CommitBranch)
+			pr, err := remote.FindPullRequest(repository)
 			return pr, err
 		}
 	}
@@ -29,7 +29,7 @@ func (p *PullRequestStore) FindMatchingPullRequest(repository *domain.GitReposit
 func (p *PullRequestStore) EnsurePullRequest(repository *domain.GitRepository) error {
 	for _, remote := range p.providers {
 		if remote.HasSupportFor(repository.URL) {
-			return remote.EnsurePullRequest(repository.URL, repository.PullRequest)
+			return remote.EnsurePullRequest(repository, repository.PullRequest)
 		}
 	}
 	return fmt.Errorf("%s: %w", repository.URL, ErrProviderNotSupported)

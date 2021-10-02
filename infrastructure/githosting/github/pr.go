@@ -6,12 +6,11 @@ import (
 	"strings"
 
 	"github.com/ccremer/greposync/domain"
-	"github.com/ccremer/greposync/infrastructure/logging"
 	"github.com/google/go-github/v39/github"
 )
 
-func (r *GhRemote) FindPullRequest(url *domain.GitURL, _, commitBranch string) (*domain.PullRequest, error) {
-	pr, err := r.findExistingPr(url.GetNamespace(), url.GetRepositoryName(), commitBranch)
+func (r *GhRemote) FindPullRequest(repository *domain.GitRepository) (*domain.PullRequest, error) {
+	pr, err := r.findExistingPr(repository)
 	if err != nil {
 		return nil, err
 	}
@@ -22,53 +21,56 @@ func (r *GhRemote) FindPullRequest(url *domain.GitURL, _, commitBranch string) (
 	return converted, nil
 }
 
-func (r *GhRemote) findExistingPr(owner, repo, commitBranch string) (*github.PullRequest, error) {
-	r.log.V(logging.LevelDebug).Info("Searching existing PRs with same branch...", "branch", commitBranch)
-	list, _, err := r.client.PullRequests.List(context.Background(), owner, repo, &github.PullRequestListOptions{
-		Head: fmt.Sprintf("%s:%s", owner, commitBranch),
+func (r *GhRemote) findExistingPr(repository *domain.GitRepository) (*github.PullRequest, error) {
+	list, _, err := r.client.PullRequests.List(context.Background(), repository.URL.GetNamespace(), repository.URL.GetRepositoryName(), &github.PullRequestListOptions{
+		Head: fmt.Sprintf("%s:%s", repository.URL.GetNamespace(), repository.CommitBranch),
 	})
 	if err != nil {
 		return nil, err
 	}
 	if len(list) > 0 {
-		return list[0], nil
+		return list[0], r.instrumentation.prFound(repository, list[0])
 	}
-	return nil, nil
+	return nil, r.instrumentation.noPrFound(repository)
 }
 
-func (r *GhRemote) EnsurePullRequest(url *domain.GitURL, pr *domain.PullRequest) error {
+func (r *GhRemote) EnsurePullRequest(repository *domain.GitRepository, pr *domain.PullRequest) error {
 	converted := PrConverter{}.ConvertFromEntity(pr)
 	cached, exists := r.prCache[*converted.Number]
 	if !exists {
-		return r.createNewPr(url, pr)
+		return r.createNewPr(repository, pr)
 	}
 	cached.Title = converted.Title
 	cached.Body = converted.Body
 	cached.Labels = converted.Labels
-	return r.updateExistingPr(url, cached, pr)
+	return r.updateExistingPr(repository, cached, pr)
 }
 
-func (r *GhRemote) updateExistingPr(url *domain.GitURL, cached *github.PullRequest, pr *domain.PullRequest) error {
-	err := r.updatePrDescription(url, cached, pr)
+func (r *GhRemote) updateExistingPr(repository *domain.GitRepository, cached *github.PullRequest, pr *domain.PullRequest) error {
+	if r.canSkipDescriptionUpdate(cached, pr) && r.canSkipLabelUpdate(cached, pr) {
+		return r.instrumentation.prIsUpToDate(repository, cached)
+	}
+	err := r.updatePrDescription(repository, cached, pr)
 	if err != nil {
 		return err
 	}
-	return r.updatePrLabels(url, cached, pr)
+	return r.updatePrLabels(repository, cached, pr)
 }
 
-func (r *GhRemote) updatePrDescription(url *domain.GitURL, cached *github.PullRequest, pr *domain.PullRequest) error {
+func (r *GhRemote) updatePrDescription(repository *domain.GitRepository, cached *github.PullRequest, pr *domain.PullRequest) error {
 	if r.canSkipDescriptionUpdate(cached, pr) {
 		return nil
 	}
-	_, _, err := r.client.PullRequests.Edit(context.Background(), url.GetNamespace(), url.GetRepositoryName(), *cached.Number, cached)
-	return err
+	ghPr, _, err := r.client.PullRequests.Edit(context.Background(), repository.URL.GetNamespace(), repository.URL.GetRepositoryName(), *cached.Number, cached)
+	return r.instrumentation.prUpdated(repository, ghPr, err)
 }
 
-func (r *GhRemote) updatePrLabels(url *domain.GitURL, cached *github.PullRequest, pr *domain.PullRequest) error {
+func (r *GhRemote) updatePrLabels(repository *domain.GitRepository, cached *github.PullRequest, pr *domain.PullRequest) error {
 	if r.canSkipLabelUpdate(cached, pr) {
 		return nil
 	}
-	return r.setLabelsToPr(url, *cached.Number, pr.GetLabels())
+	err := r.setLabelsToPr(repository.URL, *cached.Number, pr.GetLabels())
+	return r.instrumentation.prLabelsUpdated(repository, pr, err)
 }
 
 func (r *GhRemote) canSkipDescriptionUpdate(cached *github.PullRequest, pr *domain.PullRequest) bool {
@@ -85,7 +87,7 @@ func (r *GhRemote) canSkipLabelUpdate(cached *github.PullRequest, pr *domain.Pul
 
 // createNewPr makes a new pull request in GitHub.
 // Based on: https://godoc.org/github.com/google/go-github/github#example-PullRequestsService-Create
-func (r *GhRemote) createNewPr(url *domain.GitURL, pr *domain.PullRequest) error {
+func (r *GhRemote) createNewPr(repository *domain.GitRepository, pr *domain.PullRequest) error {
 	newPR := &github.NewPullRequest{
 		Title:               github.String(pr.GetTitle()),
 		Head:                &pr.CommitBranch,
@@ -94,23 +96,22 @@ func (r *GhRemote) createNewPr(url *domain.GitURL, pr *domain.PullRequest) error
 		MaintainerCanModify: github.Bool(true),
 	}
 
-	ghPr, _, err := r.client.PullRequests.Create(context.Background(), url.GetNamespace(), url.GetRepositoryName(), newPR)
+	ghPr, _, err := r.client.PullRequests.Create(context.Background(), repository.URL.GetNamespace(), repository.URL.GetRepositoryName(), newPR)
 	if err != nil {
 		if strings.Contains(err.Error(), "No commits between") {
-			r.log.Info("No pull request created as there are no commits between branches", "base", pr.BaseBranch, "head", pr.CommitBranch)
-			return nil
+			return r.instrumentation.prNotCreatedBecauseNoCommits(repository, pr)
 		}
 		return err
 	}
 
 	if len(pr.GetLabels()) > 0 {
-		err := r.setLabelsToPr(url, *ghPr.Number, pr.GetLabels())
+		err := r.setLabelsToPr(repository.URL, *ghPr.Number, pr.GetLabels())
 		if err != nil {
 			return err
 		}
 	}
 
-	r.log.Info("PR created", "url", ghPr.GetHTMLURL())
+	r.instrumentation.prCreated(repository, ghPr.GetHTMLURL())
 	return nil
 }
 

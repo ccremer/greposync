@@ -142,9 +142,9 @@ Push updates remote refs.
 [source, go]
 ----
 type LabelStore interface {
-    FetchLabelsForRepository(url *GitURL) (LabelSet, error)
-    EnsureLabelsForRepository(url *GitURL, labels LabelSet) error
-    RemoveLabelsFromRepository(url *GitURL, labels LabelSet) error
+    FetchLabelsForRepository(repository *GitRepository) (LabelSet, error)
+    EnsureLabelsForRepository(repository *GitRepository, labels LabelSet) error
+    RemoveLabelsFromRepository(repository *GitRepository, labels LabelSet) error
 }
 ----
 
@@ -155,14 +155,14 @@ In Domain-Driven Design language, the term `Store` corresponds to `Repository`, 
 .FetchLabelsForRepository
 [source, go]
 ----
-func FetchLabelsForRepository(url *GitURL) (LabelSet, error)
+func FetchLabelsForRepository(repository *GitRepository) (LabelSet, error)
 ----
 FetchLabelsForRepository retrieves a LabelSet for the given repository.
 
 .EnsureLabelsForRepository
 [source, go]
 ----
-func EnsureLabelsForRepository(url *GitURL, labels LabelSet) error
+func EnsureLabelsForRepository(repository *GitRepository, labels LabelSet) error
 ----
 EnsureLabelsForRepository creates or updates the given LabelSet in the given repository.
 Labels that exist remotely, but not in the given LabelSet are ignored.
@@ -173,7 +173,7 @@ Renaming labels are currently not supported.
 .RemoveLabelsFromRepository
 [source, go]
 ----
-func RemoveLabelsFromRepository(url *GitURL, labels LabelSet) error
+func RemoveLabelsFromRepository(repository *GitRepository, labels LabelSet) error
 ----
 RemoveLabelsFromRepository remotely removes all labels in the given LabelSet.
 Only the Label.Name is relevant to determine label equality.
@@ -854,6 +854,14 @@ A label is not included in the result if the name matches.
 No validation checks are performed.
 The original order is preserved.
 
+.String
+[source, go]
+----
+func (s LabelSet) String() string
+----
+
+String implements fmt.Stringer.
+
 
 '''
 
@@ -1136,6 +1144,7 @@ func NewGitRepository(u *GitURL, root Path) *GitRepository
 ----
 
 NewGitRepository creates a new instance.
+
 
 
 

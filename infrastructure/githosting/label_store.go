@@ -19,32 +19,32 @@ func NewLabelStore(providers ProviderMap) *LabelStore {
 	}
 }
 
-func (s *LabelStore) FetchLabelsForRepository(url *domain.GitURL) (domain.LabelSet, error) {
+func (s *LabelStore) FetchLabelsForRepository(repository *domain.GitRepository) (domain.LabelSet, error) {
 	for _, remote := range s.providers {
-		if remote.HasSupportFor(url) {
-			labels, err := remote.FetchLabels(url)
+		if remote.HasSupportFor(repository.URL) {
+			labels, err := remote.FetchLabels(repository)
 			return labels, err
 		}
 	}
-	return nil, fmt.Errorf("%s: %w", url, ErrProviderNotSupported)
+	return nil, fmt.Errorf("%s: %w", repository.URL.GetFullName(), ErrProviderNotSupported)
 }
 
-func (s *LabelStore) EnsureLabelsForRepository(url *domain.GitURL, labels domain.LabelSet) error {
+func (s *LabelStore) EnsureLabelsForRepository(repository *domain.GitRepository, labels domain.LabelSet) error {
 	for _, remote := range s.providers {
-		if remote.HasSupportFor(url) {
-			err := remote.EnsureLabels(url, labels)
+		if remote.HasSupportFor(repository.URL) {
+			err := remote.EnsureLabels(repository, labels)
 			return err
 		}
 	}
-	return fmt.Errorf("%s: %w", url, ErrProviderNotSupported)
+	return fmt.Errorf("%s: %w", repository.URL.GetFullName(), ErrProviderNotSupported)
 }
 
-func (s *LabelStore) RemoveLabelsFromRepository(url *domain.GitURL, labels domain.LabelSet) error {
+func (s *LabelStore) RemoveLabelsFromRepository(repository *domain.GitRepository, labels domain.LabelSet) error {
 	for _, remote := range s.providers {
-		if remote.HasSupportFor(url) {
-			err := remote.DeleteLabels(url, labels)
+		if remote.HasSupportFor(repository.URL) {
+			err := remote.DeleteLabels(repository, labels)
 			return err
 		}
 	}
-	return fmt.Errorf("%s: %w", url, ErrProviderNotSupported)
+	return fmt.Errorf("%s: %w", repository.URL.GetFullName(), ErrProviderNotSupported)
 }
