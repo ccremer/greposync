@@ -42,3 +42,15 @@ func (r *GitRepository) SetLabels(labels LabelSet) error {
 	r.Labels = labels
 	return nil
 }
+
+// AsValues returns the metadata as Values for rendering.
+func (r GitRepository) AsValues() Values {
+	return Values{
+		"FullName":      r.URL.GetFullName(),
+		"Name":          r.URL.GetRepositoryName(),
+		"Namespace":     r.URL.GetNamespace(),
+		"CommitBranch":  r.CommitBranch,
+		"DefaultBranch": r.DefaultBranch,
+		"RootDir":       r.RootDir,
+	}
+}

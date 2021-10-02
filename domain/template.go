@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"fmt"
 	"io/fs"
 	"path"
 	"strings"
@@ -40,7 +41,20 @@ func (t *Template) CleanPath() Path {
 	return NewPath(dirName, newName)
 }
 
+// AsValues returns the metadata as Values for rendering.
+func (t *Template) AsValues() Values {
+	return Values{
+		"RelativePath": t.RelativePath.String(),
+		"Permissions":  t.FilePermissions.Octal(),
+	}
+}
+
 // FileMode converts Permissions to fs.FileMode.
 func (p Permissions) FileMode() fs.FileMode {
 	return fs.FileMode(p)
+}
+
+// Octal returns an octal permission representation (Linux)
+func (p Permissions) Octal() string {
+	return fmt.Sprintf("%#o", p.FileMode().Perm())
 }

@@ -1,8 +1,6 @@
 package update
 
 import (
-	"time"
-
 	pipeline "github.com/ccremer/go-command-pipeline"
 	"github.com/ccremer/go-command-pipeline/predicate"
 	"github.com/ccremer/greposync/domain"
@@ -77,7 +75,6 @@ func (c *pipelineContext) renderTemplates() pipeline.ActionFunc {
 			TemplateStore: c.appService.templateStore,
 			Engine:        c.appService.engine,
 		})
-		time.Sleep(2 * time.Second)
 		return pipeline.Result{Err: err}
 	}
 }
