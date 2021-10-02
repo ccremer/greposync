@@ -713,6 +713,15 @@ This was considered too complicated, thus these actions are to be implemented in
 <p>SetLabels validates and sets the new LabelSet.
 Returns nil if there are no empty Label names or duplicates.</p>
 </div>
+<div class="listingblock">
+<div class="title">AsValues</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func (r GitRepository) AsValues() Values</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>AsValues returns the metadata as Values for rendering.</p>
+</div>
 <hr>
 </div>
 <div class="sect2">
@@ -1019,6 +1028,15 @@ Rendered files should have the same permissions as template files.</p>
 <div class="paragraph">
 <p>CleanPath returns a new Path with the first occurrence of ".tpl" in the base file name removed.</p>
 </div>
+<div class="listingblock">
+<div class="title">AsValues</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func (t *Template) AsValues() Values</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>AsValues returns the metadata as Values for rendering.</p>
+</div>
 <hr>
 </div>
 </div>
@@ -1281,6 +1299,15 @@ Otherwise, an error is returned.</p>
 </div>
 <div class="paragraph">
 <p>FileMode converts Permissions to fs.FileMode.</p>
+</div>
+<div class="listingblock">
+<div class="title">Octal</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func (p Permissions) Octal() string</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Octal returns an octal permission representation (Linux)</p>
 </div>
 <hr>
 </div>
