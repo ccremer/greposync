@@ -114,10 +114,10 @@ func (ctx *RenderContext) loadValues(template *Template) error {
 
 func (ctx *RenderContext) enrichWithMetadata(values Values, template *Template) Values {
 	return Values{
-		"Values": values,
-		"Metadata": Values{
-			"Repository": ctx.Repository.AsValues(),
-			"Template":   template.AsValues(),
+		ValuesKey: values,
+		MetadataValueKey: Values{
+			RepositoryValueKey: ctx.Repository.AsValues(),
+			TemplateValueKey:   template.AsValues(),
 		},
 	}
 }

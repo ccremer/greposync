@@ -36,7 +36,7 @@ func (r *GhRemote) findExistingPr(repository *domain.GitRepository) (*github.Pul
 
 func (r *GhRemote) EnsurePullRequest(repository *domain.GitRepository, pr *domain.PullRequest) error {
 	converted := PrConverter{}.ConvertFromEntity(pr)
-	cached, exists := r.prCache[*converted.Number]
+	cached, exists := r.prCache[converted.GetNumber()]
 	if !exists {
 		return r.createNewPr(repository, pr)
 	}

@@ -28,11 +28,11 @@ func TestGolden_MetadataValues(t *testing.T) {
 	require.NoError(t, err)
 	defer file.Close()
 	for k, _ := range ctx.Repository.AsValues() {
-		placeholder := fmt.Sprintf("{{ .Metadata.Repository.%s }}", k)
+		placeholder := fmt.Sprintf("{{ .%s.%s.%s }}", MetadataValueKey, RepositoryValueKey, k)
 		_, _ = fmt.Fprintf(file, "{{`%s`}} = %s\n", placeholder, placeholder)
 	}
 	for k, _ := range template.AsValues() {
-		placeholder := fmt.Sprintf("{{ .Metadata.Template.%s }}", k)
+		placeholder := fmt.Sprintf("{{ .%s.%s.%s }}", MetadataValueKey, TemplateValueKey, k)
 		_, _ = fmt.Fprintf(file, "{{`%s`}} = %s\n", placeholder, placeholder)
 	}
 

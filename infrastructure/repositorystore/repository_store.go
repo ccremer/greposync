@@ -68,9 +68,16 @@ func (s *RepositoryStore) FetchGitRepositories() ([]*domain.GitRepository, error
 		// TODO: Reimplement filtering
 
 		gitUrl := domain.FromURL(u)
-		root := s.toLocalFilePath(gitUrl.AsURL())
-		gitRepository := domain.NewGitRepository(gitUrl, domain.NewFilePath(root))
+		root := domain.NewFilePath(s.toLocalFilePath(gitUrl.AsURL()))
+		gitRepository := domain.NewGitRepository(gitUrl, root)
 		gitRepository.CommitBranch = s.CommitBranch
+		if root.DirExists() {
+			defaultBranch, err := GetDefaultBranch(gitRepository)
+			if err != nil && !strings.Contains(err.Error(), "no default branch determined") {
+				return list, err
+			}
+			gitRepository.DefaultBranch = defaultBranch
+		}
 		list = append(list, gitRepository)
 	}
 	return list, nil

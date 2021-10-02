@@ -63,3 +63,21 @@ func HasCommitsBetween(repository *domain.GitRepository, rootBranch, headBranch 
 	out, _, err := execGitCommand(repository.RootDir, []string{"log", fmt.Sprintf("%s..%s", rootBranch, headBranch), "--oneline"})
 	return out != "", err
 }
+
+// GetDefaultBranch returns the name of the default branch in origin.
+// Returns an error if either Git command failed or if no default branch could be detected.
+func GetDefaultBranch(repository *domain.GitRepository) (string, error) {
+	out, stderr, err := execGitCommand(repository.RootDir, []string{"remote", "show", "origin"})
+	if err != nil {
+		return "master", mergeWithStdErr(err, stderr)
+	}
+	lines := strings.Split(out, "\n")
+	head := "HEAD branch: "
+	for _, line := range lines {
+		str := strings.TrimSpace(line)
+		if strings.Contains(str, head) {
+			return strings.TrimPrefix(str, head), nil
+		}
+	}
+	return "master", fmt.Errorf("no default branch determined")
+}

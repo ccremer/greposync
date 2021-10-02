@@ -2,6 +2,7 @@ package repositorystore
 
 import (
 	"errors"
+	"strings"
 
 	"github.com/ccremer/greposync/domain"
 )
@@ -20,6 +21,13 @@ func (s *RepositoryStore) Clone(repository *domain.GitRepository) error {
 		return mergeWithStdErr(err, stderr)
 	}
 	s.instrumentation.logInfo(repository, out)
+	if repository.RootDir.DirExists() {
+		defaultBranch, err := GetDefaultBranch(repository)
+		if err != nil && !strings.Contains(err.Error(), "no default branch determined") {
+			return err
+		}
+		repository.DefaultBranch = defaultBranch
+	}
 	return nil
 }
 
