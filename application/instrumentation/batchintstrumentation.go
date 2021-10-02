@@ -10,5 +10,9 @@ type BatchInstrumentation interface {
 	BatchPipelineCompleted(repos []*domain.GitRepository)
 	PipelineForRepositoryStarted(repo *domain.GitRepository)
 	PipelineForRepositoryCompleted(repo *domain.GitRepository, err error)
-	NewCollectErrorHandler(repos []*domain.GitRepository, skipBroken bool) parallel.ResultHandler
+	NewCollectErrorHandler(skipBroken bool) parallel.ResultHandler
+}
+
+type InstrumentationContext interface {
+	GetRepositories() []*domain.GitRepository
 }

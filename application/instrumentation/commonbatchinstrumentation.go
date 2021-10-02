@@ -55,11 +55,11 @@ func (i *CommonBatchInstrumentation) PipelineForRepositoryCompleted(repo *domain
 	i.console.PrintProgressbarMessage(repo.URL.GetFullName(), err)
 }
 
-func (i *CommonBatchInstrumentation) NewCollectErrorHandler(repos []*domain.GitRepository, skipBroken bool) parallel.ResultHandler {
+func (i *CommonBatchInstrumentation) NewCollectErrorHandler(skipBroken bool) parallel.ResultHandler {
 	if skipBroken {
 		return i.ignoreErrors()
 	}
-	return i.reduceErrors(repos)
+	return i.reduceErrors()
 }
 
 func (i *CommonBatchInstrumentation) ignoreErrors() parallel.ResultHandler {
@@ -70,14 +70,18 @@ func (i *CommonBatchInstrumentation) ignoreErrors() parallel.ResultHandler {
 	}
 }
 
-func (i *CommonBatchInstrumentation) reduceErrors(repos []*domain.GitRepository) parallel.ResultHandler {
+func (i *CommonBatchInstrumentation) reduceErrors() parallel.ResultHandler {
 	return func(ctx pipeline.Context, results map[uint64]pipeline.Result) pipeline.Result {
 		i.results = results
+		repos := ctx.(InstrumentationContext).GetRepositories()
 		var err error
 		for index, repo := range repos {
 			if result := results[uint64(index)]; result.Err != nil {
 				err = multierror.Append(err, fmt.Errorf("%s: %w", repo.URL.GetRepositoryName(), result.Err))
 			}
+		}
+		if err == nil {
+			return pipeline.Result{}
 		}
 		return pipeline.Result{Err: fmt.Errorf("%w: %s", clierror.ErrPipeline, err)}
 	}

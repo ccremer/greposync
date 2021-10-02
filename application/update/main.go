@@ -48,13 +48,13 @@ func NewCommand(
 
 func (c *Command) runCommand(_ *cli.Context) error {
 	logger := c.logFactory.NewPipelineLogger("")
-	p := pipeline.NewPipeline().AddBeforeHook(logger).WithSteps(
+	p := pipeline.NewPipeline().WithContext(c).AddBeforeHook(logger).WithSteps(
 		pipeline.NewStep("configure infrastructure", c.configureInfrastructure()),
 		pipeline.NewStep("fetch managed repos config", c.fetchRepositories()),
-		parallel.NewWorkerPoolStep("update repositories", c.cfg.Project.Jobs, c.updateReposInParallel(), c.instrumentation.NewCollectErrorHandler(c.repositories, c.cfg.Project.SkipBroken)),
+		parallel.NewWorkerPoolStep("update repositories", c.cfg.Project.Jobs, c.updateReposInParallel(), c.instrumentation.NewCollectErrorHandler(c.cfg.Project.SkipBroken)),
 	)
 	p.WithFinalizer(func(ctx pipeline.Context, result pipeline.Result) error {
-		c.instrumentation.BatchPipelineCompleted(c.repositories)
+		c.instrumentation.BatchPipelineCompleted(c.GetRepositories())
 		return result.Err
 	})
 	return p.Run().Err
@@ -125,7 +125,7 @@ func (c *Command) updateReposInParallel() parallel.PipelineSupplier {
 	return func(pipelines chan *pipeline.Pipeline) {
 		defer close(pipelines)
 		c.instrumentation.BatchPipelineStarted(c.repositories)
-		for _, r := range c.repositories {
+		for _, r := range c.GetRepositories() {
 			p := c.createPipeline(r)
 			pipelines <- p
 		}
@@ -145,4 +145,8 @@ func (c *Command) fetchRepositories() pipeline.ActionFunc {
 		c.repositories = repos
 		return pipeline.Result{Err: err}
 	}
+}
+
+func (c *Command) GetRepositories() []*domain.GitRepository {
+	return c.repositories
 }
