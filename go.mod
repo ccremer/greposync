@@ -5,7 +5,7 @@ go 1.16
 require (
 	github.com/BurntSushi/toml v0.4.1
 	github.com/Masterminds/sprig/v3 v3.2.1
-	github.com/ccremer/go-command-pipeline v0.8.0
+	github.com/ccremer/go-command-pipeline v0.9.0
 	github.com/ccremer/plogr v0.5.0
 	github.com/go-logr/logr v1.1.0
 	github.com/google/go-github/v39 v39.1.0

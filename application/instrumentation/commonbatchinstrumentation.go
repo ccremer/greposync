@@ -64,14 +64,14 @@ func (i *CommonBatchInstrumentation) NewCollectErrorHandler(repos []*domain.GitR
 
 func (i *CommonBatchInstrumentation) ignoreErrors() parallel.ResultHandler {
 	// Do not propagate update errors from single repositories up the stack
-	return func(results map[uint64]pipeline.Result) pipeline.Result {
+	return func(ctx pipeline.Context, results map[uint64]pipeline.Result) pipeline.Result {
 		i.results = results
 		return pipeline.Result{}
 	}
 }
 
 func (i *CommonBatchInstrumentation) reduceErrors(repos []*domain.GitRepository) parallel.ResultHandler {
-	return func(results map[uint64]pipeline.Result) pipeline.Result {
+	return func(ctx pipeline.Context, results map[uint64]pipeline.Result) pipeline.Result {
 		i.results = results
 		var err error
 		for index, repo := range repos {

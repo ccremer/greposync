@@ -53,7 +53,7 @@ func (c *Command) runCommand(_ *cli.Context) error {
 		pipeline.NewStep("fetch managed repos config", c.fetchRepositories()),
 		parallel.NewWorkerPoolStep("update repositories", c.cfg.Project.Jobs, c.updateReposInParallel(), c.instrumentation.NewCollectErrorHandler(c.repositories, c.cfg.Project.SkipBroken)),
 	)
-	p.WithFinalizer(func(result pipeline.Result) error {
+	p.WithFinalizer(func(ctx pipeline.Context, result pipeline.Result) error {
 		c.instrumentation.BatchPipelineCompleted(c.repositories)
 		return result.Err
 	})
@@ -113,7 +113,7 @@ func (c *Command) createPipeline(r *domain.GitRepository) *pipeline.Pipeline {
 		predicate.ToStep("find existing pull request", repoCtx.fetchPullRequest(), predicate.Bool(sc.PullRequest.Create)),
 		predicate.ToStep("update pull request", repoCtx.ensurePullRequest(), predicate.And(repoCtx.hasCommits(), predicate.Bool(sc.PullRequest.Create))),
 	)
-	p.WithFinalizer(func(result pipeline.Result) error {
+	p.WithFinalizer(func(ctx pipeline.Context, result pipeline.Result) error {
 		c.instrumentation.PipelineForRepositoryCompleted(r, result.Err)
 		result.Name = r.URL.GetFullName()
 		return result.Err
