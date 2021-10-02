@@ -70,7 +70,7 @@ func (c *Command) createPipeline(r *domain.GitRepository) *pipeline.Pipeline {
 		pipeline.NewStep("determine which labels to delete", c.determineLabelsToDelete(uc, r)),
 		pipeline.NewStep("update existing labels", uc.updateLabelsForRepositoryAction(r)),
 		pipeline.NewStep("delete unwanted labels", uc.deleteLabelsForRepository(r)),
-	).WithFinalizer(func(result pipeline.Result) error {
+	).WithFinalizer(func(ctx pipeline.Context, result pipeline.Result) error {
 		c.instrumentation.PipelineForRepositoryCompleted(r, result.Err)
 		result.Name = r.URL.GetFullName()
 		return result.Err
