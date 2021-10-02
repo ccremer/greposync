@@ -337,9 +337,9 @@ The diff may be empty.</p>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">type LabelStore interface {
-    FetchLabelsForRepository(url *GitURL) (LabelSet, error)
-    EnsureLabelsForRepository(url *GitURL, labels LabelSet) error
-    RemoveLabelsFromRepository(url *GitURL, labels LabelSet) error
+    FetchLabelsForRepository(repository *GitRepository) (LabelSet, error)
+    EnsureLabelsForRepository(repository *GitRepository, labels LabelSet) error
+    RemoveLabelsFromRepository(repository *GitRepository, labels LabelSet) error
 }</code></pre>
 </div>
 </div>
@@ -352,7 +352,7 @@ The diff may be empty.</p>
 <div class="listingblock">
 <div class="title">FetchLabelsForRepository</div>
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func FetchLabelsForRepository(url *GitURL) (LabelSet, error)</code></pre>
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func FetchLabelsForRepository(repository *GitRepository) (LabelSet, error)</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -361,7 +361,7 @@ The diff may be empty.</p>
 <div class="listingblock">
 <div class="title">EnsureLabelsForRepository</div>
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func EnsureLabelsForRepository(url *GitURL, labels LabelSet) error</code></pre>
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func EnsureLabelsForRepository(repository *GitRepository, labels LabelSet) error</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -375,7 +375,7 @@ Remote labels have to be updated when Label.GetColor or Label.Description are no
 <div class="listingblock">
 <div class="title">RemoveLabelsFromRepository</div>
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func RemoveLabelsFromRepository(url *GitURL, labels LabelSet) error</code></pre>
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func RemoveLabelsFromRepository(repository *GitRepository, labels LabelSet) error</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -508,6 +508,7 @@ Returns fetchErr unmodified for method chaining.</p>
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">type TemplateEngine interface {
     Execute(template *Template, values Values) (RenderResult, error)
+    ExecuteString(template string, values Values) (RenderResult, error)
 }</code></pre>
 </div>
 </div>
@@ -522,6 +523,15 @@ Returns fetchErr unmodified for method chaining.</p>
 </div>
 <div class="paragraph">
 <p>Execute renders the given Template with the given Values.</p>
+</div>
+<div class="listingblock">
+<div class="title">ExecuteString</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func ExecuteString(template string, values Values) (RenderResult, error)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>ExecuteString renders the given template string with the given Values.</p>
 </div>
 <hr>
 </div>
@@ -937,6 +947,40 @@ There cannot be duplicates or labels with no name.</p>
 <hr>
 </div>
 <div class="sect2">
+<h3 id="_pullrequestservice"><a class="anchor" href="#_pullrequestservice"></a>PullRequestService</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">type PullRequestService struct {
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Receivers</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">NewPullRequestForRepository</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func (prs *PullRequestService) NewPullRequestForRepository(prsCtx PullRequestServiceContext) error</code></pre>
+</div>
+</div>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="_pullrequestservicecontext"><a class="anchor" href="#_pullrequestservicecontext"></a>PullRequestServiceContext</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">type PullRequestServiceContext struct {
+    Repository        *GitRepository
+    TemplateEngine    TemplateEngine
+    Body              string
+    Title             string
+    TargetBranch      string
+}</code></pre>
+</div>
+</div>
+<hr>
+</div>
+<div class="sect2">
 <h3 id="_renderservice"><a class="anchor" href="#_renderservice"></a>RenderService</h3>
 <div class="listingblock">
 <div class="content">
@@ -1146,6 +1190,15 @@ A label is not included in the result if the name matches.</p>
 <div class="paragraph">
 <p>No validation checks are performed.
 The original order is preserved.</p>
+</div>
+<div class="listingblock">
+<div class="title">String</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func (s LabelSet) String() string</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>String implements fmt.Stringer.</p>
 </div>
 <hr>
 </div>
@@ -1407,6 +1460,55 @@ Any leading "/" is removed.</p>
 </div>
 </div>
 <div class="sect1">
+<h2 id="_constants"><a class="anchor" href="#_constants"></a>Constants</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_metadatavaluekey"><a class="anchor" href="#_metadatavaluekey"></a>MetadataValueKey</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">MetadataValueKey = "Metadata"</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>MetadataValueKey is the root key for the metadata variables.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_repositoryvaluekey"><a class="anchor" href="#_repositoryvaluekey"></a>RepositoryValueKey</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">RepositoryValueKey = "Repository"</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>RepositoryValueKey is the key for the GitRepository variable.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_templatevaluekey"><a class="anchor" href="#_templatevaluekey"></a>TemplateValueKey</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">TemplateValueKey = "Template"</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>TemplateValueKey is the key for the Template variable.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_valueskey"><a class="anchor" href="#_valueskey"></a>ValuesKey</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">ValuesKey = "Values"</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>ValuesKey is the key for user-defined variables.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
 <h2 id="_variables"><a class="anchor" href="#_variables"></a>Variables</h2>
 <div class="sectionbody">
 <div class="sect2">
@@ -1494,6 +1596,14 @@ Paths are joined with filepath.Join.</p>
 <div class="paragraph">
 <p>NewPullRequest returns a new instance.
 An error is returned if the given properties do not satisfy constraints.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_newpullrequestservice"><a class="anchor" href="#_newpullrequestservice"></a>NewPullRequestService</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func NewPullRequestService() *PullRequestService</code></pre>
+</div>
 </div>
 </div>
 <div class="sect2">
