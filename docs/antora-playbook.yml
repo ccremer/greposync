@@ -21,3 +21,5 @@ asciidoc:
   attributes:
     gh-owner: ccremer
     gh-repo: greposync
+    defaults-file: config_defaults.yml
+    sync-file: .sync.yml

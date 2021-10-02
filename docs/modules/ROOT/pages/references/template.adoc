@@ -25,3 +25,41 @@ This rule exists since some IDEs provide syntax highlighting for Go template and
 A file named `README.tpl.md` will become `README.md` in the target repository.
 If you actually need a file called `README.tpl.md`, you need to name it `README.tpl.tpl.md`.
 ====
+
+== Values
+
+Any value defined in `{defaults-file}` and `{sync-file}` are merged and accessible as variable in `.Values`.
+
+.Accessing variables in templates
+[example]
+====
+.{sync-file}
+[source,yaml]
+----
+README.md:
+  sections:
+    - section 1
+----
+
+.README.md.tpl
+[source,go]
+----
+# {{ .Values.sections[0] }}
+----
+====
+
+NOTE: Inexisting keys will cause an abort for the repository update.
+
+=== Metadata
+
+Each template can use additional metadata fields.
+They are exposed in the `.Metadata` field.
+
+.Supported metadata variables
+[example]
+====
+[source]
+----
+include::example$code/metadata.tpl[]
+----
+====

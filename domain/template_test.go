@@ -1,12 +1,9 @@
 package domain
 
 import (
-	"bytes"
 	"fmt"
 	"os"
-	"path"
 	"testing"
-	"text/template"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -58,12 +55,8 @@ func TestTemplate_AsValues(t *testing.T) {
 	subject := NewTemplate(NewPath(file), Permissions(info.Mode()))
 	values := subject.AsValues()
 
-	tpl, err := template.New(path.Base(file)).ParseFiles(file)
+	engine := DummyEngine{templatePath: file}
+	result, err := engine.Execute(subject, values)
 	require.NoError(t, err)
-
-	buf := &bytes.Buffer{}
-	err = tpl.Execute(buf, values)
-	require.NoError(t, err)
-
-	assert.Equal(t, fmt.Sprintf("%s\n%s\n", file, "0644"), buf.String())
+	assert.Equal(t, fmt.Sprintf("%s\n%s\n", file, "0644"), result.String())
 }
