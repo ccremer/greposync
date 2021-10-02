@@ -41,7 +41,7 @@ func (k *KoanfValueStore) FetchValuesForTemplate(template *domain.Template, conf
 	if err != nil {
 		return domain.Values{}, err
 	}
-	return k.loadDataForTemplate(repoKoanf, template.RelativePath.String())
+	return k.loadValuesForTemplate(repoKoanf, template.CleanPath().String())
 }
 
 // FetchUnmanagedFlag implements domain.ValueStore.
@@ -51,7 +51,7 @@ func (k *KoanfValueStore) FetchUnmanagedFlag(template *domain.Template, config *
 	if err != nil {
 		return false, err
 	}
-	return k.loadBooleanFlag(repoKoanf, template.RelativePath.String(), "unmanaged")
+	return k.loadBooleanFlag(repoKoanf, template.CleanPath().String(), "unmanaged")
 }
 
 // FetchTargetPath implements domain.ValueStore.
@@ -61,7 +61,7 @@ func (k *KoanfValueStore) FetchTargetPath(template *domain.Template, config *dom
 	if err != nil {
 		return "", err
 	}
-	return k.loadTargetPath(repoKoanf, template.RelativePath.String())
+	return k.loadTargetPath(repoKoanf, template.CleanPath().String())
 }
 
 // FetchFilesToDelete implements domain.ValueStore.
@@ -100,7 +100,7 @@ func (k *KoanfValueStore) loadAndMergeConfig(repository *domain.GitRepository) (
 	return repoKoanf, k.instrumentation.loadedConfigIfNil(repository.URL.GetFullName(), err)
 }
 
-func (k *KoanfValueStore) loadDataForTemplate(repoKoanf *koanf.Koanf, templateFileName string) (domain.Values, error) {
+func (k *KoanfValueStore) loadValuesForTemplate(repoKoanf *koanf.Koanf, templateFileName string) (domain.Values, error) {
 	// Load the global variables into exposed values
 	data := make(domain.Values)
 	err := repoKoanf.Unmarshal(":globals", &data)

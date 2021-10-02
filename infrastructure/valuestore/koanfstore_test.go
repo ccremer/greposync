@@ -82,7 +82,7 @@ func TestKoanfValueStore_loadDataForTemplate(t *testing.T) {
 			s := NewValueStore(nil)
 			k := koanf.New(".")
 			require.NoError(t, k.Load(file.Provider(filepath.Join("testdata", tt.givenSyncFile)), yaml.Parser()))
-			result, err := s.loadDataForTemplate(k, tt.givenTemplateFileName)
+			result, err := s.loadValuesForTemplate(k, tt.givenTemplateFileName)
 			require.NoError(t, err)
 			assert.Equal(t, tt.expectedConf, result)
 		})
