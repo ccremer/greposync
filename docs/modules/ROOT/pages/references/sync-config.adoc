@@ -1,23 +1,30 @@
-= Sync configuration
-:global-defaults: config_defaults.yml
-:sync-yml: .sync.yml
+= Sync Configuration
+
+There are 2 locations how template variables are configured.
+
+`{defaults-file}` is the config file that defines variables for all managed repositories.
+It's expected to be in the current working directory when invoking `gsync`.
+
+`{sync-file}` is the config file that is used to configure individual values per repository.
+Each entry extends and potentially overrides variables defined in `{defaults-file}`.
+It's expected to be in the root directory of a Git repository.
 
 == Value hierarchy
 
 The following hierarchy of merging and inheriting values is applied.
 The last element in the list is overwriting anything defined before.
 
-. `:globals` in `{global-defaults}`
-. `directory/` in `{global-defaults}`
-. `directory/filename` in `{global-defaults}`
-. `:globals` in `{sync-yml}`
-. `directory/` in `{sync-yml}`
-. `directory/filename` in `{sync-yml}`
+. `:globals` in `{defaults-file}`
+. `directory/` in `{defaults-file}`
+. `directory/filename` in `{defaults-file}`
+. `:globals` in `{sync-file}`
+. `directory/` in `{sync-file}`
+. `directory/filename` in `{sync-file}`
 
 .Value hierarchy
 [example]
 ====
-.{global-defaults}
+.{defaults-file}
 [source,yaml]
 ----
 :globals:
@@ -33,7 +40,7 @@ dir/subdir/file:
   key: a
 ----
 
-.{sync-yml}
+.{sync-file}
 [source,yaml]
 ----
 :globals:
@@ -45,8 +52,8 @@ dir/subdir/:
 dir/subdir/file:
   key: b <2>
 ----
-<1> Any file within `dir` would get the value `key=2` as there is no override in `{sync-yml}`.
-<2> The `dir/subdir/file` would get the value `key=b` since it's overriding the key in `{global-defaults}`.
+<1> Any file within `dir` would get the value `key=2` as there is no override in `{sync-file}`.
+<2> The `dir/subdir/file` would get the value `key=b` since it's overriding the key in `{defaults-file}`.
 ====
 
 [NOTE]
@@ -65,13 +72,13 @@ It is not rendered at all.
 [TIP]
 ====
 * Use this flag in `config_defaults.yml` to cleanup files that aren't needed in the managed repositories anymore.
-* Use this flag in `.sync.yml` to tell greposync to not create certain files.
+* Use this flag in `.sync.file` to tell greposync to not create certain files.
 ====
 
 `unmanaged: true`::
 If this flag is set, the target file is not modified.
 
-TIP: Use this flag in `.sync.yml` if a repository maintains its own version of the file outside of {page-component-name}.
+TIP: Use this flag in `.sync.file` if a repository maintains its own version of the file outside of {page-component-name}.
 
 `targetPath: <path>`::
 This property can override where the templated file is actually being written to.
@@ -83,7 +90,7 @@ Any parent directories are created as needed, with `0775` permission flags (befo
 .Special values usage
 [example]
 ====
-.`.sync.yml`
+.`.sync.file`
 [source,yaml]
 ----
 .editorconfig:

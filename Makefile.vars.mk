@@ -10,3 +10,6 @@ GOASCIIDOC_OUT_GODOC_PATH ?= $(GOASCIIDOC_OUT_ROOT)/pages/ref-domain.adoc
 
 GOASCIIDOC_ARGS_BUILD ?= -o $(GOASCIIDOC_OUT_GODOC_PATH) --templatedir docs/config-templates
 GOASCIIDOC_CMD = go run github.com/mariotoffia/goasciidoc $(GOASCIIDOC_ARGS_BUILD)
+
+REF_CONFIG_PATH ?= docs/modules/ROOT/examples/config.yaml
+REF_LABELS_PATH ?= docs/modules/ROOT/examples/labels.yaml

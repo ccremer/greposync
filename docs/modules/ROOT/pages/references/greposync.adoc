@@ -1,1 +1,51 @@
-= {page-component-name}.yml
+= Main Configuration
+
+`{config-file}` holds configuration variables that define how greposync behaves when invoked.
+
+.All supported settings with defaults
+[source,yaml]
+----
+include::example$config.yaml[]
+----
+
+`git.commitBranch`::
+The branch name to create and checkout when making commits.
++
+[TIP]
+====
+The simplest workflow with `master` branch looks like this:
+
+. Clone repository with `master` branch
+. Create and checkout `greposync` branch
+. Update repository and make commits in `greposync` branch
+. Push `greposync` branch
+. Create pull request that merges `greposync` back into `master`
+====
+
+`pr.targetBranch`::
+The branch name which pull requests should be merged into.
+If empty, it defaults to `git.defaultBranch` (usually `master` or `main`).
+
+`pr.bodyTemplate`::
+The pull request description text.
+Supports Go templates and the xref:references/template.adoc[.Metadata.Repository] variables
+
+`pr.labels`::
+This parameter takes a string array of labels to apply on pull requests.
+Label names that don't exist are created with an empty description and a random color.
+
+== Sync Labels In All Repositories
+
+greposync can synchronize issue and pull request labels in all managed repositories.
+Configure the `repositoryLabels` key with config like this:
+
+[source,yaml]
+----
+include::example$labels.yaml[]
+----
+
+[NOTE]
+====
+The keys within `repositoryLabels.*` have no real value and are for description only.
+This structure was favored over an array in order to make this configuration deep-mergeable in the future.
+====

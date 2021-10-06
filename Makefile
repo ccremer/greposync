@@ -21,6 +21,8 @@ build: generate fmt vet ## Build the Go binary
 	@go build -o gsync .
 
 .PHONY: generate
+generate: export REFERENCE_CONFIG_PATH = $(REF_CONFIG_PATH)
+generate: export REFERENCE_LABELS_PATH = $(REF_LABELS_PATH)
 generate:
 	go generate -tags=generate generate.go
 	$(GOASCIIDOC_CMD) domain

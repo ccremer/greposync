@@ -1,0 +1,6 @@
+repositoryLabels:
+  greposync:
+    color: '#ededed'
+    delete: false
+    description: updates from template repository
+    name: greposync
