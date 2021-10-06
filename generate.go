@@ -18,7 +18,8 @@ import (
 )
 
 func main() {
-	//createExampleConfig()
+	createExampleConfig()
+	createExampleLabelConfig()
 }
 
 func createExampleConfig() {
@@ -26,7 +27,24 @@ func createExampleConfig() {
 
 	bytes, err := yaml.Marshal(exampleConfig)
 	exit(err)
-	writeFile(os.Getenv("GODOC_YAML_DEFAULTS_PATH"), bytes)
+	writeFile(os.Getenv("REFERENCE_CONFIG_PATH"), bytes)
+
+}
+
+func createExampleLabelConfig() {
+	config := map[string]interface{}{
+		"repositoryLabels": cfg.RepositoryLabelMap{
+			"greposync": {
+				Name:        "greposync",
+				Description: "updates from template repository",
+				Color:       "#ededed",
+				Delete:      false,
+			},
+		},
+	}
+	bytes, err := yaml.Marshal(config)
+	exit(err)
+	writeFile(os.Getenv("REFERENCE_LABELS_PATH"), bytes)
 }
 
 func writeFile(path string, bytes []byte) {

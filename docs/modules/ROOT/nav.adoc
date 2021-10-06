@@ -17,7 +17,8 @@
 
 .Technical reference
 * xref:references/template.adoc[Template]
-* xref:references/sync-config.adoc[Sync configuration]
+* xref:references/greposync.adoc[Main Configuration]
+* xref:references/sync-config.adoc[Sync Configuration]
 
 .Explanation
 * xref:explanations/deep-merge.adoc[Configuration deep merge]
