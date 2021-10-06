@@ -2,8 +2,4 @@ name: greposync
 title: greposync
 nav:
 - modules/ROOT/nav.adoc
-
-# This will be overridden from the playbook, only relevant for local preview now
-version: latest
-# This is a custom property using an Antora hack:
-use_ref: true
+version: "0.1"
