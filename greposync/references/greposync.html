@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>greposync.yml :: greposync docs</title>
+    <title>Main Configuration :: greposync docs</title>
     <meta name="generator" content="Antora 2.3.4">
     <link rel="stylesheet" href="../../_/css/site.css">
     <script>var uiRootPath = '../../_'</script>
@@ -85,8 +85,11 @@
   <li class="nav-item" data-depth="1">
     <a class="nav-link" href="template.html">Template</a>
   </li>
+  <li class="nav-item is-current-page" data-depth="1">
+    <a class="nav-link" href="greposync.html">Main Configuration</a>
+  </li>
   <li class="nav-item" data-depth="1">
-    <a class="nav-link" href="sync-config.html">Sync configuration</a>
+    <a class="nav-link" href="sync-config.html">Sync Configuration</a>
   </li>
 </ul>
   </li>
@@ -146,7 +149,8 @@
 <nav class="breadcrumbs" aria-label="breadcrumbs">
   <ul>
     <li><a href="../index.html">greposync</a></li>
-    <li><a href="greposync.html">greposync.yml</a></li>
+    <li>Technical reference</li>
+    <li><a href="greposync.html">Main Configuration</a></li>
   </ul>
 </nav>
 <div class="page-versions">
@@ -163,8 +167,136 @@
   <div class="toc-menu"></div>
 </aside>
 <article class="doc">
-<h1 class="page">greposync.yml</h1>
-
+<h1 class="page">Main Configuration</h1>
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>greposync.yml</code> holds configuration variables that define how greposync behaves when invoked.</p>
+</div>
+<div class="listingblock">
+<div class="title">All supported settings with defaults</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">git:
+  commitBranch: ""
+  commitMessage: Update from greposync
+  defaultBranch: ""
+  forcePush: false
+  name: ""
+  namespace: ""
+  skipCommit: false
+  skipPush: false
+  skipReset: false
+log:
+  level: info
+  showDiff: false
+  showLog: false
+pr:
+  bodyTemplate: This Pull request updates this repository with changes from a greposync
+    template repository.
+  create: false
+  labels: null
+  subject: Update from greposync
+  targetBranch: ""
+project:
+  jobs: 1
+  rootDir: repos
+repositoryLabels: null
+template:
+  rootDir: template</code></pre>
+</div>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>git.commitBranch</code></dt>
+<dd>
+<p>The branch name to create and checkout when making commits.</p>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>The simplest workflow with <code>master</code> branch looks like this:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Clone repository with <code>master</code> branch</p>
+</li>
+<li>
+<p>Create and checkout <code>greposync</code> branch</p>
+</li>
+<li>
+<p>Update repository and make commits in <code>greposync</code> branch</p>
+</li>
+<li>
+<p>Push <code>greposync</code> branch</p>
+</li>
+<li>
+<p>Create pull request that merges <code>greposync</code> back into <code>master</code></p>
+</li>
+</ol>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</dd>
+<dt class="hdlist1"><code>pr.targetBranch</code></dt>
+<dd>
+<p>The branch name which pull requests should be merged into.
+If empty, it defaults to <code>git.defaultBranch</code> (usually <code>master</code> or <code>main</code>).</p>
+</dd>
+<dt class="hdlist1"><code>pr.bodyTemplate</code></dt>
+<dd>
+<p>The pull request description text.
+Supports Go templates and the <a href="template.html" class="page">.Metadata.Repository</a> variables</p>
+</dd>
+<dt class="hdlist1"><code>pr.labels</code></dt>
+<dd>
+<p>This parameter takes a string array of labels to apply on pull requests.
+Label names that don&#8217;t exist are created with an empty description and a random color.</p>
+</dd>
+</dl>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_sync_labels_in_all_repositories"><a class="anchor" href="#_sync_labels_in_all_repositories"></a>Sync Labels In All Repositories</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>greposync can synchronize issue and pull request labels in all managed repositories.
+Configure the <code>repositoryLabels</code> key with config like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">repositoryLabels:
+  greposync:
+    color: '#ededed'
+    delete: false
+    description: updates from template repository
+    name: greposync</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>The keys within <code>repositoryLabels.*</code> have no real value and are for description only.
+This structure was favored over an array in order to make this configuration deep-mergeable in the future.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
 </article>
   </div>
 </main>
