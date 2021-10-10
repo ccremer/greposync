@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Sync configuration :: greposync docs</title>
+    <title>Sync Configuration :: greposync docs</title>
     <link rel="canonical" href="https://ccremer.github.io/greposync/greposync/0.1/references/sync-config.html">
     <meta name="generator" content="Antora 2.3.4">
     <link rel="stylesheet" href="../../../_/css/site.css">
@@ -86,8 +86,11 @@
   <li class="nav-item" data-depth="1">
     <a class="nav-link" href="template.html">Template</a>
   </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="greposync.html">Main Configuration</a>
+  </li>
   <li class="nav-item is-current-page" data-depth="1">
-    <a class="nav-link" href="sync-config.html">Sync configuration</a>
+    <a class="nav-link" href="sync-config.html">Sync Configuration</a>
   </li>
 </ul>
   </li>
@@ -121,7 +124,7 @@
 <div class="nav-panel-explore" data-panel="explore">
   <div class="context">
     <span class="title">greposync</span>
-    <span class="version">0.2-rc4</span>
+    <span class="version">0.2-rc5</span>
   </div>
   <ul class="components">
     <li class="component is-current">
@@ -131,7 +134,7 @@
           <a href="../../index.html">master</a>
         </li>
         <li class="version is-current">
-          <a href="../index.html">0.2-rc4</a>
+          <a href="../index.html">0.2-rc5</a>
         </li>
         <li class="version is-latest">
           <a href="../../0.1/index.html">0.1</a>
@@ -151,14 +154,14 @@
   <ul>
     <li><a href="../index.html">greposync</a></li>
     <li>Technical reference</li>
-    <li><a href="sync-config.html">Sync configuration</a></li>
+    <li><a href="sync-config.html">Sync Configuration</a></li>
   </ul>
 </nav>
 <div class="page-versions">
-  <button class="version-menu-toggle" title="Show other versions of page">0.2-rc4</button>
+  <button class="version-menu-toggle" title="Show other versions of page">0.2-rc5</button>
   <div class="version-menu">
     <a class="version" href="../../references/sync-config.html">master</a>
-    <a class="version is-current" href="sync-config.html">0.2-rc4</a>
+    <a class="version is-current" href="sync-config.html">0.2-rc5</a>
     <a class="version" href="../../0.1/references/sync-config.html">0.1</a>
   </div>
 </div>
@@ -169,7 +172,23 @@
   <div class="toc-menu"></div>
 </aside>
 <article class="doc">
-<h1 class="page">Sync configuration</h1>
+<h1 class="page">Sync Configuration</h1>
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>There are 2 locations how template variables are configured.</p>
+</div>
+<div class="paragraph">
+<p><code>config_defaults.yml</code> is the config file that defines variables for all managed repositories.
+It&#8217;s expected to be in the current working directory when invoking <code>gsync</code>.</p>
+</div>
+<div class="paragraph">
+<p><code>.sync.yml</code> is the config file that is used to configure individual values per repository.
+Each entry extends and potentially overrides variables defined in <code>config_defaults.yml</code>.
+It&#8217;s expected to be in the root directory of a Git repository.</p>
+</div>
+</div>
+</div>
 <div class="sect1">
 <h2 id="_value_hierarchy"><a class="anchor" href="#_value_hierarchy"></a>Value hierarchy</h2>
 <div class="sectionbody">
@@ -294,7 +313,7 @@ It is not rendered at all.</p>
 <p>Use this flag in <code>config_defaults.yml</code> to cleanup files that aren&#8217;t needed in the managed repositories anymore.</p>
 </li>
 <li>
-<p>Use this flag in <code>.sync.yml</code> to tell greposync to not create certain files.</p>
+<p>Use this flag in <code>.sync.file</code> to tell greposync to not create certain files.</p>
 </li>
 </ul>
 </div>
@@ -317,7 +336,7 @@ It is not rendered at all.</p>
 <i class="fa icon-tip" title="Tip"></i>
 </td>
 <td class="content">
-Use this flag in <code>.sync.yml</code> if a repository maintains its own version of the file outside of greposync.
+Use this flag in <code>.sync.file</code> if a repository maintains its own version of the file outside of greposync.
 </td>
 </tr>
 </table>
@@ -339,7 +358,7 @@ Any parent directories are created as needed, with <code>0775</code> permission 
 <div class="title">Example 2. Special values usage</div>
 <div class="content">
 <div class="listingblock">
-<div class="title"><code>.sync.yml</code></div>
+<div class="title"><code>.sync.file</code></div>
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">.editorconfig:
   unmanaged: true <i class="conum" data-value="1"></i><b>(1)</b>
