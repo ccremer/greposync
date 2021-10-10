@@ -25,7 +25,9 @@ func (i *RepositoryStoreInstrumentation) attemptCloning(repository *domain.GitRe
 }
 
 func (i *RepositoryStoreInstrumentation) logInfo(repository *domain.GitRepository, line string) {
-	i.log.WithName(repository.URL.GetFullName()).Info(line)
+	if line != "" {
+		i.log.WithName(repository.URL.GetFullName()).Info(line)
+	}
 }
 
 func (i *RepositoryStoreInstrumentation) logGitArguments(repository *domain.GitRepository, args []string) []string {
@@ -34,11 +36,15 @@ func (i *RepositoryStoreInstrumentation) logGitArguments(repository *domain.GitR
 }
 
 func (i *RepositoryStoreInstrumentation) logDebugInfo(repository *domain.GitRepository, line string) {
-	i.log.WithName(repository.URL.GetFullName()).V(logging.LevelDebug).Info(line)
+	if line != "" {
+		i.log.WithName(repository.URL.GetFullName()).V(logging.LevelDebug).Info(line)
+	}
 }
 
 func (i *RepositoryStoreInstrumentation) logWarning(repository *domain.GitRepository, line string) {
-	i.log.WithName(repository.URL.GetFullName()).V(logging.LevelWarn).Info(line)
+	if line != "" {
+		i.log.WithName(repository.URL.GetFullName()).V(logging.LevelWarn).Info(line)
+	}
 }
 
 func (i *RepositoryStoreInstrumentation) skipRepository(url *domain.GitURL) {
