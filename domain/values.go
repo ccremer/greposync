@@ -13,3 +13,16 @@ const (
 	// ValuesKey is the key for user-defined variables.
 	ValuesKey = "Values"
 )
+
+// Keys returns a list of keys of the top level.
+// Returns an empty string slice if Values is nil or empty.
+func (v Values) Keys() []string {
+	if v == nil || len(v) == 0 {
+		return []string{}
+	}
+	arr := make([]string, 0)
+	for k, _ := range v {
+		arr = append(arr, k)
+	}
+	return arr
+}
