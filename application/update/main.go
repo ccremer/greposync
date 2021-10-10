@@ -86,7 +86,7 @@ func (c *Command) createPipeline(r *domain.GitRepository) *pipeline.Pipeline {
 				predicate.ToStep("fetch", repoCtx.fetch(), predicate.Bool(resetRepo)),
 				predicate.ToStep("reset", repoCtx.reset(), predicate.Bool(resetRepo)),
 				predicate.ToStep("checkout branch", repoCtx.checkout(), predicate.Bool(resetRepo)),
-				predicate.ToStep("pull", repoCtx.fetch(), predicate.Bool(resetRepo)),
+				predicate.ToStep("pull", repoCtx.pull(), predicate.Bool(resetRepo)),
 			),
 
 		pipeline.NewPipeline().AddBeforeHook(logger).
