@@ -71,12 +71,6 @@ type (
 	}
 	RepositoryLabelMap map[string]RepositoryLabel
 
-	// SyncConfig configures a single repository sync
-	SyncConfig struct {
-		PullRequest *PullRequestConfig `json:"pullRequest"`
-		Git         *GitConfig         `json:"git"`
-		Template    *TemplateConfig    `json:"template"`
-	}
 	// GitConfig configures a git repository.
 	// This structure is used to configuring the sync behaviour
 	// It is also passed to templates with filled-in information

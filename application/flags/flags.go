@@ -60,26 +60,16 @@ func InitGlobalFlags(config *cfg.Configuration) []cli.Flag {
 			Name:  LogShowLogFlagName,
 			Usage: "Shows the full log in real-time rather than keeping it hidden until an error occurred.",
 		},
-		NewProjectIncludeFlag(),
-		NewProjectExcludeFlag(),
+		&cli.StringFlag{
+			Name:  ProjectIncludeFlagName,
+			Usage: "Includes only repositories in the update that match the given filter (regex). The full URL (including scheme) is matched.",
+		},
+		&cli.StringFlag{
+			Name:  ProjectExcludeFlagName,
+			Usage: "Excludes repositories from updating that match the given filter (regex). Repositories matching both include and exclude filter are still excluded.",
+		},
 	}
 	return globalFlags
-}
-
-// NewProjectIncludeFlag returns a new flag that is meant to include Git repositories.
-func NewProjectIncludeFlag() *cli.StringFlag {
-	return &cli.StringFlag{
-		Name:  ProjectIncludeFlagName,
-		Usage: "Includes only repositories in the update that match the given filter (regex).",
-	}
-}
-
-// NewProjectExcludeFlag returns a new flag that is meant to exclude Git repositories.
-func NewProjectExcludeFlag() *cli.StringFlag {
-	return &cli.StringFlag{
-		Name:  ProjectExcludeFlagName,
-		Usage: "Excludes repositories from updating that match the given filter (regex). Repositories matching both include and exclude filter are still excluded.",
-	}
 }
 
 // CombineWithGlobalFlags combines the given flags with the global flags.

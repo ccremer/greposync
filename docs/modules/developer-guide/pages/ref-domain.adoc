@@ -1149,6 +1149,17 @@ type Values map[string]interface{}
 
 Values contain a tree of properties to be consumed by a TemplateEngine.
 
+**Receivers**
+
+.Keys
+[source, go]
+----
+func (v Values) Keys() []string
+----
+
+Keys returns a list of keys of the top level.
+Returns an empty string slice if Values is nil or empty.
+
 
 '''
 
@@ -1370,6 +1381,7 @@ func FromURL(url *url.URL) *GitURL
 ----
 
 FromURL converts the given url.URL into a GitURL.
+
 
 
 

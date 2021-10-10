@@ -12,5 +12,5 @@ type PipelineLogger struct {
 
 // Accept prints the scope to debug level.
 func (p PipelineLogger) Accept(step pipeline.Step) {
-	p.Logger.V(LevelDebug).Info("executing step", "step", step.Name)
+	p.Logger.V(LevelDebug).Info("Executing step", "step", step.Name)
 }

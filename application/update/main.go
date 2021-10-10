@@ -61,12 +61,6 @@ func (c *Command) runCommand(_ *cli.Context) error {
 }
 
 func (c *Command) createPipeline(r *domain.GitRepository) *pipeline.Pipeline {
-	sc := &cfg.SyncConfig{
-		PullRequest: c.cfg.PullRequest,
-		Template: &cfg.TemplateConfig{
-			RootDir: c.cfg.Template.RootDir,
-		},
-	}
 
 	resetRepo := !c.cfg.Git.SkipReset
 	enabledCommits := !c.cfg.Git.SkipCommit
@@ -110,8 +104,8 @@ func (c *Command) createPipeline(r *domain.GitRepository) *pipeline.Pipeline {
 			predicate.And(predicate.Bool(enabledCommits), repoCtx.isDirty())),
 
 		predicate.ToStep("push changes", repoCtx.push(), predicate.And(predicate.Bool(enabledPush), repoCtx.hasCommits())),
-		predicate.ToStep("find existing pull request", repoCtx.fetchPullRequest(), predicate.Bool(sc.PullRequest.Create)),
-		predicate.ToStep("ensure pull request", repoCtx.ensurePullRequest(), predicate.And(repoCtx.hasCommits(), predicate.Bool(sc.PullRequest.Create))),
+		predicate.ToStep("find existing pull request", repoCtx.fetchPullRequest(), predicate.Bool(c.cfg.PullRequest.Create)),
+		predicate.ToStep("ensure pull request", repoCtx.ensurePullRequest(), predicate.And(repoCtx.hasCommits(), predicate.Bool(c.cfg.PullRequest.Create))),
 	)
 	p.WithFinalizer(func(ctx pipeline.Context, result pipeline.Result) error {
 		c.instrumentation.PipelineForRepositoryCompleted(r, result.Err)
