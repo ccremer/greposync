@@ -40,3 +40,11 @@ func (i *RepositoryStoreInstrumentation) logDebugInfo(repository *domain.GitRepo
 func (i *RepositoryStoreInstrumentation) logWarning(repository *domain.GitRepository, line string) {
 	i.log.WithName(repository.URL.GetFullName()).V(logging.LevelWarn).Info(line)
 }
+
+func (i *RepositoryStoreInstrumentation) skipRepository(url *domain.GitURL) {
+	i.log.Info("Skipping repository due to filters", "url", url.GetFullName())
+}
+
+func (i *RepositoryStoreInstrumentation) loadRepositoryConfigFile(name string) {
+	i.log.V(logging.LevelDebug).Info("Loading config file", "name", name)
+}

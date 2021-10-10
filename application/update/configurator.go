@@ -55,6 +55,8 @@ func (c *AppService) ConfigureInfrastructure() {
 	c.repoStore.ParentDir = "repos"
 	c.repoStore.DefaultNamespace = c.cfg.Git.Namespace
 	c.repoStore.CommitBranch = c.cfg.Git.CommitBranch
+	c.repoStore.ExcludeFilter = c.cfg.Project.Exclude
+	c.repoStore.IncludeFilter = c.cfg.Project.Include
 	c.templateStore.RootDir = "template"
 	c.console.Quiet = !c.cfg.Log.ShowLog
 }

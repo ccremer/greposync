@@ -5,6 +5,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 
 	"github.com/ccremer/greposync/domain"
@@ -29,17 +30,20 @@ type StoreConfig struct {
 	ParentDir        string
 	DefaultNamespace string
 	CommitBranch     string
-}
 
-var (
+	IncludeFilter string
+	ExcludeFilter string
 	// ManagedReposFileName is the base file name where managed git repositories config is searched.
-	ManagedReposFileName = "managed_repos.yml"
-)
+	ManagedReposFileName string
+}
 
 func NewRepositoryStore(instrumentation *RepositoryStoreInstrumentation) *RepositoryStore {
 	return &RepositoryStore{
 		k:               koanf.New("."),
 		instrumentation: instrumentation,
+		StoreConfig: StoreConfig{
+			ManagedReposFileName: "managed_repos.yml",
+		},
 	}
 }
 
@@ -49,7 +53,8 @@ func (s *RepositoryStore) deleteFileHandler(file *os.File) {
 }
 
 func (s *RepositoryStore) FetchGitRepositories() ([]*domain.GitRepository, error) {
-	if err := s.k.Load(file.Provider(ManagedReposFileName), yaml.Parser()); err != nil {
+	s.instrumentation.loadRepositoryConfigFile(s.ManagedReposFileName)
+	if err := s.k.Load(file.Provider(s.ManagedReposFileName), yaml.Parser()); err != nil {
 		return nil, err
 	}
 	var list []*domain.GitRepository
@@ -59,15 +64,23 @@ func (s *RepositoryStore) FetchGitRepositories() ([]*domain.GitRepository, error
 	}
 	gitBase := "git@github.com:"
 
+	includeRegex, excludeRegex, err := compileRegex(s.IncludeFilter, s.ExcludeFilter)
+	if err != nil {
+		return nil, err
+	}
+
 	for _, repo := range m {
 		u, err := parseUrl(repo, gitBase, s.DefaultNamespace)
 		if err != nil {
 			return list, err
 		}
 
-		// TODO: Reimplement filtering
-
 		gitUrl := domain.FromURL(u)
+		if skipRepository(gitUrl.String(), includeRegex, excludeRegex) {
+			s.instrumentation.skipRepository(gitUrl)
+			continue
+		}
+
 		root := domain.NewFilePath(s.toLocalFilePath(gitUrl.AsURL()))
 		gitRepository := domain.NewGitRepository(gitUrl, root)
 		gitRepository.CommitBranch = s.CommitBranch
@@ -95,4 +108,26 @@ func parseUrl(m ManagedGitRepo, gitBase, defaultNs string) (*url.URL, error) {
 	}
 	u, err := giturls.Parse(fmt.Sprintf("%s/%s/%s", gitBase, defaultNs, m.Name))
 	return u, err
+}
+
+func skipRepository(s string, includeRegex *regexp.Regexp, excludeRegex *regexp.Regexp) bool {
+	return excludeRegex.MatchString(s) || !includeRegex.MatchString(s)
+}
+
+func compileRegex(includeFilter, excludeFilter string) (includeRegex, excludeRegex *regexp.Regexp, err error) {
+	if includeFilter == "" {
+		includeFilter = ".*"
+	}
+	if excludeFilter == "" {
+		excludeFilter = "^$"
+	}
+	includeRegex, err = regexp.Compile(includeFilter)
+	if err != nil {
+		return nil, nil, err
+	}
+	excludeRegex, err = regexp.Compile(excludeFilter)
+	if err != nil {
+		return nil, nil, err
+	}
+	return includeRegex, excludeRegex, nil
 }
