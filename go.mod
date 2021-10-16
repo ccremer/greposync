@@ -8,7 +8,7 @@ require (
 	github.com/ccremer/go-command-pipeline v0.9.0
 	github.com/ccremer/plogr v0.5.0
 	github.com/go-logr/logr v1.1.0
-	github.com/google/go-github/v39 v39.1.0
+	github.com/google/go-github/v39 v39.2.0
 	github.com/google/wire v0.5.0
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/knadh/koanf v1.2.4
