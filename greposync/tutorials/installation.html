@@ -341,7 +341,6 @@ rm -f checksums.txt checksums.txt.sig signature.asc</code></pre>
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">gsync() {
   docker run \
-    --interactive \
     --rm \
     --user="$(id -u)" \
     --env GITHUB_TOKEN \
