@@ -91,10 +91,10 @@ include::example$code/install-download.sh[]
 gsync() {
   docker run \
     --interactive \
-    --tty \
     --rm \
     --user="$(id -u)" \
     --env GITHUB_TOKEN \
+    --env HOME=/app \
     --env SSH_AUTH_SOCK=/tmp/ssh_agent.sock \
     --volume "$\{SSH_AUTH_SOCK}:/tmp/ssh_agent.sock" \
     --volume "$\{HOME}/.ssh/config:/app/.ssh/config:ro" \
@@ -106,3 +106,11 @@ gsync() {
     $*
 }
 ----
++
+[NOTE]
+====
+* If any of the `~/.ssh` files or `~/.gitconfig` don't exist, they are created as directories!
+  This won't work, so please ensure that these files exist before.
+* `git clone` inside the container fails if using git+ssh URLs when the SSH config files have not the correct permissions.
+  Ensure that they are at least `0644` or lower.
+====
