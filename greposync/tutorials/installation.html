@@ -342,10 +342,10 @@ rm -f checksums.txt checksums.txt.sig signature.asc</code></pre>
 <pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">gsync() {
   docker run \
     --interactive \
-    --tty \
     --rm \
     --user="$(id -u)" \
     --env GITHUB_TOKEN \
+    --env HOME=/app \
     --env SSH_AUTH_SOCK=/tmp/ssh_agent.sock \
     --volume "${SSH_AUTH_SOCK}:/tmp/ssh_agent.sock" \
     --volume "${HOME}/.ssh/config:/app/.ssh/config:ro" \
@@ -357,6 +357,29 @@ rm -f checksums.txt checksums.txt.sig signature.asc</code></pre>
     $*
 }</code></pre>
 </div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="ulist">
+<ul>
+<li>
+<p>If any of the <code>~/.ssh</code> files or <code>~/.gitconfig</code> don&#8217;t exist, they are created as directories!
+This won&#8217;t work, so please ensure that these files exist before.</p>
+</li>
+<li>
+<p><code>git clone</code> inside the container fails if using git+ssh URLs when the SSH config files have not the correct permissions.
+Ensure that they are at least <code>0644</code> or lower.</p>
+</li>
+</ul>
+</div>
+</td>
+</tr>
+</table>
 </div>
 </li>
 </ol>
