@@ -3,6 +3,4 @@ title: greposync
 nav:
   - modules/ROOT/nav.adoc
   - modules/developer-guide/nav.adoc
-version: master
-prerelease: true
-display_version: master
+version: "0.2"
