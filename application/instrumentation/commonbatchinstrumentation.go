@@ -29,8 +29,7 @@ func NewUpdateInstrumentation(console *ui.ColoredConsole, factory logging.Logger
 
 func (i *CommonBatchInstrumentation) BatchPipelineStarted(repos []*domain.GitRepository) {
 	i.log.Info("Update started")
-	p, _ := i.console.BatchProgressbar.WithTotal(len(repos)).Start()
-	i.console.BatchProgressbar = p
+	i.console.StartBatchUpdate(repos)
 }
 
 func (i *CommonBatchInstrumentation) BatchPipelineCompleted(repos []*domain.GitRepository) {

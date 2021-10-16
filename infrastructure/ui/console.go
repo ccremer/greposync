@@ -6,17 +6,19 @@ import (
 	"os"
 	"sync"
 
+	"github.com/ccremer/greposync/domain"
+	"github.com/mattn/go-isatty"
 	"github.com/pterm/pterm"
 )
 
 type ColoredConsole struct {
-	// BatchProgressbar is a persistent line appended showing the progress of a batch operation.
-	// After each call to Printfln, the line is update.
-	// Be sure to assign the new value of this field after calling Start() on the progress bar.
-	BatchProgressbar *pterm.ProgressbarPrinter
+	// batchProgressbar is a persistent line appended showing the progress of a batch operation.
+	// After each call to Printfln, the line is updated.
+	batchProgressbar *pterm.ProgressbarPrinter
 
-	buffers map[string]*bytes.Buffer
-	m       sync.Mutex
+	buffers       map[string]*bytes.Buffer
+	m             sync.Mutex
+	isInteractive bool
 
 	// Quiet will redirect all console lines to an internal buffer if true.
 	Quiet bool
@@ -24,9 +26,18 @@ type ColoredConsole struct {
 
 func NewColoredConsole() *ColoredConsole {
 	return &ColoredConsole{
-		BatchProgressbar: pterm.DefaultProgressbar.WithTitle("---------  UPDATING REPOSITORIES..."),
+		batchProgressbar: pterm.DefaultProgressbar.WithTitle("---------  UPDATING REPOSITORIES..."),
 		buffers:          map[string]*bytes.Buffer{},
+		isInteractive:    isatty.IsTerminal(os.Stdout.Fd()),
 	}
+}
+
+func (c *ColoredConsole) StartBatchUpdate(repos []*domain.GitRepository) {
+	if !c.isInteractive {
+		return
+	}
+	p, _ := c.batchProgressbar.WithTotal(len(repos)).Start()
+	c.batchProgressbar = p
 }
 
 func (c *ColoredConsole) PrintProgressbarMessage(scope string, err error) {
@@ -40,14 +51,19 @@ func (c *ColoredConsole) PrintProgressbarMessage(scope string, err error) {
 		pterm.Error.WithScope(pterm.Scope{Text: scope, Style: pterm.Error.Scope.Style}).
 			Println("Update failed for repository")
 	}
-	c.BatchProgressbar.Increment()
+	if c.isInteractive {
+		c.batchProgressbar.Increment()
+	}
 }
 
 func (c *ColoredConsole) RefreshProgressBar() {
+	if !c.isInteractive {
+		return
+	}
 	c.m.Lock()
 	defer c.m.Unlock()
 
-	c.BatchProgressbar.Add(0)
+	c.batchProgressbar.Add(0)
 }
 
 func (c *ColoredConsole) AddToBuffer(scope string, buffer io.WriterTo) {

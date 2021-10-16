@@ -13,6 +13,7 @@ require (
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/knadh/koanf v1.2.4
 	github.com/mariotoffia/goasciidoc v0.4.6
+	github.com/mattn/go-isatty v0.0.14
 	github.com/pterm/pterm v0.12.31
 	github.com/stretchr/testify v1.7.0
 	github.com/urfave/cli/v2 v2.3.0
