@@ -90,7 +90,6 @@ include::example$code/install-download.sh[]
 ----
 gsync() {
   docker run \
-    --interactive \
     --rm \
     --user="$(id -u)" \
     --env GITHUB_TOKEN \
