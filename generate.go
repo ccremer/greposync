@@ -1,3 +1,4 @@
+//go:build generate
 // +build generate
 
 package main
@@ -7,6 +8,9 @@ package main
 
 // Generate dependency tree
 //go:generate go run github.com/google/wire/cmd/wire
+
+// Fix wire import
+//go:generate sed -i -e "s|//+build|// +build|" wire_gen.go
 
 import (
 	"fmt"
