@@ -37,7 +37,7 @@ func (s *RepositoryStore) Checkout(repository *domain.GitRepository) error {
 		return err
 	} else if !localExists {
 		// Checkout to new branch
-		args = append(args, "-t", "-b")
+		args = append(args, "-b")
 	}
 	args = append(args, repository.CommitBranch)
 
@@ -75,7 +75,7 @@ func (s *RepositoryStore) Pull(repository *domain.GitRepository) error {
 		return err
 	}
 	if exists {
-		out, stderr, err := execGitCommand(repository.RootDir, s.instrumentation.logGitArguments(repository, []string{"pull"}))
+		out, stderr, err := execGitCommand(repository.RootDir, s.instrumentation.logGitArguments(repository, []string{"pull", "origin", repository.CommitBranch}))
 		if err != nil {
 			return mergeWithStdErr(err, stderr)
 		}
