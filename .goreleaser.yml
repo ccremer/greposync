@@ -26,14 +26,16 @@ checksum:
   name_template: "checksums.txt"
 
 snapshot:
-  name_template: "{{ .Tag }}-snapshot"
+  name_template: "{{ incpatch .Version }}-snapshot"
 
 signs:
 - artifacts: checksum
   args: ["-u", "4E74BD9589869F6CB8A73D279533207D7E3143FC", "--output", "${signature}", "--detach-sign", "${artifact}"]
 
 dockers:
-- image_templates:
+- extra_files:
+  - docker/entrypoint.sh
+  image_templates:
   - "ghcr.io/ccremer/greposync:v{{ .Version }}"
 
     # For prereleases, updating `latest` and the floating tags of the major version does not make sense.

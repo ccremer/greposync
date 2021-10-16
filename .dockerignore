@@ -1,0 +1,4 @@
+.*
+*
+!gsync
+!docker/entrypoint.sh
