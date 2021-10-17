@@ -1,6 +1,6 @@
 :globals:
   comment:
-    text: | <1>
+    text: |- <1>
       This file is managed by {page-component-name}.
       Do not modify manually.
       Adjust variables in `.sync.yml`.
