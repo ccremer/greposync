@@ -66,6 +66,7 @@ func (c *Command) createPipeline(r *domain.GitRepository) *pipeline.Pipeline {
 	enabledCommits := !c.cfg.Git.SkipCommit
 	enabledPush := !c.cfg.Git.SkipPush
 	showDiff := c.cfg.Log.ShowDiff
+	createPR := c.cfg.PullRequest.Create
 
 	repoCtx := &pipelineContext{
 		repo:       r,
@@ -104,8 +105,8 @@ func (c *Command) createPipeline(r *domain.GitRepository) *pipeline.Pipeline {
 			predicate.And(predicate.Bool(enabledCommits), repoCtx.isDirty())),
 
 		predicate.ToStep("push changes", repoCtx.push(), predicate.And(predicate.Bool(enabledPush), repoCtx.hasCommits())),
-		predicate.ToStep("find existing pull request", repoCtx.fetchPullRequest(), predicate.Bool(c.cfg.PullRequest.Create)),
-		predicate.ToStep("ensure pull request", repoCtx.ensurePullRequest(), predicate.And(repoCtx.hasCommits(), predicate.Bool(c.cfg.PullRequest.Create))),
+		predicate.ToStep("find existing pull request", repoCtx.fetchPullRequest(), predicate.Bool(createPR)),
+		predicate.ToStep("ensure pull request", repoCtx.ensurePullRequest(), predicate.And(repoCtx.hasCommits(), predicate.Bool(createPR))),
 	)
 	p.WithFinalizer(func(ctx pipeline.Context, result pipeline.Result) error {
 		c.instrumentation.PipelineForRepositoryCompleted(r, result.Err)

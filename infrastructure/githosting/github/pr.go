@@ -40,9 +40,6 @@ func (r *GhRemote) EnsurePullRequest(repository *domain.GitRepository, pr *domai
 	if !exists {
 		return r.createNewPr(repository, pr)
 	}
-	cached.Title = converted.Title
-	cached.Body = converted.Body
-	cached.Labels = converted.Labels
 	return r.updateExistingPr(repository, cached, pr)
 }
 
@@ -61,6 +58,8 @@ func (r *GhRemote) updatePrDescription(repository *domain.GitRepository, cached 
 	if r.canSkipDescriptionUpdate(cached, pr) {
 		return nil
 	}
+	cached.Title = github.String(pr.GetTitle())
+	cached.Body = github.String(pr.GetBody())
 	ghPr, _, err := r.client.PullRequests.Edit(context.Background(), repository.URL.GetNamespace(), repository.URL.GetRepositoryName(), *cached.Number, cached)
 	return r.instrumentation.prUpdated(repository, ghPr, err)
 }
@@ -69,13 +68,15 @@ func (r *GhRemote) updatePrLabels(repository *domain.GitRepository, cached *gith
 	if r.canSkipLabelUpdate(cached, pr) {
 		return nil
 	}
-	err := r.setLabelsToPr(repository.URL, *cached.Number, pr.GetLabels())
+	current := LabelSetConverter{}.ConvertToEntity(cached.Labels)
+	merged := current.Merge(pr.GetLabels())
+	err := r.setLabelsToPr(repository.URL, cached, merged)
 	return r.instrumentation.prLabelsUpdated(repository, pr, err)
 }
 
 func (r *GhRemote) canSkipDescriptionUpdate(cached *github.PullRequest, pr *domain.PullRequest) bool {
-	sameTitle := *cached.Title == pr.GetTitle()
-	sameBody := *cached.Body == pr.GetBody()
+	sameTitle := cached.GetTitle() == pr.GetTitle()
+	sameBody := cached.GetBody() == pr.GetBody()
 	return sameTitle && sameBody
 }
 
@@ -105,7 +106,7 @@ func (r *GhRemote) createNewPr(repository *domain.GitRepository, pr *domain.Pull
 	}
 
 	if len(pr.GetLabels()) > 0 {
-		err := r.setLabelsToPr(repository.URL, *ghPr.Number, pr.GetLabels())
+		err := r.setLabelsToPr(repository.URL, ghPr, pr.GetLabels())
 		if err != nil {
 			return err
 		}
@@ -115,11 +116,12 @@ func (r *GhRemote) createNewPr(repository *domain.GitRepository, pr *domain.Pull
 	return nil
 }
 
-func (r *GhRemote) setLabelsToPr(url *domain.GitURL, issueNumber int, set domain.LabelSet) error {
+func (r *GhRemote) setLabelsToPr(url *domain.GitURL, ghPr *github.PullRequest, set domain.LabelSet) error {
 	var labelArr = make([]string, len(set))
 	for i := range set {
 		labelArr[i] = set[i].Name
 	}
-	_, _, err := r.client.Issues.ReplaceLabelsForIssue(context.Background(), url.GetNamespace(), url.GetRepositoryName(), issueNumber, labelArr)
+	labels, _, err := r.client.Issues.ReplaceLabelsForIssue(context.Background(), url.GetNamespace(), url.GetRepositoryName(), ghPr.GetNumber(), labelArr)
+	ghPr.Labels = labels
 	return err
 }
