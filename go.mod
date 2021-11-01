@@ -6,7 +6,7 @@ require (
 	github.com/BurntSushi/toml v0.4.1
 	github.com/Masterminds/sprig/v3 v3.2.1
 	github.com/ccremer/go-command-pipeline v0.9.0
-	github.com/ccremer/plogr v0.5.0
+	github.com/ccremer/plogr v0.5.1
 	github.com/go-logr/logr v1.2.0
 	github.com/google/go-github/v39 v39.2.0
 	github.com/google/wire v0.5.0
@@ -14,7 +14,7 @@ require (
 	github.com/knadh/koanf v1.3.0
 	github.com/mariotoffia/goasciidoc v0.4.6
 	github.com/mattn/go-isatty v0.0.14
-	github.com/pterm/pterm v0.12.32
+	github.com/pterm/pterm v0.12.33
 	github.com/stretchr/testify v1.7.0
 	github.com/urfave/cli/v2 v2.3.0
 	github.com/whilp/git-urls v1.0.0
