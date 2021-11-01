@@ -15,6 +15,7 @@ type PullRequestServiceContext struct {
 	Body           string
 	Title          string
 	TargetBranch   string
+	Labels         LabelSet
 }
 
 func (prs *PullRequestService) NewPullRequestForRepository(prsCtx PullRequestServiceContext) error {
@@ -36,7 +37,7 @@ func (prs *PullRequestService) NewPullRequestForRepository(prsCtx PullRequestSer
 			return err
 		}),
 		pipeline.NewStepFromFunc("newPR", func(ctx pipeline.Context) error {
-			newPr, err := NewPullRequest(nil, prsCtx.Title, prsCtx.Body, prsCtx.Repository.CommitBranch, prsCtx.TargetBranch, prsCtx.Repository.Labels)
+			newPr, err := NewPullRequest(nil, prsCtx.Title, prsCtx.Body, prsCtx.Repository.CommitBranch, prsCtx.TargetBranch, nil)
 			prsCtx.Repository.PullRequest = newPr
 			return err
 		}),

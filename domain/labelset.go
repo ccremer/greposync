@@ -8,6 +8,18 @@ import (
 // LabelSet is a set of Label.
 type LabelSet []Label
 
+// FromStringSlice returns a LabelSet with the names from the given string slice.
+// Label.GetColor and Label.Description are empty.
+func FromStringSlice(labels []string) LabelSet {
+	set := make(LabelSet, len(labels))
+	for i, label := range labels {
+		set[i] = Label{
+			Name: label,
+		}
+	}
+	return set
+}
+
 // CheckForEmptyLabelNames returns an error if there's a Label in the set that is an empty string.
 func (s LabelSet) CheckForEmptyLabelNames() error {
 	for _, label := range s {

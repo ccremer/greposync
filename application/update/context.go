@@ -103,6 +103,9 @@ func (c *pipelineContext) ensurePullRequest() pipeline.ActionFunc {
 				return pipeline.Result{Err: err}
 			}
 		}
+		if err := c.repo.PullRequest.AttachLabels(domain.FromStringSlice(c.appService.cfg.PullRequest.Labels)); err != nil {
+			return pipeline.Result{Err: err}
+		}
 		err := c.appService.prStore.EnsurePullRequest(c.repo)
 		return pipeline.Result{Err: err}
 	}

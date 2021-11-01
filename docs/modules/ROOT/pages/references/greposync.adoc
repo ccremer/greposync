@@ -33,6 +33,7 @@ Supports Go templates and the xref:references/template.adoc[.Metadata.Repository
 `pr.labels`::
 This parameter takes a string array of labels to apply on pull requests.
 Label names that don't exist are created with an empty description and a random color.
+Foreign labels in existing pull requests are not removed or renamed.
 
 == Sync Labels In All Repositories
 
