@@ -983,6 +983,7 @@ There cannot be duplicates or labels with no name.</p>
     Body              string
     Title             string
     TargetBranch      string
+    Labels            LabelSet
 }</code></pre>
 </div>
 </div>
@@ -1578,6 +1579,18 @@ Returns an empty string slice if Values is nil or empty.</p>
 </div>
 <div class="paragraph">
 <p>NewGitRepository creates a new instance.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_fromstringslice"><a class="anchor" href="#_fromstringslice"></a>FromStringSlice</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func FromStringSlice(labels []string) LabelSet</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>FromStringSlice returns a LabelSet with the names from the given string slice.
+Label.GetColor and Label.Description are empty.</p>
 </div>
 </div>
 <div class="sect2">
