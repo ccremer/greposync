@@ -11,7 +11,7 @@ require (
 	github.com/google/go-github/v39 v39.2.0
 	github.com/google/wire v0.5.0
 	github.com/hashicorp/go-multierror v1.1.1
-	github.com/knadh/koanf v1.3.2
+	github.com/knadh/koanf v1.3.3
 	github.com/mariotoffia/goasciidoc v0.4.6
 	github.com/mattn/go-isatty v0.0.14
 	github.com/pterm/pterm v0.12.33
