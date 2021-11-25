@@ -2,11 +2,13 @@ package repositorystore
 
 import (
 	"fmt"
+	"math/rand"
 	"net/url"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
+	"time"
 
 	"github.com/ccremer/greposync/domain"
 	"github.com/knadh/koanf"
@@ -93,6 +95,11 @@ func (s *RepositoryStore) FetchGitRepositories() ([]*domain.GitRepository, error
 		}
 		list = append(list, gitRepository)
 	}
+	// Shuffle the list to avoid rate limits to be applied always at the same "spot", if any.
+	rand.Seed(time.Now().Unix())
+	rand.Shuffle(len(list), func(i, j int) {
+		list[i], list[j] = list[j], list[i]
+	})
 	return list, nil
 }
 
