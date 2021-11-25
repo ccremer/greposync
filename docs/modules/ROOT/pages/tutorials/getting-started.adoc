@@ -101,8 +101,9 @@ gsync update --dry-run=commit
 +
 [NOTE]
 ====
-There is a warning about a missing `.sync.yml`.
-We will add this file in a later step.
+* There is a warning about a missing `.sync.yml`.
+  We will add this file in a later step.
+* The order of repositories being updated is randomized each time.
 ====
 
 . Inspect the directory structure
