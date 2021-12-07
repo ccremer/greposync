@@ -6,14 +6,12 @@ import (
 	"strings"
 
 	"github.com/ccremer/greposync/domain"
-	"github.com/knadh/koanf"
 )
 
-func (k *KoanfValueStore) loadFilesToDelete(repoKoanf *koanf.Koanf) ([]domain.Path, error) {
+func (s *MapStore) loadFilesToDelete(repoConfig config) ([]domain.Path, error) {
 	filePaths := make([]domain.Path, 0)
-	allKeys := repoKoanf.Raw()
 	// Go through all top-level keys, which are the file names
-	for filePath, _ := range allKeys {
+	for filePath, _ := range repoConfig {
 		// If the filename is already handled by the template renderer, ignore it.
 		// Otherwise, add files that have deletion flag, but ignore directories
 		if !pathIsFile(filePath) {
@@ -23,7 +21,7 @@ func (k *KoanfValueStore) loadFilesToDelete(repoKoanf *koanf.Koanf) ([]domain.Pa
 			// can't delete file named ':globals' anyway
 			continue
 		}
-		del, err := k.loadBooleanFlag(repoKoanf, filePath, "delete")
+		del, err := s.loadBooleanFlag(repoConfig, filePath, "delete")
 		if errors.Is(err, domain.ErrKeyNotFound) {
 			continue
 		}
@@ -38,8 +36,8 @@ func pathIsFile(filePath string) bool {
 	return !strings.HasSuffix(filePath, "/")
 }
 
-func (k *KoanfValueStore) loadBooleanFlag(repoKoanf *koanf.Koanf, relativePath, flagName string) (bool, error) {
-	values, err := k.loadValuesForTemplate(repoKoanf, relativePath)
+func (s *MapStore) loadBooleanFlag(repoConfig config, relativePath, flagName string) (bool, error) {
+	values, err := s.loadValuesForTemplate(repoConfig, relativePath)
 	if err != nil {
 		return false, err
 	}
@@ -50,8 +48,8 @@ func (k *KoanfValueStore) loadBooleanFlag(repoKoanf *koanf.Koanf, relativePath, 
 	return false, domain.ErrKeyNotFound
 }
 
-func (k *KoanfValueStore) loadTargetPath(repoKoanf *koanf.Koanf, relativePath string) (domain.Path, error) {
-	values, err := k.loadValuesForTemplate(repoKoanf, relativePath)
+func (s *MapStore) loadTargetPath(repoConfig config, relativePath string) (domain.Path, error) {
+	values, err := s.loadValuesForTemplate(repoConfig, relativePath)
 	if err != nil {
 		return "", err
 	}
