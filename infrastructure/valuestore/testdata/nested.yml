@@ -1,0 +1,10 @@
+:globals:
+  features:
+    testing:
+      enabled: true
+      anotherKey: value
+
+.github/workflows/release.yaml:
+  features:
+    testing:
+      enabled: false

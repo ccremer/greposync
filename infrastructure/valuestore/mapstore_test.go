@@ -6,18 +6,15 @@ import (
 	"testing"
 
 	"github.com/ccremer/greposync/domain"
-	"github.com/knadh/koanf"
-	"github.com/knadh/koanf/parsers/yaml"
-	"github.com/knadh/koanf/providers/file"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-func TestKoanfValueStore_ImplementsInterface(t *testing.T) {
-	assert.Implements(t, (*domain.ValueStore)(nil), new(KoanfValueStore))
+func TestMapStore_ImplementsInterface(t *testing.T) {
+	assert.Implements(t, (*domain.ValueStore)(nil), new(MapStore))
 }
 
-func TestKoanfValueStore_loadAndMergeConfig(t *testing.T) {
+func TestMapStore_loadAndMergeConfig(t *testing.T) {
 	tests := map[string]struct {
 		expectedConf  map[string]interface{}
 		givenSyncFile string
@@ -40,20 +37,20 @@ func TestKoanfValueStore_loadAndMergeConfig(t *testing.T) {
 	}
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
-			s := NewValueStore(nil)
+			s := NewMapStore(nil)
 			u, err := url.Parse("https://github.com/ccremer/greposync")
 			require.NoError(t, err)
-			s.globalKoanf = koanf.New("")
+			s.globalConfig = config{}
 			SyncConfigFileName = tt.givenSyncFile
 			repo := &domain.GitRepository{URL: domain.FromURL(u), RootDir: domain.NewFilePath("testdata")}
 			result, err := s.loadAndMergeConfig(repo)
 			require.NoError(t, err)
-			assert.Equal(t, tt.expectedConf, result.Raw())
+			assert.EqualValues(t, tt.expectedConf, result)
 		})
 	}
 }
 
-func TestKoanfValueStore_loadDataForTemplate(t *testing.T) {
+func TestMapStore_loadDataForTemplate(t *testing.T) {
 	tests := map[string]struct {
 		expectedConf          domain.Values
 		givenSyncFile         string
@@ -76,13 +73,25 @@ func TestKoanfValueStore_loadDataForTemplate(t *testing.T) {
 				"array": "overridden",
 			},
 		},
+		"GivenConfigWithNestedObjects_WhenSinglePropertyOverridden_ThenMergeOnlyOverriddenProperty": {
+			givenSyncFile:         "nested.yml",
+			givenTemplateFileName: ".github/workflows/release.yaml",
+			expectedConf: domain.Values{
+				"features": map[string]interface{}{
+					"testing": map[string]interface{}{
+						"enabled":    false,
+						"anotherKey": "value",
+					},
+				},
+			},
+		},
 	}
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
-			s := NewValueStore(nil)
-			k := koanf.New(".")
-			require.NoError(t, k.Load(file.Provider(filepath.Join("testdata", tt.givenSyncFile)), yaml.Parser()))
-			result, err := s.loadValuesForTemplate(k, tt.givenTemplateFileName)
+			s := NewMapStore(nil)
+			cfg, err := s.loadYaml(filepath.Join("testdata", tt.givenSyncFile))
+			require.NoError(t, err)
+			result, err := s.loadValuesForTemplate(cfg, tt.givenTemplateFileName)
 			require.NoError(t, err)
 			assert.Equal(t, tt.expectedConf, result)
 		})

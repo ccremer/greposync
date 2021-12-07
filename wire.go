@@ -63,7 +63,7 @@ func initInjector() *injector {
 
 		// Stores
 		wire.NewSet(repositorystore.NewRepositoryStore, wire.Bind(new(domain.GitRepositoryStore), new(*repositorystore.RepositoryStore))),
-		wire.NewSet(valuestore.NewValueStore, wire.Bind(new(domain.ValueStore), new(*valuestore.KoanfValueStore))),
+		wire.NewSet(valuestore.NewMapStore, wire.Bind(new(domain.ValueStore), new(*valuestore.MapStore))),
 		wire.NewSet(githosting.NewPullRequestStore, wire.Bind(new(domain.PullRequestStore), new(*githosting.PullRequestStore))),
 		wire.NewSet(githosting.NewLabelStore, wire.Bind(new(domain.LabelStore), new(*githosting.LabelStore))),
 
