@@ -12,11 +12,12 @@ import (
 )
 
 const (
-	dryRunFlagName   = "dry-run"
-	prCreateFlagName = "pr-create"
-	prBodyFlagName   = "pr-bodyTemplate"
-	amendFlagName    = "git-amend"
-	showDiffFlagName = "log-showDiff"
+	dryRunFlagName    = "dry-run"
+	prCreateFlagName  = "pr-create"
+	prBodyFlagName    = "pr-bodyTemplate"
+	amendFlagName     = "git-amend"
+	forcePushFlagName = "git-forcePush"
+	showDiffFlagName  = "log-showDiff"
 )
 
 type (

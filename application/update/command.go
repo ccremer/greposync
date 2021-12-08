@@ -24,7 +24,11 @@ func (c *Command) createCliCommand() *cli.Command {
 			},
 			&cli.BoolFlag{
 				Name:  amendFlagName,
-				Usage: "Amend previous commit.",
+				Usage: "Amend previous commit. Requires --git-forcePush",
+			},
+			&cli.BoolFlag{
+				Name:  forcePushFlagName,
+				Usage: "If push is enabled, push forcefully.",
 			},
 			&cli.BoolFlag{
 				Name:  prCreateFlagName,
