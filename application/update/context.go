@@ -49,7 +49,9 @@ func (c *pipelineContext) commit() pipeline.ActionFunc {
 
 func (c *pipelineContext) diff() pipeline.ActionFunc {
 	return func(_ pipeline.Context) pipeline.Result {
-		diff, err := c.appService.repoStore.Diff(c.repo)
+		diff, err := c.appService.repoStore.Diff(c.repo, domain.DiffOptions{
+			WorkDirToHEAD: c.appService.cfg.Git.SkipCommit, // If we don't commit, show the unstaged changes
+		})
 		if err != nil {
 			return pipeline.Result{Err: err}
 		}

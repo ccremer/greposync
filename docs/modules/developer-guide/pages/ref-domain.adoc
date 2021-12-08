@@ -53,7 +53,7 @@ type GitRepositoryStore interface {
     Pull(repository *GitRepository) error
     Add(repository *GitRepository) error
     Commit(repository *GitRepository, options CommitOptions) error
-    Diff(repository *GitRepository) (string, error)
+    Diff(repository *GitRepository, options DiffOptions) (string, error)
     Push(repository *GitRepository, options PushOptions) error
 }
 ----
@@ -124,10 +124,10 @@ Commit records changes in the repository.
 .Diff
 [source, go]
 ----
-func Diff(repository *GitRepository) (string, error)
+func Diff(repository *GitRepository, options DiffOptions) (string, error)
 ----
-Diff returns a `patch`-compatible diff between HEAD and previous commit as string.
-The diff may be empty.
+Diff returns a `patch`-compatible diff using given options.
+The diff may be empty without error.
 
 .Push
 [source, go]
@@ -514,6 +514,25 @@ PushOptions contains settings to influence the GitRepositoryStore.Push action.
 
 Force::
 Force overwrites the remote state when pushing.
+
+
+
+
+'''
+
+=== DiffOptions
+[source, go]
+----
+type DiffOptions struct {
+    WorkDirToHEAD    bool
+}
+----
+
+DiffOptions contains settings to influence the GitRepositoryStore.Diff action.
+
+WorkDirToHEAD::
+WorkDirToHEAD retrieves a diff between Working Directory and latest commit.
+If false, a diff between HEAD and previous commit (HEAD~1) is retrieved.
 
 
 

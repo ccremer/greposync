@@ -46,7 +46,7 @@ var specialFlagsCases = map[string]struct {
 	},
 }
 
-func TestKoanfValueStore_FetchFilesToDelete(t *testing.T) {
+func TestMapStore_FetchFilesToDelete(t *testing.T) {
 	tests := map[string]struct {
 		givenSyncFile string
 		expectedFiles []domain.Path
@@ -81,7 +81,7 @@ func TestKoanfValueStore_FetchFilesToDelete(t *testing.T) {
 	}
 }
 
-func TestKoanfValueStore_loadBooleanFlag(t *testing.T) {
+func TestMapStore_loadBooleanFlag(t *testing.T) {
 	for _, flagName := range []string{"delete", "unmanaged"} {
 		for name, tt := range specialFlagsCases {
 			t.Run(name+"_With_"+flagName, func(t *testing.T) {
@@ -101,7 +101,7 @@ func TestKoanfValueStore_loadBooleanFlag(t *testing.T) {
 	}
 }
 
-func TestKoanfValueStore_FetchTargetPath(t *testing.T) {
+func TestMapStore_FetchTargetPath(t *testing.T) {
 	for name, tt := range specialFlagsCases {
 		t.Run(name, func(t *testing.T) {
 			s := NewMapStore(nil)

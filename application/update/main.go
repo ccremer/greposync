@@ -100,10 +100,10 @@ func (c *Command) createPipeline(r *domain.GitRepository) *pipeline.Pipeline {
 			WithNestedSteps("commit changes",
 				pipeline.NewStep("add", repoCtx.add()),
 				pipeline.NewStep("commit", repoCtx.commit()),
-				predicate.ToStep("show diff", repoCtx.diff(), predicate.Bool(showDiff)),
 			),
 			predicate.And(predicate.Bool(enabledCommits), repoCtx.isDirty())),
 
+		predicate.ToStep("show diff", repoCtx.diff(), predicate.Bool(showDiff)),
 		predicate.ToStep("push changes", repoCtx.push(), predicate.And(predicate.Bool(enabledPush), repoCtx.hasCommits())),
 		predicate.ToStep("find existing pull request", repoCtx.fetchPullRequest(), predicate.Bool(createPR)),
 		predicate.ToStep("ensure pull request", repoCtx.ensurePullRequest(), predicate.And(repoCtx.hasCommits(), predicate.Bool(createPR))),

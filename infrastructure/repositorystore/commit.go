@@ -51,8 +51,12 @@ func (s *RepositoryStore) Add(repository *domain.GitRepository) error {
 	return nil
 }
 
-func (s *RepositoryStore) Diff(repository *domain.GitRepository) (string, error) {
-	out, stderr, err := execGitCommand(repository.RootDir, []string{"diff", "HEAD~1"})
+func (s *RepositoryStore) Diff(repository *domain.GitRepository, options domain.DiffOptions) (string, error) {
+	args := []string{"diff", "HEAD~1"}
+	if options.WorkDirToHEAD {
+		args = []string{"diff", "HEAD"}
+	}
+	out, stderr, err := execGitCommand(repository.RootDir, args)
 	if err != nil {
 		if strings.Contains(stderr, "ambiguous argument 'HEAD~1': unknown revision or path not in the working tree.") {
 			s.instrumentation.logInfo(repository, "This is the first commit, no diff available.")
