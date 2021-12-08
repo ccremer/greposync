@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Sync Configuration :: greposync docs</title>
+    <link rel="canonical" href="https://ccremer.github.io/greposync/greposync/0.2/references/sync-config.html">
+    <meta name="generator" content="Antora 2.3.4">
+    <link rel="stylesheet" href="../../../_/css/site.css">
+    <script>var uiRootPath = '../../../_'</script>
+  </head>
+  <body class="article">
+<header class="header" role="banner">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <div class="navbar-item">
+        <a href="https://ccremer.github.io/greposync">greposync docs</a>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="greposync" data-version="0.3">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <h3 class="title"><a href="../index.html">greposync</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../index.html">Introduction</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-text"><a href="https://github.com/ccremer/greposync/releases" target="_blank" rel="noopener">Changelog</a></span>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Tutorials</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../tutorials/installation.html">Installation</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../tutorials/getting-started.html">Getting started</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../tutorials/create-pr.html">Create a PR</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">How To</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../how-tos/inherit-value.html">Inherit values in directories</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../how-tos/ignore-file.html">Ignore file in a repository</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../how-tos/delete-file.html">Remove file in a specific repository</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../how-tos/delete-files.html">Remove files in all repositories</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../how-tos/comment-files.html">Add comment headers</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../how-tos/sync-labels.html">Sync labels in all repositories</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../how-tos/migrate-from-modulesync.html">Migrate from ModuleSync</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Technical reference</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="template.html">Template</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="greposync.html">Main Configuration</a>
+  </li>
+  <li class="nav-item is-current-page" data-depth="1">
+    <a class="nav-link" href="sync-config.html">Sync Configuration</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Explanation</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../explanations/deep-merge.html">Configuration deep merge</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../explanations/feature-comparison.html">Feature comparison with ModuleSync</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Developer Guide</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../developer-guide/intro.html">Introduction</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../developer-guide/ref-domain.html">Godoc: Domain</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">greposync</span>
+    <span class="version">0.3-rc1</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <a class="title" href="../../0.2/index.html">greposync</a>
+      <ul class="versions">
+        <li class="version">
+          <a href="../../index.html">master</a>
+        </li>
+        <li class="version is-current">
+          <a href="../index.html">0.3-rc1</a>
+        </li>
+        <li class="version is-latest">
+          <a href="../../0.2/index.html">0.2</a>
+        </li>
+        <li class="version">
+          <a href="../../0.1/index.html">0.1</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../../0.2/index.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../index.html">greposync</a></li>
+    <li>Technical reference</li>
+    <li><a href="sync-config.html">Sync Configuration</a></li>
+  </ul>
+</nav>
+<div class="page-versions">
+  <button class="version-menu-toggle" title="Show other versions of page">0.3-rc1</button>
+  <div class="version-menu">
+    <a class="version" href="../../references/sync-config.html">master</a>
+    <a class="version is-current" href="sync-config.html">0.3-rc1</a>
+    <a class="version" href="../../0.2/references/sync-config.html">0.2</a>
+    <a class="version" href="../../0.1/references/sync-config.html">0.1</a>
+  </div>
+</div>
+  <div class="edit-this-page"><a href="https://github.com/ccremer/greposync/edit/docs/v0.3-rc/docs/modules/ROOT/pages/references/sync-config.adoc">Edit this Page</a></div>
+  </div>
+  <div class="content">
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+<h1 class="page">Sync Configuration</h1>
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>There are 2 locations how template variables are configured.</p>
+</div>
+<div class="paragraph">
+<p><code>config_defaults.yml</code> is the config file that defines variables for all managed repositories.
+It&#8217;s expected to be in the current working directory when invoking <code>gsync</code>.</p>
+</div>
+<div class="paragraph">
+<p><code>.sync.yml</code> is the config file that is used to configure individual values per repository.
+Each entry extends and potentially overrides variables defined in <code>config_defaults.yml</code>.
+It&#8217;s expected to be in the root directory of a Git repository.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_value_hierarchy"><a class="anchor" href="#_value_hierarchy"></a>Value hierarchy</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The following hierarchy of merging and inheriting values is applied.
+The last element in the list is overwriting anything defined before.</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><code>:globals</code> in <code>config_defaults.yml</code></p>
+</li>
+<li>
+<p><code>directory/</code> in <code>config_defaults.yml</code></p>
+</li>
+<li>
+<p><code>directory/filename</code> in <code>config_defaults.yml</code></p>
+</li>
+<li>
+<p><code>:globals</code> in <code>.sync.yml</code></p>
+</li>
+<li>
+<p><code>directory/</code> in <code>.sync.yml</code></p>
+</li>
+<li>
+<p><code>directory/filename</code> in <code>.sync.yml</code></p>
+</li>
+</ol>
+</div>
+<div class="exampleblock">
+<div class="title">Example 1. Value hierarchy</div>
+<div class="content">
+<div class="listingblock">
+<div class="title">config_defaults.yml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">:globals:
+  key: 1
+
+dir/:
+  key: 2 <i class="conum" data-value="1"></i><b>(1)</b>
+
+dir/subdir/:
+  key: 3
+
+dir/subdir/file:
+  key: a</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">.sync.yml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">:globals:
+  key: 4
+
+dir/subdir/:
+  key: 5
+
+dir/subdir/file:
+  key: b <i class="conum" data-value="2"></i><b>(2)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Any file within <code>dir</code> would get the value <code>key=2</code> as there is no override in <code>.sync.yml</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>The <code>dir/subdir/file</code> would get the value <code>key=b</code> since it&#8217;s overriding the key in <code>config_defaults.yml</code>.</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="ulist">
+<ul>
+<li>
+<p>Specifying <code>/</code> as the top dir to apply values is not supported.
+Use <code>:globals</code> for that purpose.</p>
+</li>
+<li>
+<p>Appending the <code>/</code> suffix to a directory is necessary, otherwise they are interpreted as files.</p>
+</li>
+</ul>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_special_values"><a class="anchor" href="#_special_values"></a>Special values</h2>
+<div class="sectionbody">
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>delete: true</code></dt>
+<dd>
+<p>When this flag is set, the target file is being deleted.
+It is not rendered at all.</p>
+</dd>
+</dl>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="ulist">
+<ul>
+<li>
+<p>Use this flag in <code>config_defaults.yml</code> to cleanup files that aren&#8217;t needed in the managed repositories anymore.</p>
+</li>
+<li>
+<p>Use this flag in <code>.sync.file</code> to tell greposync to not create certain files.</p>
+</li>
+</ul>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>unmanaged: true</code></dt>
+<dd>
+<p>If this flag is set, the target file is not modified.</p>
+</dd>
+</dl>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+Use this flag in <code>.sync.file</code> if a repository maintains its own version of the file outside of greposync.
+</td>
+</tr>
+</table>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>targetPath: &lt;path&gt;</code></dt>
+<dd>
+<p>This property can override where the templated file is actually being written to.
+It is relative to the Git root directory.</p>
+</dd>
+</dl>
+</div>
+<div class="paragraph">
+<p>If the path contains the suffix <code>/</code>, the directory is changed but the file name is kept.
+Any parent directories are created as needed, with <code>0775</code> permission flags (before <code>umask</code>).</p>
+</div>
+<div class="exampleblock">
+<div class="title">Example 2. Special values usage</div>
+<div class="content">
+<div class="listingblock">
+<div class="title"><code>.sync.file</code></div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">.editorconfig:
+  unmanaged: true <i class="conum" data-value="1"></i><b>(1)</b>
+
+Makefile:
+  delete: true <i class="conum" data-value="2"></i><b>(2)</b>
+
+subdir/.gitignore:
+  targetPath: newDir/ <i class="conum" data-value="3"></i><b>(3)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The repository keeps its own version of <code>.editorconfig</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>The repository does not need a <code>Makefile</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Parse the template in <code>subdir/.gitignore</code>, but write the output to <code>newDir/.gitignore</code> in the repository root.</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+</article>
+  </div>
+</main>
+</div>
+<!--
+This page was built using the Antora default UI.
+The source code for this UI is licensed under the terms of the MPL-2.0 license.
+-->
+<script src="../../../_/js/site.js"></script>
+<script async src="../../../_/js/vendor/highlight.js"></script>
+  </body>
+</html>

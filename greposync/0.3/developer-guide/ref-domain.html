@@ -1,0 +1,1725 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>package domain :: greposync docs</title>
+    <link rel="canonical" href="https://ccremer.github.io/greposync/greposync/0.2/developer-guide/ref-domain.html">
+    <meta name="generator" content="Antora 2.3.4">
+    <link rel="stylesheet" href="../../../_/css/site.css">
+    <script>var uiRootPath = '../../../_'</script>
+  </head>
+  <body class="article">
+<header class="header" role="banner">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <div class="navbar-item">
+        <a href="https://ccremer.github.io/greposync">greposync docs</a>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="greposync" data-version="0.3">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <h3 class="title"><a href="../index.html">greposync</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../index.html">Introduction</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-text"><a href="https://github.com/ccremer/greposync/releases" target="_blank" rel="noopener">Changelog</a></span>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Tutorials</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../tutorials/installation.html">Installation</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../tutorials/getting-started.html">Getting started</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../tutorials/create-pr.html">Create a PR</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">How To</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../how-tos/inherit-value.html">Inherit values in directories</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../how-tos/ignore-file.html">Ignore file in a repository</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../how-tos/delete-file.html">Remove file in a specific repository</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../how-tos/delete-files.html">Remove files in all repositories</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../how-tos/comment-files.html">Add comment headers</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../how-tos/sync-labels.html">Sync labels in all repositories</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../how-tos/migrate-from-modulesync.html">Migrate from ModuleSync</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Technical reference</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../references/template.html">Template</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../references/greposync.html">Main Configuration</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../references/sync-config.html">Sync Configuration</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Explanation</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../explanations/deep-merge.html">Configuration deep merge</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../explanations/feature-comparison.html">Feature comparison with ModuleSync</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Developer Guide</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="intro.html">Introduction</a>
+  </li>
+  <li class="nav-item is-current-page" data-depth="1">
+    <a class="nav-link" href="ref-domain.html">Godoc: Domain</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">greposync</span>
+    <span class="version">0.3-rc1</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <a class="title" href="../../0.2/index.html">greposync</a>
+      <ul class="versions">
+        <li class="version">
+          <a href="../../index.html">master</a>
+        </li>
+        <li class="version is-current">
+          <a href="../index.html">0.3-rc1</a>
+        </li>
+        <li class="version is-latest">
+          <a href="../../0.2/index.html">0.2</a>
+        </li>
+        <li class="version">
+          <a href="../../0.1/index.html">0.1</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../../0.2/index.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../index.html">greposync</a></li>
+    <li>Developer Guide</li>
+    <li><a href="ref-domain.html">Godoc: Domain</a></li>
+  </ul>
+</nav>
+<div class="page-versions">
+  <button class="version-menu-toggle" title="Show other versions of page">0.3-rc1</button>
+  <div class="version-menu">
+    <a class="version" href="../../developer-guide/ref-domain.html">master</a>
+    <a class="version is-current" href="ref-domain.html">0.3-rc1</a>
+    <a class="version" href="../../0.2/developer-guide/ref-domain.html">0.2</a>
+    <a class="version is-missing" href="../../0.1/index.html">0.1</a>
+  </div>
+</div>
+  <div class="edit-this-page"><a href="https://github.com/ccremer/greposync/edit/docs/v0.3-rc/docs/modules/developer-guide/pages/ref-domain.adoc">Edit this Page</a></div>
+  </div>
+  <div class="content">
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+<h1 class="page">package domain</h1>
+<div class="sect1">
+<h2 id="_interfaces"><a class="anchor" href="#_interfaces"></a>Interfaces</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_cleanupserviceinstrumentation"><a class="anchor" href="#_cleanupserviceinstrumentation"></a>CleanupServiceInstrumentation</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">type CleanupServiceInstrumentation interface {
+    FetchedFilesToDelete(fetchErr error, files []Path) error
+    DeletedFile(file Path)
+    WithRepository(repository *GitRepository) CleanupServiceInstrumentation
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>CleanupServiceInstrumentation provides methods for domain observability.</p>
+</div>
+<div class="listingblock">
+<div class="title">FetchedFilesToDelete</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func FetchedFilesToDelete(fetchErr error, files []Path) error</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>FetchedFilesToDelete logs a message indicating that fetching file paths to delete from ValueStore was successful but only if fetchErr is nil.
+Returns fetchErr unmodified for method chaining.</p>
+</div>
+<div class="listingblock">
+<div class="title">DeletedFile</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func DeletedFile(file Path)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>DeletedFile logs a message indicating that deleting file occurred.</p>
+</div>
+<div class="listingblock">
+<div class="title">WithRepository</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func WithRepository(repository *GitRepository) CleanupServiceInstrumentation</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>WithRepository returns an instance that has the given repository as scope.</p>
+</div>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="_gitrepositorystore"><a class="anchor" href="#_gitrepositorystore"></a>GitRepositoryStore</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">type GitRepositoryStore interface {
+    FetchGitRepositories() ([]*GitRepository, error)
+    Clone(repository *GitRepository) error
+    Checkout(repository *GitRepository) error
+    Fetch(repository *GitRepository) error
+    Reset(repository *GitRepository) error
+    Pull(repository *GitRepository) error
+    Add(repository *GitRepository) error
+    Commit(repository *GitRepository, options CommitOptions) error
+    Diff(repository *GitRepository, options DiffOptions) (string, error)
+    Push(repository *GitRepository, options PushOptions) error
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>GitRepositoryStore provides methods to interact with GitRepository on the local filesystem.
+Most methods described follow the corresponding Git operations.</p>
+</div>
+<div class="paragraph">
+<p>In Domain-Driven Design language, the term <code>Store</code> corresponds to <code>Repository</code>, but to avoid name clash it was named <code>Store</code>.</p>
+</div>
+<div class="listingblock">
+<div class="title">FetchGitRepositories</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func FetchGitRepositories() ([]*GitRepository, error)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>FetchGitRepositories loads a list of GitRepository from a configuration set.
+Returns an empty list on first error.</p>
+</div>
+<div class="listingblock">
+<div class="title">Clone</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func Clone(repository *GitRepository) error</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Clone will download the given GitRepository to local filesystem.
+The location is specified in GitRepository.RootDir.</p>
+</div>
+<div class="listingblock">
+<div class="title">Checkout</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func Checkout(repository *GitRepository) error</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Checkout checks out the GitRepository.CommitBranch.</p>
+</div>
+<div class="listingblock">
+<div class="title">Fetch</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func Fetch(repository *GitRepository) error</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Fetch retrieves the objects and refs from remote.</p>
+</div>
+<div class="listingblock">
+<div class="title">Reset</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func Reset(repository *GitRepository) error</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Reset current HEAD to GitRepository.CommitBranch.</p>
+</div>
+<div class="listingblock">
+<div class="title">Pull</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func Pull(repository *GitRepository) error</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Pull integrates objects from remote.</p>
+</div>
+<div class="listingblock">
+<div class="title">Add</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func Add(repository *GitRepository) error</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Add stages all files in GitRepository.RootDir.</p>
+</div>
+<div class="listingblock">
+<div class="title">Commit</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func Commit(repository *GitRepository, options CommitOptions) error</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Commit records changes in the repository.</p>
+</div>
+<div class="listingblock">
+<div class="title">Diff</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func Diff(repository *GitRepository, options DiffOptions) (string, error)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Diff returns a <code>patch</code>-compatible diff using given options.
+The diff may be empty without error.</p>
+</div>
+<div class="listingblock">
+<div class="title">Push</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func Push(repository *GitRepository, options PushOptions) error</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Push updates remote refs.</p>
+</div>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="_labelstore"><a class="anchor" href="#_labelstore"></a>LabelStore</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">type LabelStore interface {
+    FetchLabelsForRepository(repository *GitRepository) (LabelSet, error)
+    EnsureLabelsForRepository(repository *GitRepository, labels LabelSet) error
+    RemoveLabelsFromRepository(repository *GitRepository, labels LabelSet) error
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>LabelStore provides methods to interact with labels on a Git hosting service.</p>
+</div>
+<div class="paragraph">
+<p>In Domain-Driven Design language, the term <code>Store</code> corresponds to <code>Repository</code>, but to avoid name clash it was named <code>Store</code>.</p>
+</div>
+<div class="listingblock">
+<div class="title">FetchLabelsForRepository</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func FetchLabelsForRepository(repository *GitRepository) (LabelSet, error)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>FetchLabelsForRepository retrieves a LabelSet for the given repository.</p>
+</div>
+<div class="listingblock">
+<div class="title">EnsureLabelsForRepository</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func EnsureLabelsForRepository(repository *GitRepository, labels LabelSet) error</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>EnsureLabelsForRepository creates or updates the given LabelSet in the given repository.
+Labels that exist remotely, but not in the given LabelSet are ignored.
+Remote labels have to be updated when Label.GetColor or Label.Description are not matching.</p>
+</div>
+<div class="paragraph">
+<p>Renaming labels are currently not supported.</p>
+</div>
+<div class="listingblock">
+<div class="title">RemoveLabelsFromRepository</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func RemoveLabelsFromRepository(repository *GitRepository, labels LabelSet) error</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>RemoveLabelsFromRepository remotely removes all labels in the given LabelSet.
+Only the Label.Name is relevant to determine label equality.</p>
+</div>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="_pullrequeststore"><a class="anchor" href="#_pullrequeststore"></a>PullRequestStore</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">type PullRequestStore interface {
+    FindMatchingPullRequest(repository *GitRepository) (*PullRequest, error)
+    EnsurePullRequest(repository *GitRepository) error
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>PullRequestStore provides methods to interact with PullRequest on a Git hosting service.</p>
+</div>
+<div class="paragraph">
+<p>In Domain-Driven Design language, the term <code>Store</code> corresponds to <code>Repository</code>, but to avoid name clash it was named <code>Store</code>.</p>
+</div>
+<div class="listingblock">
+<div class="title">FindMatchingPullRequest</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func FindMatchingPullRequest(repository *GitRepository) (*PullRequest, error)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>FindMatchingPullRequest returns the PullRequest that has the same branch as GitRepository.CommitBranch.
+If not found, it returns nil without error.</p>
+</div>
+<div class="listingblock">
+<div class="title">EnsurePullRequest</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func EnsurePullRequest(repository *GitRepository) error</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>EnsurePullRequest creates or updates the GitRepository.PullRequest in the repository.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>This operation does not alter any properties of existing labels.</p>
+</li>
+<li>
+<p>Existing labels are left untouched, but any extraneous labels are removed.</p>
+</li>
+<li>
+<p>Title and Body are updated.</p>
+</li>
+<li>
+<p>Existing Commit and Base branches are left untouched.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The first error encountered aborts the operation.</p>
+</div>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="_renderserviceinstrumentation"><a class="anchor" href="#_renderserviceinstrumentation"></a>RenderServiceInstrumentation</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">type RenderServiceInstrumentation interface {
+    FetchedTemplatesFromStore(fetchErr error) error
+    FetchedValuesForTemplate(fetchErr error, template *Template) error
+    AttemptingToRenderTemplate(template *Template)
+    WrittenRenderResultToFile(template *Template, targetPath Path, writeErr error) error
+    WithRepository(repository *GitRepository) RenderServiceInstrumentation
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>RenderServiceInstrumentation provides methods for domain observability.</p>
+</div>
+<div class="listingblock">
+<div class="title">FetchedTemplatesFromStore</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func FetchedTemplatesFromStore(fetchErr error) error</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>FetchedTemplatesFromStore logs a message indicating that fetching templates from TemplateStore was successful, but only if fetchErr is nil.
+Returns fetchErr unmodified for method chaining.</p>
+</div>
+<div class="listingblock">
+<div class="title">FetchedValuesForTemplate</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func FetchedValuesForTemplate(fetchErr error, template *Template) error</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>FetchedValuesForTemplate logs a message indicating that fetching Values from ValueStore was successful but only if fetchErr is nil.
+Returns fetchErr unmodified for method chaining.</p>
+</div>
+<div class="listingblock">
+<div class="title">AttemptingToRenderTemplate</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func AttemptingToRenderTemplate(template *Template)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>AttemptingToRenderTemplate logs a message indicating that the actual rendering is about to begin.</p>
+</div>
+<div class="listingblock">
+<div class="title">WrittenRenderResultToFile</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func WrittenRenderResultToFile(template *Template, targetPath Path, writeErr error) error</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">WithRepository</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func WithRepository(repository *GitRepository) RenderServiceInstrumentation</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>WithRepository creates a new RenderServiceInstrumentation instance using the given GitRepository as context.</p>
+</div>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="_templateengine"><a class="anchor" href="#_templateengine"></a>TemplateEngine</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">type TemplateEngine interface {
+    Execute(template *Template, values Values) (RenderResult, error)
+    ExecuteString(template string, values Values) (RenderResult, error)
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>TemplateEngine provides methods to process a Template.</p>
+</div>
+<div class="listingblock">
+<div class="title">Execute</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func Execute(template *Template, values Values) (RenderResult, error)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Execute renders the given Template with the given Values.</p>
+</div>
+<div class="listingblock">
+<div class="title">ExecuteString</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func ExecuteString(template string, values Values) (RenderResult, error)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>ExecuteString renders the given template string with the given Values.</p>
+</div>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="_templatestore"><a class="anchor" href="#_templatestore"></a>TemplateStore</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">type TemplateStore interface {
+    FetchTemplates() ([]*Template, error)
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>TemplateStore provides methods to load Template from template root directory.</p>
+</div>
+<div class="paragraph">
+<p>In Domain-Driven Design language, the term <code>Store</code> corresponds to <code>Repository</code>, but to avoid name clash it was named <code>Store</code>.</p>
+</div>
+<div class="listingblock">
+<div class="title">FetchTemplates</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func FetchTemplates() ([]*Template, error)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>FetchTemplates lists all templates.
+It aborts on first error.</p>
+</div>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="_valuestore"><a class="anchor" href="#_valuestore"></a>ValueStore</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">type ValueStore interface {
+    FetchValuesForTemplate(template *Template, repository *GitRepository) (Values, error)
+    FetchUnmanagedFlag(template *Template, repository *GitRepository) (bool, error)
+    FetchTargetPath(template *Template, repository *GitRepository) (Path, error)
+    FetchFilesToDelete(repository *GitRepository) ([]Path, error)
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>ValueStore provides methods to query Values from a configuration.</p>
+</div>
+<div class="paragraph">
+<p>In Domain-Driven Design language, the term <code>Store</code> corresponds to <code>Repository</code>, but to avoid name clash it was named <code>Store</code>.</p>
+</div>
+<div class="listingblock">
+<div class="title">FetchValuesForTemplate</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func FetchValuesForTemplate(template *Template, repository *GitRepository) (Values, error)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>FetchValuesForTemplate retrieves the Values for the given template.</p>
+</div>
+<div class="listingblock">
+<div class="title">FetchUnmanagedFlag</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func FetchUnmanagedFlag(template *Template, repository *GitRepository) (bool, error)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>FetchUnmanagedFlag returns true if the given template should not be rendered.
+The implementation may return ErrKeyNotFound if the flag is undefined, as the boolean 'false' is ambiguous.</p>
+</div>
+<div class="listingblock">
+<div class="title">FetchTargetPath</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func FetchTargetPath(template *Template, repository *GitRepository) (Path, error)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>FetchTargetPath returns an alternative output path for the given template relative to the Git repository.
+An empty string indicates that there is no alternative path configured.</p>
+</div>
+<div class="listingblock">
+<div class="title">FetchFilesToDelete</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func FetchFilesToDelete(repository *GitRepository) ([]Path, error)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>FetchFilesToDelete returns a slice of Path that should be deleted in the Git repository.
+The paths are relative to the Git root directory.</p>
+</div>
+<hr>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_structs"><a class="anchor" href="#_structs"></a>Structs</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_cleanupservice"><a class="anchor" href="#_cleanupservice"></a>CleanupService</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">type CleanupService struct {
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Receivers</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">CleanupUnwantedFiles</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func (s *CleanupService) CleanupUnwantedFiles(ctx CleanupContext) error</code></pre>
+</div>
+</div>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="_cleanupcontext"><a class="anchor" href="#_cleanupcontext"></a>CleanupContext</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">type CleanupContext struct {
+    Repository    *GitRepository
+    ValueStore    ValueStore
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Receivers</strong></p>
+</div>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="_gitrepository"><a class="anchor" href="#_gitrepository"></a>GitRepository</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">type GitRepository struct {
+    RootDir          Path
+    URL              *GitURL
+    PullRequest      *PullRequest
+    Labels           LabelSet
+    CommitBranch     string
+    DefaultBranch    string
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>GitRepository is the heart of the domain.</p>
+</div>
+<div class="paragraph">
+<p>The model itself doesn&#8217;t feature common actions like Commit.
+It was decided against adding those rich functionalities since that would mean implementing a replayable history of actions to keep in memory.
+This was considered too complicated, thus these actions are to be implemented in Stores.</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">RootDir</dt>
+<dd>
+<p>RootDir is the full path to the Git root directory in the local filesystem.</p>
+</dd>
+<dt class="hdlist1">URL</dt>
+<dd>
+<p>URL is the remote URL of origin.</p>
+</dd>
+<dt class="hdlist1">PullRequest</dt>
+<dd>
+<p>PullRequest is the associated PullRequest for this repository in the remote Git hosting service.</p>
+</dd>
+<dt class="hdlist1">Labels</dt>
+<dd>
+<p>Labels contains the LabelSet that is present in the remote Git hosting service.</p>
+</dd>
+<dt class="hdlist1">CommitBranch</dt>
+<dd>
+<p>CommitBranch in the branch name of the current branch the working tree is in.</p>
+</dd>
+<dt class="hdlist1">DefaultBranch</dt>
+<dd>
+<p>DefaultBranch is the branch name of the remote default branch (usually <code>master</code> or <code>main</code>).</p>
+</dd>
+</dl>
+</div>
+<div class="paragraph">
+<p><strong>Receivers</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">SetLabels</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func (r *GitRepository) SetLabels(labels LabelSet) error</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>SetLabels validates and sets the new LabelSet.
+Returns nil if there are no empty Label names or duplicates.</p>
+</div>
+<div class="listingblock">
+<div class="title">AsValues</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func (r GitRepository) AsValues() Values</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>AsValues returns the metadata as Values for rendering.</p>
+</div>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="_commitoptions"><a class="anchor" href="#_commitoptions"></a>CommitOptions</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">type CommitOptions struct {
+    Message    string
+    Amend      bool
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>CommitOptions contains settings to influence the GitRepositoryStore.Commit action.</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">Message</dt>
+<dd>
+<p>Message contains the commit message.</p>
+</dd>
+<dt class="hdlist1">Amend</dt>
+<dd>
+<p>Amend will edit the last commit instead of creating a new one.</p>
+</dd>
+</dl>
+</div>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="_pushoptions"><a class="anchor" href="#_pushoptions"></a>PushOptions</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">type PushOptions struct {
+    Force    bool
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>PushOptions contains settings to influence the GitRepositoryStore.Push action.</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">Force</dt>
+<dd>
+<p>Force overwrites the remote state when pushing.</p>
+</dd>
+</dl>
+</div>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="_diffoptions"><a class="anchor" href="#_diffoptions"></a>DiffOptions</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">type DiffOptions struct {
+    WorkDirToHEAD    bool
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>DiffOptions contains settings to influence the GitRepositoryStore.Diff action.</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">WorkDirToHEAD</dt>
+<dd>
+<p>WorkDirToHEAD retrieves a diff between Working Directory and latest commit.
+If false, a diff between HEAD and previous commit (HEAD~1) is retrieved.</p>
+</dd>
+</dl>
+</div>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="_label"><a class="anchor" href="#_label"></a>Label</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">type Label struct {
+    Name           string
+    Description    string
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Label is a Value object containing the properties of labels in a Git hosting service.</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">Name</dt>
+<dd>
+<p>Name is the label name</p>
+</dd>
+<dt class="hdlist1">Description</dt>
+<dd>
+<p>Description adds additional details to the label.</p>
+</dd>
+</dl>
+</div>
+<div class="paragraph">
+<p><strong>Receivers</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">GetColor</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func (l Label) GetColor() Color</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>GetColor returns the color of the Label.</p>
+</div>
+<div class="listingblock">
+<div class="title">SetColor</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func (l *Label) SetColor(color Color) error</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>SetColor sets the color of the Label.
+If Color.CheckValue fails, then that error is returned.</p>
+</div>
+<div class="listingblock">
+<div class="title">IsSameAs</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func (l Label) IsSameAs(label Label) bool</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>IsSameAs returns true if each Label.Name is equal.</p>
+</div>
+<div class="listingblock">
+<div class="title">IsEqualTo</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func (l Label) IsEqualTo(label Label) bool</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>IsEqualTo returns true if all properties of Label are equal.</p>
+</div>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="_pullrequest"><a class="anchor" href="#_pullrequest"></a>PullRequest</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">type PullRequest struct {
+    CommitBranch    string
+    BaseBranch      string
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>PullRequest is a model that represents a pull request in a remote Git hosting service.</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">CommitBranch</dt>
+<dd>
+<p>CommitBranch is the branch name of the current working tree.</p>
+</dd>
+<dt class="hdlist1">BaseBranch</dt>
+<dd>
+<p>BaseBranch is the branch name into which CommitBranch should be merged into.</p>
+</dd>
+</dl>
+</div>
+<div class="paragraph">
+<p><strong>Receivers</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">GetLabels</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func (pr *PullRequest) GetLabels() LabelSet</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>GetLabels returns the LabelSet of this PR.</p>
+</div>
+<div class="listingblock">
+<div class="title">SetNumber</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func (pr *PullRequest) SetNumber(nr *PullRequestNumber) error</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>SetNumber sets the pull request number.</p>
+</div>
+<div class="listingblock">
+<div class="title">GetNumber</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func (pr *PullRequest) GetNumber() *PullRequestNumber</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>GetNumber returns the pull request number.
+It returns nil if this PullRequest does not yet exist in remote.</p>
+</div>
+<div class="listingblock">
+<div class="title">GetTitle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func (pr *PullRequest) GetTitle() string</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>GetTitle returns the PR title.</p>
+</div>
+<div class="listingblock">
+<div class="title">GetBody</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func (pr *PullRequest) GetBody() string</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>GetBody returns the PR description.</p>
+</div>
+<div class="listingblock">
+<div class="title">ChangeDescription</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func (pr *PullRequest) ChangeDescription(title, body string) error</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>ChangeDescription changes the title and body of this PR.
+An error is returned if the title is empty.</p>
+</div>
+<div class="listingblock">
+<div class="title">AttachLabels</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func (pr *PullRequest) AttachLabels(labels LabelSet) error</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>AttachLabels sets the LabelSet of this PR.
+There cannot be duplicates or labels with no name.</p>
+</div>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="_pullrequestservice"><a class="anchor" href="#_pullrequestservice"></a>PullRequestService</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">type PullRequestService struct {
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Receivers</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">NewPullRequestForRepository</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func (prs *PullRequestService) NewPullRequestForRepository(prsCtx PullRequestServiceContext) error</code></pre>
+</div>
+</div>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="_pullrequestservicecontext"><a class="anchor" href="#_pullrequestservicecontext"></a>PullRequestServiceContext</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">type PullRequestServiceContext struct {
+    Repository        *GitRepository
+    TemplateEngine    TemplateEngine
+    Body              string
+    Title             string
+    TargetBranch      string
+    Labels            LabelSet
+}</code></pre>
+</div>
+</div>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="_renderservice"><a class="anchor" href="#_renderservice"></a>RenderService</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">type RenderService struct {
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>RenderService is a domain service that helps rendering templates.</p>
+</div>
+<div class="paragraph">
+<p><strong>Receivers</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">RenderTemplates</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func (s *RenderService) RenderTemplates(ctx RenderContext) error</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>RenderTemplates loads the Templates and renders them in the GitRepository.RootDir of the given RenderContext.Repository.</p>
+</div>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="_rendercontext"><a class="anchor" href="#_rendercontext"></a>RenderContext</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">type RenderContext struct {
+    Repository       *GitRepository
+    ValueStore       ValueStore
+    TemplateStore    TemplateStore
+    Engine           TemplateEngine
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>RenderContext represents a single rendering context for a GitRepository.</p>
+</div>
+<div class="paragraph">
+<p><strong>Receivers</strong></p>
+</div>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="_template"><a class="anchor" href="#_template"></a>Template</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">type Template struct {
+    RelativePath       Path
+    FilePermissions    Permissions
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Template is a reference to a file that contains special syntax.</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">RelativePath</dt>
+<dd>
+<p>RelativePath is the Path reference to where the template file is contained within the template root directory.</p>
+</dd>
+<dt class="hdlist1">FilePermissions</dt>
+<dd>
+<p>FilePermissions defines what file permissions this template file has.
+Rendered files should have the same permissions as template files.</p>
+</dd>
+</dl>
+</div>
+<div class="paragraph">
+<p><strong>Receivers</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Render</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func (t *Template) Render(values Values, engine TemplateEngine) (RenderResult, error)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Render takes the given Values and returns a RenderResult from the given TemplateEngine.</p>
+</div>
+<div class="listingblock">
+<div class="title">CleanPath</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func (t *Template) CleanPath() Path</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>CleanPath returns a new Path with the first occurrence of ".tpl" in the base file name removed.</p>
+</div>
+<div class="listingblock">
+<div class="title">AsValues</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func (t *Template) AsValues() Values</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>AsValues returns the metadata as Values for rendering.</p>
+</div>
+<hr>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_variable_typedefinitions"><a class="anchor" href="#_variable_typedefinitions"></a>Variable Typedefinitions</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_color"><a class="anchor" href="#_color"></a>Color</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">type Color string</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Color is a 6-digit uppercase hexadecimal string value with '#' prefix</p>
+</div>
+<div class="paragraph">
+<p><strong>Receivers</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">String</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func (c Color) String() string</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>String returns the color in hexadecimal RGB format</p>
+</div>
+<div class="listingblock">
+<div class="title">CheckValue</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func (c Color) CheckValue() error</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>CheckValue returns ErrInvalidArgument in case the string is not in an acceptable format.
+Returns nil otherwise.</p>
+</div>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="_labelset"><a class="anchor" href="#_labelset"></a>LabelSet</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">type LabelSet []Label</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>LabelSet is a set of Label.</p>
+</div>
+<div class="paragraph">
+<p><strong>Receivers</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">CheckForEmptyLabelNames</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func (s LabelSet) CheckForEmptyLabelNames() error</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>CheckForEmptyLabelNames returns an error if there&#8217;s a Label in the set that is an empty string.</p>
+</div>
+<div class="listingblock">
+<div class="title">CheckForDuplicates</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func (s LabelSet) CheckForDuplicates() error</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>CheckForDuplicates returns an error if two or more Label have the same Label.Name.</p>
+</div>
+<div class="listingblock">
+<div class="title">FindLabelByName</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func (s LabelSet) FindLabelByName(label string) (Label, bool)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>FindLabelByName returns the Label by given Name, if there is one matching.</p>
+</div>
+<div class="listingblock">
+<div class="title">Merge</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func (s LabelSet) Merge(other LabelSet) LabelSet</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Merge returns a new copy of LabelSet that contains the Label from other if they are missing in the original slice, and replaces existing ones.
+A label to replace is determined by equality of LabelSet.FindLabelByName.</p>
+</div>
+<div class="paragraph">
+<p>No validation checks are performed.
+The original order is not preserved.
+Duplicates are removed from the result.</p>
+</div>
+<div class="listingblock">
+<div class="title">Without</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func (s LabelSet) Without(other LabelSet) LabelSet</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Without returns a new LabelSet that contain only the labels that do not exist in other set.
+A label is not included in the result if the name matches.</p>
+</div>
+<div class="paragraph">
+<p>No validation checks are performed.
+The original order is preserved.</p>
+</div>
+<div class="listingblock">
+<div class="title">String</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func (s LabelSet) String() string</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>String implements fmt.Stringer.</p>
+</div>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="_path"><a class="anchor" href="#_path"></a>Path</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">type Path string</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Path is a Value object identifying a file path.</p>
+</div>
+<div class="paragraph">
+<p><strong>Receivers</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Exists</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func (p Path) Exists() bool</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Exists returns true if the path exists in the local file system.</p>
+</div>
+<div class="listingblock">
+<div class="title">FileExists</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func (p Path) FileExists() bool</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>FileExists returns true if the path exists in the local file system and is a file.</p>
+</div>
+<div class="listingblock">
+<div class="title">DirExists</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func (p Path) DirExists() bool</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>DirExists returns true if the path exists in the local file system and is a directory.</p>
+</div>
+<div class="listingblock">
+<div class="title">Join</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func (p Path) Join(elems ...Path) Path</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Join takes this Path as root and makes a new Path with given elements.</p>
+</div>
+<div class="listingblock">
+<div class="title">Delete</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func (p Path) Delete()</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Delete removes the path (and possibly all children if it&#8217;s a directory), ignoring any errors.
+If you need error handling, use os.RemoveAll directly.</p>
+</div>
+<div class="listingblock">
+<div class="title">String</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func (p Path) String() string</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>String returns a string representation of itself.</p>
+</div>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="_pullrequestnumber"><a class="anchor" href="#_pullrequestnumber"></a>PullRequestNumber</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">type PullRequestNumber int</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>PullRequestNumber identifies a PullRequest by a number in a Git hosting service.</p>
+</div>
+<div class="paragraph">
+<p><strong>Receivers</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">String</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func (nr PullRequestNumber) String() string</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>String returns the number prefixed with <code>#</code>.</p>
+</div>
+<div class="listingblock">
+<div class="title">Int</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func (nr *PullRequestNumber) Int() *int</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Int returns nil if nr is also nil.
+Otherwise, it returns an int pointer.</p>
+</div>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="_renderresult"><a class="anchor" href="#_renderresult"></a>RenderResult</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">type RenderResult string</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>RenderResult represents the string value after rendering from a Template.</p>
+</div>
+<div class="paragraph">
+<p><strong>Receivers</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">WriteToFile</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func (r RenderResult) WriteToFile(path Path, permissions Permissions) error</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>WriteToFile writes the content to the given Path with given Permissions.
+Otherwise, an error is returned.</p>
+</div>
+<div class="listingblock">
+<div class="title">String</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func (r RenderResult) String() string</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>String implements fmt.Stringer.</p>
+</div>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="_permissions"><a class="anchor" href="#_permissions"></a>Permissions</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">type Permissions fs.FileMode</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Permissions is an alias for file permissions.</p>
+</div>
+<div class="paragraph">
+<p><strong>Receivers</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">FileMode</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func (p Permissions) FileMode() fs.FileMode</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>FileMode converts Permissions to fs.FileMode.</p>
+</div>
+<div class="listingblock">
+<div class="title">Octal</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func (p Permissions) Octal() string</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Octal returns an octal permission representation (Linux)</p>
+</div>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="_giturl"><a class="anchor" href="#_giturl"></a>GitURL</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">type GitURL url.URL</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>GitURL is the same as url.URL but with additional helper methods.</p>
+</div>
+<div class="paragraph">
+<p><strong>Receivers</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">GetRepositoryName</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func (u *GitURL) GetRepositoryName() string</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>GetRepositoryName returns the last element of the Git URL.
+Strips the name from any .git extensions in the URL.</p>
+</div>
+<div class="listingblock">
+<div class="title">GetNamespace</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func (u *GitURL) GetNamespace() string</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>GetNamespace returns the middle element(s) of the Git URL.
+Depending on the Git hosting service, this name may contain multiple slashes.
+Any leading "/" is removed.</p>
+</div>
+<div class="listingblock">
+<div class="title">Redacted</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func (u *GitURL) Redacted() string</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Redacted returns the same as url.URL:Redacted().</p>
+</div>
+<div class="listingblock">
+<div class="title">String</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func (u *GitURL) String() string</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>String returns the same as url.URL:String().</p>
+</div>
+<div class="listingblock">
+<div class="title">GetFullName</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func (u *GitURL) GetFullName() string</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>GetFullName returns the hostname (or host:port) joined by GetNamespace and GetRepositoryName delimited by slashes.</p>
+</div>
+<div class="listingblock">
+<div class="title">AsURL</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func (u *GitURL) AsURL() *url.URL</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>AsURL converts GitURL to url.URL</p>
+</div>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="_values"><a class="anchor" href="#_values"></a>Values</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">type Values map[string]interface{}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Values contain a tree of properties to be consumed by a TemplateEngine.</p>
+</div>
+<div class="paragraph">
+<p><strong>Receivers</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Keys</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func (v Values) Keys() []string</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Keys returns a list of keys of the top level.
+Returns an empty string slice if Values is nil or empty.</p>
+</div>
+<hr>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_constants"><a class="anchor" href="#_constants"></a>Constants</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_metadatavaluekey"><a class="anchor" href="#_metadatavaluekey"></a>MetadataValueKey</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">MetadataValueKey = "Metadata"</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>MetadataValueKey is the root key for the metadata variables.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_repositoryvaluekey"><a class="anchor" href="#_repositoryvaluekey"></a>RepositoryValueKey</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">RepositoryValueKey = "Repository"</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>RepositoryValueKey is the key for the GitRepository variable.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_templatevaluekey"><a class="anchor" href="#_templatevaluekey"></a>TemplateValueKey</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">TemplateValueKey = "Template"</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>TemplateValueKey is the key for the Template variable.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_valueskey"><a class="anchor" href="#_valueskey"></a>ValuesKey</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">ValuesKey = "Values"</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>ValuesKey is the key for user-defined variables.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_variables"><a class="anchor" href="#_variables"></a>Variables</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_errinvalidargument"><a class="anchor" href="#_errinvalidargument"></a>ErrInvalidArgument</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">var ErrInvalidArgument = errors.New("invalid argument")</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>ErrInvalidArgument is an error that indicates that a particular field is invalid.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_errkeynotfound"><a class="anchor" href="#_errkeynotfound"></a>ErrKeyNotFound</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">var ErrKeyNotFound = errors.New("key not found")</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>ErrKeyNotFound is an error that indicates that a particular key was not found.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_functions"><a class="anchor" href="#_functions"></a>Functions</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_newcleanupservice"><a class="anchor" href="#_newcleanupservice"></a>NewCleanupService</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func NewCleanupService(
+    instrumentation CleanupServiceInstrumentation,
+) *CleanupService</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_newgitrepository"><a class="anchor" href="#_newgitrepository"></a>NewGitRepository</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func NewGitRepository(u *GitURL, root Path) *GitRepository</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>NewGitRepository creates a new instance.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_fromstringslice"><a class="anchor" href="#_fromstringslice"></a>FromStringSlice</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func FromStringSlice(labels []string) LabelSet</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>FromStringSlice returns a LabelSet with the names from the given string slice.
+Label.GetColor and Label.Description are empty.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_newpath"><a class="anchor" href="#_newpath"></a>NewPath</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func NewPath(elems ...string) Path</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>NewPath constructs a new Path joined by the given elements.
+Paths are joined with path.Join.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_newfilepath"><a class="anchor" href="#_newfilepath"></a>NewFilePath</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func NewFilePath(elems ...string) Path</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>NewFilePath constructs a new Path joined by the given elements.
+Paths are joined with filepath.Join.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_newpullrequest"><a class="anchor" href="#_newpullrequest"></a>NewPullRequest</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func NewPullRequest(
+    number *PullRequestNumber, title, body, commitBranch, baseBranch string,
+    labels LabelSet,
+) (*PullRequest, error)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>NewPullRequest returns a new instance.
+An error is returned if the given properties do not satisfy constraints.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_newpullrequestservice"><a class="anchor" href="#_newpullrequestservice"></a>NewPullRequestService</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func NewPullRequestService() *PullRequestService</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_newpullrequestnumber"><a class="anchor" href="#_newpullrequestnumber"></a>NewPullRequestNumber</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func NewPullRequestNumber(nr *int) *PullRequestNumber</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>NewPullRequestNumber takes the given number and returns a new instance.
+If nr is nil, then nil is returned.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_newrenderservice"><a class="anchor" href="#_newrenderservice"></a>NewRenderService</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func NewRenderService(instrumentation RenderServiceInstrumentation) *RenderService</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_newtemplate"><a class="anchor" href="#_newtemplate"></a>NewTemplate</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func NewTemplate(relPath Path, perms Permissions) *Template</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>NewTemplate returns a new instance.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_fromurl"><a class="anchor" href="#_fromurl"></a>FromURL</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func FromURL(url *url.URL) *GitURL</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>FromURL converts the given url.URL into a GitURL.</p>
+</div>
+</div>
+</div>
+</div>
+</article>
+  </div>
+</main>
+</div>
+<!--
+This page was built using the Antora default UI.
+The source code for this UI is licensed under the terms of the MPL-2.0 license.
+-->
+<script src="../../../_/js/site.js"></script>
+<script async src="../../../_/js/vendor/highlight.js"></script>
+  </body>
+</html>
