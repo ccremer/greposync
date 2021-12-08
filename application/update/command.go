@@ -20,7 +20,7 @@ func (c *Command) createCliCommand() *cli.Command {
 			&cli.StringFlag{
 				Name:    dryRunFlagName,
 				Aliases: []string{"d"},
-				Usage:   "Select a dry run mode. Allowed values: offline (do not run any Git commands), commit (commit, but don't push), push (push, but don't touch PRs)",
+				Usage:   "Select a dry run mode. Allowed values: offline (do not run any Git commands except initial clone), commit (commit, but don't push), push (push, but don't touch PRs)",
 			},
 			&cli.BoolFlag{
 				Name:  amendFlagName,
@@ -36,7 +36,7 @@ func (c *Command) createCliCommand() *cli.Command {
 			},
 			&cli.BoolFlag{
 				Name:  showDiffFlagName,
-				Usage: "Show the Git Diff for each repository after updating.",
+				Usage: "Show the Git Diff for each repository after committing. In --dry-run=offline mode the diff is showed for unstaged changes.",
 			},
 		),
 	}
