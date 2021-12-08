@@ -4,4 +4,4 @@ nav:
   - modules/ROOT/nav.adoc
   - modules/developer-guide/nav.adoc
 version: "0.3"
-prerelease: -rc1
+prerelease: -rc2
