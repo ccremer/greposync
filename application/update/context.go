@@ -114,19 +114,19 @@ func (c *pipelineContext) ensurePullRequest() pipeline.ActionFunc {
 }
 
 func (c *pipelineContext) dirMissing() predicate.Predicate {
-	return func(ctx pipeline.Context, step pipeline.Step) bool {
+	return func(_ pipeline.Context) bool {
 		return !c.repo.RootDir.DirExists()
 	}
 }
 
 func (c *pipelineContext) isDirty() predicate.Predicate {
-	return func(ctx pipeline.Context, step pipeline.Step) bool {
+	return func(_ pipeline.Context) bool {
 		return c.appService.repoStore.IsDirty(c.repo)
 	}
 }
 
 func (c *pipelineContext) hasCommits() predicate.Predicate {
-	return func(ctx pipeline.Context, step pipeline.Step) bool {
+	return func(_ pipeline.Context) bool {
 		return true
 		// TODO: There should be a better way to determine whether to push...
 

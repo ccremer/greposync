@@ -49,7 +49,7 @@ func NewCommand(
 
 func (c *Command) runCommand(_ *cli.Context) error {
 	logger := c.logFactory.NewPipelineLogger("")
-	p := pipeline.NewPipeline().WithContext(c).AddBeforeHook(logger).WithSteps(
+	p := pipeline.NewPipeline().WithContext(c).AddBeforeHook(logger.Accept).WithSteps(
 		pipeline.NewStep("configure infrastructure", c.configureInfrastructure()),
 		pipeline.NewStep("fetch managed repos config", c.fetchRepositories()),
 		parallel.NewWorkerPoolStep("update repositories", c.cfg.Project.Jobs, c.updateReposInParallel(), c.instrumentation.NewCollectErrorHandler(c.cfg.Project.SkipBroken)),
@@ -75,14 +75,14 @@ func (c *Command) createPipeline(r *domain.GitRepository) *pipeline.Pipeline {
 	}
 
 	logger := c.logFactory.NewPipelineLogger(r.URL.GetFullName())
-	p := pipeline.NewPipeline().AddBeforeHook(logger)
+	p := pipeline.NewPipeline().AddBeforeHook(logger.Accept)
 	p.WithSteps(
 		pipeline.NewStepFromFunc("setup instrumentation", func(_ pipeline.Context) error {
 			c.instrumentation.PipelineForRepositoryStarted(repoCtx.repo)
 			return nil
 		}),
 
-		pipeline.NewPipeline().AddBeforeHook(logger).
+		pipeline.NewPipeline().AddBeforeHook(logger.Accept).
 			WithNestedSteps("prepare workspace",
 				predicate.ToStep("clone repository", repoCtx.clone(), repoCtx.dirMissing()),
 				predicate.ToStep("fetch", repoCtx.fetch(), predicate.Bool(resetRepo)),
@@ -91,18 +91,20 @@ func (c *Command) createPipeline(r *domain.GitRepository) *pipeline.Pipeline {
 				predicate.ToStep("pull", repoCtx.pull(), predicate.Bool(resetRepo)),
 			),
 
-		pipeline.NewPipeline().AddBeforeHook(logger).
+		pipeline.NewPipeline().AddBeforeHook(logger.Accept).
 			WithNestedSteps("render",
 				pipeline.NewStep("render templates", repoCtx.renderTemplates()),
 				pipeline.NewStep("cleanup unwanted files", repoCtx.cleanupUnwantedFiles()),
 			),
 
-		predicate.WrapIn(pipeline.NewPipeline().AddBeforeHook(logger).
-			WithNestedSteps("commit changes",
-				pipeline.NewStep("add", repoCtx.add()),
-				pipeline.NewStep("commit", repoCtx.commit()),
-			),
-			predicate.And(predicate.Bool(enabledCommits), repoCtx.isDirty())),
+		predicate.If(predicate.And(predicate.Bool(enabledCommits), repoCtx.isDirty()),
+			pipeline.NewPipeline().
+				AddBeforeHook(logger.Accept).
+				WithNestedSteps("commit changes",
+					pipeline.NewStep("add", repoCtx.add()),
+					pipeline.NewStep("commit", repoCtx.commit()),
+				),
+		),
 
 		predicate.ToStep("show diff", repoCtx.diff(), predicate.Bool(showDiff)),
 		predicate.ToStep("push changes", repoCtx.push(), predicate.And(predicate.Bool(enabledPush), repoCtx.hasCommits())),

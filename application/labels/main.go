@@ -60,7 +60,7 @@ func (c *Command) createPipeline(r *domain.GitRepository) *pipeline.Pipeline {
 	uc := &labelUseCase{
 		appService: c.appService,
 	}
-	return pipeline.NewPipeline().AddBeforeHook(c.appService.factory.NewPipelineLogger("")).WithSteps(
+	return pipeline.NewPipeline().AddBeforeHook(c.appService.factory.NewPipelineLogger("").Accept).WithSteps(
 		pipeline.NewStepFromFunc("setup instrumentation", func(_ pipeline.Context) error {
 			c.instrumentation.PipelineForRepositoryStarted(r)
 			return nil
