@@ -65,8 +65,8 @@ github.com/aws/aws-sdk-go-v2/service/sso v1.4.2/go.mod h1:NBvT9R1MEF+Ud6ApJKM0G+
 github.com/aws/aws-sdk-go-v2/service/sts v1.7.2/go.mod h1:8EzeIqfWt2wWT4rJVu3f21TfrhJ8AEMzVybRNSb/b4g=
 github.com/aws/smithy-go v1.8.0/go.mod h1:SObp3lf9smib00L/v3U2eAKG8FyQ7iLrJnQiAmR5n+E=
 github.com/bgentry/speakeasy v0.1.0/go.mod h1:+zsyZBPWlz7T6j88CTgSN5bM796AkVf0kBD4zp0CCIs=
-github.com/ccremer/go-command-pipeline v0.9.0 h1:EzdBeAlyVFV6GOpqRV/I3ErY99LbS0TK2TorKVvaWcQ=
-github.com/ccremer/go-command-pipeline v0.9.0/go.mod h1:/z7VzRQR5FtUeH/bCDYwHgP+Hojkn754hdS5U1Aw5Pw=
+github.com/ccremer/go-command-pipeline v0.12.0 h1:uOJG17ID3wPAJd3qzGAXG/u0VgY06u01uFKWo2ImC4A=
+github.com/ccremer/go-command-pipeline v0.12.0/go.mod h1:wJ2s6OZ3pZGBezJy3fp3rPYtz6VfLq2FLg4/Woj6md8=
 github.com/ccremer/plogr v0.5.1 h1:kcJ55KxQz1JO0sEKtBV+eUmvjPElhpRsE9sffMeWi24=
 github.com/ccremer/plogr v0.5.1/go.mod h1:tHX0c/EJy6ei2Qo6W9s5pS7yl9hoJssoKZxOlQ4UNys=
 github.com/census-instrumentation/opencensus-proto v0.2.1/go.mod h1:f6KPmirojxKA12rnyqOA5BBL4O983OfeGPqjHWSTneU=
