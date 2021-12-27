@@ -18,6 +18,12 @@
         "on the first day of the month"
       ],
       "automerge": true
+    },
+    {
+      "matchPackagePatterns": [
+        "@antora/*"
+      ],
+      "groupName": "antora"
     }
   ]
 }
