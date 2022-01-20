@@ -2,7 +2,6 @@ package flag
 
 import (
 	"errors"
-	"strings"
 
 	"github.com/knadh/koanf"
 	"github.com/knadh/koanf/maps"
@@ -11,49 +10,47 @@ import (
 
 // Cli implements a urfave/cli command line provider.
 type Cli struct {
-	delim string
-	ko    *koanf.Koanf
-	ctx   *cli.Context
+	delim       string
+	ko          *koanf.Koanf
+	ctx         *cli.Context
+	aliases     map[string]string
+	useDefaults bool
 }
 
 /*
-Provider returns a commandline flags provider that returns a nested map[string]interface{} where the nesting hierarchy of keys are defined by flagDelim.
+Provider returns a commandline flags provider that returns a nested map[string]interface{} where the nesting hierarchy of keys is defined by flagDelim.
 For instance, the flagDelim "." will convert the flag name `parent.child.key: 1` to `{parent: {child: {key: 1}}}`.
-It takes an optional (but recommended) Koanf instance to see if the the flags defined have been set from other providers, for instance, a config file.
-If they are not, then the default values of the flags are merged.
-If they do exist, the flag values are not merged but only the values that have been explicitly set in the command line are merged.
+It takes an optional (but recommended) Koanf instance to see if the flags defined have been set from other providers, for instance, a config file.
+If there are pre-existing values, then they are overwritten.
+The aliases map allows putting flag values into trees at arbitrary positions.
+For example, given alias["flag"] = "nested-flag", flagDelim = "-" and parsed arguments = "--flag=bar", then the resulting map is `{nested: {flag: "bar"}}`.
 */
-func Provider(ctx *cli.Context, flagDelim string, ko *koanf.Koanf) *Cli {
+func Provider(ctx *cli.Context, flagDelim string, ko *koanf.Koanf, aliases map[string]string) *Cli {
+	if aliases == nil {
+		aliases = map[string]string{}
+	}
 	return &Cli{
-		delim: flagDelim,
-		ko:    ko,
-		ctx:   ctx,
+		delim:   flagDelim,
+		ko:      ko,
+		ctx:     ctx,
+		aliases: aliases,
 	}
 }
 
 // Read reads the flag variables and returns a nested conf map.
 func (p *Cli) Read() (map[string]interface{}, error) {
 	mp := make(map[string]interface{})
-	if p.ctx.Command == nil {
-		return mp, nil
-	}
-	for _, flag := range p.ctx.Command.Flags {
-		flagName := flag.Names()[0]
+	for _, flagName := range p.ctx.FlagNames() {
 		val := p.ctx.Value(flagName)
 
-		// If the default value of the flag was never changed by the user,
-		// it should not override the value in the conf map (if it exists in the first place).
-		if !p.ctx.IsSet(flagName) {
-			if p.ko != nil {
-				newFlag := strings.ReplaceAll(flagName, p.delim, p.ko.Delim())
-				if p.ko.Exists(newFlag) {
-					continue
-				}
-			} else {
-				continue
-			}
+		alias := p.aliases[flagName]
+		if alias == "" {
+			alias = flagName
 		}
-		mp[flagName] = val
+
+		if p.ctx.IsSet(flagName) {
+			mp[alias] = val
+		}
 	}
 	return maps.Unflatten(mp, p.delim), nil
 }
@@ -64,6 +61,6 @@ func (p *Cli) ReadBytes() ([]byte, error) {
 }
 
 // Watch is not supported.
-func (p *Cli) Watch(cb func(event interface{}, err error)) error {
+func (p *Cli) Watch(_ func(event interface{}, err error)) error {
 	return errors.New("cli provider does not support this method")
 }
