@@ -55,7 +55,6 @@ func (t *ConsoleSink) Info(level int, msg string, keysAndValues ...interface{}) 
 		return
 	}
 	t.console.AddToBuffer(t.ptermSink.Name(), buf)
-	t.console.RefreshProgressBar()
 }
 
 // Error implements logr.LogSink.
@@ -69,7 +68,6 @@ func (t *ConsoleSink) Error(err error, msg string, keysAndValues ...interface{})
 		return
 	}
 	t.console.AddToBuffer(t.ptermSink.Name(), buf)
-	t.console.RefreshProgressBar()
 }
 
 // WithValues implements logr.LogSink.
