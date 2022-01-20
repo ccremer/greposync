@@ -56,16 +56,6 @@ func (c *ColoredConsole) PrintProgressbarMessage(scope string, err error) {
 	}
 }
 
-func (c *ColoredConsole) RefreshProgressBar() {
-	if !c.isInteractive {
-		return
-	}
-	c.m.Lock()
-	defer c.m.Unlock()
-
-	c.batchProgressbar.Add(0)
-}
-
 func (c *ColoredConsole) AddToBuffer(scope string, buffer io.WriterTo) {
 	c.m.Lock()
 	defer c.m.Unlock()
