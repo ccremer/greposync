@@ -15,7 +15,7 @@ require (
 	github.com/knadh/koanf v1.4.1
 	github.com/mariotoffia/goasciidoc v0.4.6
 	github.com/mattn/go-isatty v0.0.14
-	github.com/pterm/pterm v0.12.37
+	github.com/pterm/pterm v0.12.41
 	github.com/stretchr/testify v1.7.1
 	github.com/urfave/cli/v2 v2.4.0
 	github.com/whilp/git-urls v1.0.0
@@ -37,7 +37,7 @@ require (
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/google/subcommands v1.0.1 // indirect
 	github.com/google/uuid v1.1.1 // indirect
-	github.com/gookit/color v1.4.2 // indirect
+	github.com/gookit/color v1.5.0 // indirect
 	github.com/hashicorp/errwrap v1.0.0 // indirect
 	github.com/huandu/xstrings v1.3.1 // indirect
 	github.com/mattn/go-runewidth v0.0.13 // indirect
