@@ -387,7 +387,7 @@ type CleanupService struct {
 .CleanupUnwantedFiles
 [source, go]
 ----
-func (s *CleanupService) CleanupUnwantedFiles(ctx CleanupContext) error
+func (s *CleanupService) CleanupUnwantedFiles(pipe CleanupPipeline) error
 ----
 
 
@@ -395,10 +395,10 @@ func (s *CleanupService) CleanupUnwantedFiles(ctx CleanupContext) error
 
 '''
 
-=== CleanupContext
+=== CleanupPipeline
 [source, go]
 ----
-type CleanupContext struct {
+type CleanupPipeline struct {
     Repository    *GitRepository
     ValueStore    ValueStore
 }
@@ -1264,7 +1264,6 @@ func NewCleanupService(
 
 
 
-
 === NewGitRepository
 [source, go]
 ----
@@ -1372,7 +1371,6 @@ If nr is nil, then nil is returned.
 ----
 func NewRenderService(instrumentation RenderServiceInstrumentation) *RenderService
 ----
-
 
 
 

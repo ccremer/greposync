@@ -51,9 +51,9 @@ func (c *Command) createCommand() *cli.Command {
 
 func (c *Command) runCommand(_ *cli.Context) error {
 	result := pipeline.NewPipeline().AddBeforeHook(c.plog.Accept).WithSteps(
-		pipeline.NewStep("create main config files", c.createMainConfigFiles()),
-		pipeline.NewStep("create template dir", c.createTemplateDir()),
-		pipeline.NewStep("create template files", c.createTemplateFiles()),
+		pipeline.NewStepFromFunc("create main config files", c.createMainConfigFiles),
+		pipeline.NewStepFromFunc("create template dir", c.createTemplateDir),
+		pipeline.NewStepFromFunc("create template files", c.createTemplateFiles),
 	).Run()
-	return result.Err
+	return result.Err()
 }

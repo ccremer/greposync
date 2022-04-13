@@ -1,8 +1,9 @@
 package labels
 
 import (
+	"context"
+
 	pipeline "github.com/ccremer/go-command-pipeline"
-	"github.com/ccremer/go-command-pipeline/parallel"
 	"github.com/ccremer/greposync/application/instrumentation"
 	"github.com/ccremer/greposync/cfg"
 	"github.com/ccremer/greposync/domain"
@@ -37,87 +38,89 @@ func NewCommand(
 }
 
 func (c *Command) runCommand(_ *cli.Context) error {
-	result := pipeline.NewPipeline().WithContext(c).WithSteps(
+	result := pipeline.NewPipeline().WithSteps(
 		pipeline.NewStepFromFunc("configure infrastructure", c.configureInfrastructure),
 		pipeline.NewStepFromFunc("fetch repositories", c.fetchRepositories),
-		parallel.NewWorkerPoolStep("update labels for all repos", c.cfg.Project.Jobs, c.updateRepos(), c.instrumentation.NewCollectErrorHandler(c.cfg.Project.SkipBroken)),
+		pipeline.NewWorkerPoolStep("update labels for all repos", c.cfg.Project.Jobs, c.updateRepos(), c.instrumentation.NewCollectErrorHandler(c.cfg.Project.SkipBroken)),
 	).Run()
-	return result.Err
+	return result.Err()
 }
 
-func (c *Command) updateRepos() parallel.PipelineSupplier {
-	return func(pipelines chan *pipeline.Pipeline) {
-		defer close(pipelines)
+func (c *Command) updateRepos() pipeline.Supplier {
+	return func(ctx context.Context, pipelinesCH chan *pipeline.Pipeline) {
+		defer close(pipelinesCH)
 		c.instrumentation.BatchPipelineStarted(c.repos)
 		for _, r := range c.repos {
-			p := c.createPipeline(r)
-			pipelines <- p
+			select {
+			case <-ctx.Done():
+				return
+			default:
+				p := c.createPipeline(r)
+				pipelinesCH <- p
+			}
 		}
 	}
 }
 
 func (c *Command) createPipeline(r *domain.GitRepository) *pipeline.Pipeline {
-	uc := &labelUseCase{
+	uc := &labelPipeline{
 		appService: c.appService,
+		repo:       r,
 	}
 	return pipeline.NewPipeline().AddBeforeHook(c.appService.factory.NewPipelineLogger("").Accept).WithSteps(
-		pipeline.NewStepFromFunc("setup instrumentation", func(_ pipeline.Context) error {
+		pipeline.NewStepFromFunc("setup instrumentation", func(_ context.Context) error {
 			c.instrumentation.PipelineForRepositoryStarted(r)
 			return nil
 		}),
-		pipeline.NewStep("fetch labels", uc.fetchLabelsForRepository(r)),
-		pipeline.NewStep("determine which labels to modify", c.determineLabelsToModify(uc, r)),
-		pipeline.NewStep("determine which labels to delete", c.determineLabelsToDelete(uc, r)),
-		pipeline.NewStep("update existing labels", uc.updateLabelsForRepositoryAction(r)),
-		pipeline.NewStep("delete unwanted labels", uc.deleteLabelsForRepository(r)),
-	).WithFinalizer(func(ctx pipeline.Context, result pipeline.Result) error {
-		c.instrumentation.PipelineForRepositoryCompleted(r, result.Err)
-		result.Name = r.URL.GetFullName()
-		return result.Err
+		pipeline.NewStepFromFunc("fetch labels", uc.fetchLabelsForRepository),
+		pipeline.NewStepFromFunc("determine which labels to modify", c.determineLabelsToModify(uc, r)),
+		pipeline.NewStepFromFunc("determine which labels to delete", c.determineLabelsToDelete(uc, r)),
+		pipeline.NewStepFromFunc("update existing labels", uc.updateLabelsForRepository),
+		pipeline.NewStepFromFunc("delete unwanted labels", uc.deleteLabelsForRepository),
+	).WithFinalizer(func(ctx context.Context, result pipeline.Result) error {
+		c.instrumentation.PipelineForRepositoryCompleted(r, result.Err())
+		return result.Err()
 	})
 }
 
-func (c *Command) determineLabelsToModify(uc *labelUseCase, r *domain.GitRepository) pipeline.ActionFunc {
+func (c *Command) determineLabelsToModify(uc *labelPipeline, r *domain.GitRepository) func(ctx context.Context) error {
 	converter := cfg.RepositoryLabelSetConverter{}
-	return func(ctx pipeline.Context) pipeline.Result {
+	return func(ctx context.Context) error {
 		toModify, err := converter.ConvertToEntity(c.cfg.RepositoryLabels.SelectModifications())
 		if err != nil {
-			return pipeline.Result{Err: err}
+			return err
 		}
 		uc.labelsToModify = toModify
 
 		mergedSet := r.Labels.Merge(uc.labelsToModify)
 		err = r.SetLabels(mergedSet)
-		return pipeline.Result{Err: err}
+		return err
 	}
 }
 
-func (c *Command) determineLabelsToDelete(uc *labelUseCase, r *domain.GitRepository) pipeline.ActionFunc {
+func (c *Command) determineLabelsToDelete(uc *labelPipeline, r *domain.GitRepository) func(ctx context.Context) error {
 	converter := cfg.RepositoryLabelSetConverter{}
-	return func(ctx pipeline.Context) pipeline.Result {
+	return func(ctx context.Context) error {
 		toDelete, err := converter.ConvertToEntity(c.cfg.RepositoryLabels.SelectDeletions())
 		if err != nil {
-			return pipeline.Result{Err: err}
+			return err
 		}
 		uc.labelsToDelete = toDelete
 
 		reducedSet := r.Labels.Without(toDelete)
 		err = r.SetLabels(reducedSet)
-		return pipeline.Result{Err: err}
+		return nil
 	}
 }
 
-func (c *Command) fetchRepositories(_ pipeline.Context) error {
+func (c *Command) fetchRepositories(ctx context.Context) error {
 	repos, err := c.appService.repoStore.FetchGitRepositories()
 	c.repos = repos
+	pipeline.StoreInContext(ctx, instrumentation.RepositoriesContextKey{}, repos)
 	return err
 }
 
-func (c *Command) configureInfrastructure(_ pipeline.Context) error {
+func (c *Command) configureInfrastructure(_ context.Context) error {
 	c.appService.ConfigureInfrastructure()
 	return nil
-}
-
-func (c *Command) GetRepositories() []*domain.GitRepository {
-	return c.repos
 }

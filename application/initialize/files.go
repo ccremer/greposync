@@ -1,10 +1,9 @@
 package initialize
 
 import (
+	"context"
 	_ "embed"
 	"os"
-
-	pipeline "github.com/ccremer/go-command-pipeline"
 )
 
 var (
@@ -22,19 +21,15 @@ var (
 )
 
 // createMainConfigFiles creates the main configuration files.
-// Each pre existing file is skipped.
-func (c *Command) createMainConfigFiles() pipeline.ActionFunc {
-	return func(_ pipeline.Context) pipeline.Result {
-		return pipeline.Result{Err: writeFiles(c.configFiles)}
-	}
+// Each pre-existing file is skipped.
+func (c *Command) createMainConfigFiles(_ context.Context) error {
+	return writeFiles(c.configFiles)
 }
 
 // createTemplateFiles creates the example files in the template directory.
 // The dir has to exist.
-func (c *Command) createTemplateFiles() pipeline.ActionFunc {
-	return func(_ pipeline.Context) pipeline.Result {
-		return pipeline.Result{Err: writeFiles(c.templateFiles)}
-	}
+func (c *Command) createTemplateFiles(_ context.Context) error {
+	return writeFiles(c.templateFiles)
 }
 
 func writeFiles(files map[string][]byte) error {
@@ -55,10 +50,8 @@ func writeFile(file string, content []byte) error {
 }
 
 // createTemplateDir creates the template directory if it doesn't exist.
-func (c *Command) createTemplateDir() pipeline.ActionFunc {
-	return func(_ pipeline.Context) pipeline.Result {
-		return pipeline.Result{Err: createDir("template")}
-	}
+func (c *Command) createTemplateDir(_ context.Context) error {
+	return createDir("template")
 }
 
 func fileExists(path string) bool {

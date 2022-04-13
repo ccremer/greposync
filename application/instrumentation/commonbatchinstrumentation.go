@@ -1,10 +1,10 @@
 package instrumentation
 
 import (
+	"context"
 	"fmt"
 
 	pipeline "github.com/ccremer/go-command-pipeline"
-	"github.com/ccremer/go-command-pipeline/parallel"
 	"github.com/ccremer/greposync/application/clierror"
 	"github.com/ccremer/greposync/domain"
 	"github.com/ccremer/greposync/infrastructure/logging"
@@ -54,34 +54,35 @@ func (i *CommonBatchInstrumentation) PipelineForRepositoryCompleted(repo *domain
 	i.console.PrintProgressbarMessage(repo.URL.GetFullName(), err)
 }
 
-func (i *CommonBatchInstrumentation) NewCollectErrorHandler(skipBroken bool) parallel.ResultHandler {
+func (i *CommonBatchInstrumentation) NewCollectErrorHandler(skipBroken bool) pipeline.ParallelResultHandler {
 	if skipBroken {
 		return i.ignoreErrors()
 	}
 	return i.reduceErrors()
 }
 
-func (i *CommonBatchInstrumentation) ignoreErrors() parallel.ResultHandler {
+func (i *CommonBatchInstrumentation) ignoreErrors() pipeline.ParallelResultHandler {
 	// Do not propagate update errors from single repositories up the stack
-	return func(ctx pipeline.Context, results map[uint64]pipeline.Result) pipeline.Result {
+	return func(ctx context.Context, results map[uint64]pipeline.Result) error {
 		i.results = results
-		return pipeline.Result{}
+		return nil
 	}
 }
 
-func (i *CommonBatchInstrumentation) reduceErrors() parallel.ResultHandler {
-	return func(ctx pipeline.Context, results map[uint64]pipeline.Result) pipeline.Result {
+func (i *CommonBatchInstrumentation) reduceErrors() pipeline.ParallelResultHandler {
+	return func(ctx context.Context, results map[uint64]pipeline.Result) error {
 		i.results = results
-		repos := ctx.(InstrumentationContext).GetRepositories()
 		var err error
-		for index, repo := range repos {
-			if result := results[uint64(index)]; result.Err != nil {
-				err = multierror.Append(err, fmt.Errorf("%s: %w", repo.URL.GetRepositoryName(), result.Err))
+		if repos, found := pipeline.LoadFromContext(ctx, RepositoriesContextKey{}); found {
+			for index, repo := range repos.([]*domain.GitRepository) {
+				if result := results[uint64(index)]; result.Err() != nil {
+					err = multierror.Append(err, fmt.Errorf("%s: %w", repo.URL.GetRepositoryName(), result.Err()))
+				}
 			}
 		}
-		if err == nil {
-			return pipeline.Result{}
+		if err != nil {
+			return fmt.Errorf("%w: %s", clierror.ErrPipeline, err)
 		}
-		return pipeline.Result{Err: fmt.Errorf("%w: %s", clierror.ErrPipeline, err)}
+		return nil
 	}
 }
