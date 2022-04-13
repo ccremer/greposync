@@ -1,6 +1,10 @@
 package domain
 
-import pipeline "github.com/ccremer/go-command-pipeline"
+import (
+	"context"
+
+	pipeline "github.com/ccremer/go-command-pipeline"
+)
 
 type PullRequestService struct {
 }
@@ -26,21 +30,21 @@ func (prs *PullRequestService) NewPullRequestForRepository(prsCtx PullRequestSer
 	}
 
 	p := pipeline.NewPipeline().WithSteps(
-		pipeline.NewStepFromFunc("body", func(ctx pipeline.Context) error {
+		pipeline.NewStepFromFunc("body", func(ctx context.Context) error {
 			body, err := prsCtx.TemplateEngine.ExecuteString(prsCtx.Body, values)
 			prsCtx.Body = body.String()
 			return err
 		}),
-		pipeline.NewStepFromFunc("title", func(ctx pipeline.Context) error {
+		pipeline.NewStepFromFunc("title", func(ctx context.Context) error {
 			title, err := prsCtx.TemplateEngine.ExecuteString(prsCtx.Title, values)
 			prsCtx.Title = title.String()
 			return err
 		}),
-		pipeline.NewStepFromFunc("newPR", func(ctx pipeline.Context) error {
+		pipeline.NewStepFromFunc("newPR", func(ctx context.Context) error {
 			newPr, err := NewPullRequest(nil, prsCtx.Title, prsCtx.Body, prsCtx.Repository.CommitBranch, prsCtx.TargetBranch, nil)
 			prsCtx.Repository.PullRequest = newPr
 			return err
 		}),
 	)
-	return p.Run().Err
+	return p.Run().Err()
 }

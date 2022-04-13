@@ -1,7 +1,7 @@
 package instrumentation
 
 import (
-	"github.com/ccremer/go-command-pipeline/parallel"
+	pipeline "github.com/ccremer/go-command-pipeline"
 	"github.com/ccremer/greposync/domain"
 )
 
@@ -10,9 +10,7 @@ type BatchInstrumentation interface {
 	BatchPipelineCompleted(repos []*domain.GitRepository)
 	PipelineForRepositoryStarted(repo *domain.GitRepository)
 	PipelineForRepositoryCompleted(repo *domain.GitRepository, err error)
-	NewCollectErrorHandler(skipBroken bool) parallel.ResultHandler
+	NewCollectErrorHandler(skipBroken bool) pipeline.ParallelResultHandler
 }
 
-type InstrumentationContext interface {
-	GetRepositories() []*domain.GitRepository
-}
+type RepositoriesContextKey struct{}

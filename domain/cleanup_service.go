@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"context"
 	"os"
 
 	pipeline "github.com/ccremer/go-command-pipeline"
@@ -10,7 +11,7 @@ type CleanupService struct {
 	instrumentation CleanupServiceInstrumentation
 }
 
-type CleanupContext struct {
+type CleanupPipeline struct {
 	Repository *GitRepository
 	ValueStore ValueStore
 
@@ -26,39 +27,31 @@ func NewCleanupService(
 	}
 }
 
-func (s *CleanupService) CleanupUnwantedFiles(ctx CleanupContext) error {
-	ctx.instrumentation = s.instrumentation.WithRepository(ctx.Repository)
+func (s *CleanupService) CleanupUnwantedFiles(pipe CleanupPipeline) error {
+	pipe.instrumentation = s.instrumentation.WithRepository(pipe.Repository)
 	result := pipeline.NewPipeline().WithSteps(
-		pipeline.NewStep("preflight check", ctx.preFlightCheck()),
-		pipeline.NewStep("load files", ctx.toAction(ctx.loadFiles)),
-		pipeline.NewStep("delete files", ctx.toAction(ctx.deleteFiles)),
+		pipeline.NewStepFromFunc("preflight check", pipe.preFlightCheck),
+		pipeline.NewStepFromFunc("load files", pipe.loadFiles),
+		pipeline.NewStepFromFunc("delete files", pipe.deleteFiles),
 	).Run()
-	return result.Err
+	return result.Err()
 }
 
-func (ctx *CleanupContext) preFlightCheck() pipeline.ActionFunc {
-	return func(_ pipeline.Context) pipeline.Result {
-		err := firstOf(
-			checkIfArgumentNil(ctx.Repository, "Repository"),
-			checkIfArgumentNil(ctx.ValueStore, "ValueStore"),
-		)
-		return pipeline.Result{Err: err}
-	}
+func (ctx *CleanupPipeline) preFlightCheck(_ context.Context) error {
+	err := firstOf(
+		checkIfArgumentNil(ctx.Repository, "Repository"),
+		checkIfArgumentNil(ctx.ValueStore, "ValueStore"),
+	)
+	return err
 }
 
-func (ctx *CleanupContext) toAction(action func() error) pipeline.ActionFunc {
-	return func(_ pipeline.Context) pipeline.Result {
-		return pipeline.Result{Err: action()}
-	}
-}
-
-func (ctx *CleanupContext) loadFiles() error {
+func (ctx *CleanupPipeline) loadFiles(_ context.Context) error {
 	files, err := ctx.ValueStore.FetchFilesToDelete(ctx.Repository)
 	ctx.files = files
 	return ctx.instrumentation.FetchedFilesToDelete(err, files)
 }
 
-func (ctx *CleanupContext) deleteFiles() error {
+func (ctx *CleanupPipeline) deleteFiles(_ context.Context) error {
 	for _, file := range ctx.files {
 		absoluteFile := ctx.Repository.RootDir.Join(file)
 		if absoluteFile.FileExists() {

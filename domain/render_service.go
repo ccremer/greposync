@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"context"
 	"errors"
 
 	pipeline "github.com/ccremer/go-command-pipeline"
@@ -34,32 +35,24 @@ func NewRenderService(instrumentation RenderServiceInstrumentation) *RenderServi
 func (s *RenderService) RenderTemplates(ctx RenderContext) error {
 	ctx.instrumentation = s.instrumentation.WithRepository(ctx.Repository)
 	result := pipeline.NewPipeline().WithSteps(
-		pipeline.NewStep("preflight check", ctx.preFlightCheck()),
-		pipeline.NewStep("load templates", ctx.toAction(ctx.loadTemplates)),
-		pipeline.NewStep("render templates", ctx.toAction(ctx.renderTemplates)),
+		pipeline.NewStepFromFunc("preflight check", ctx.preFlightCheck),
+		pipeline.NewStepFromFunc("load templates", ctx.loadTemplates),
+		pipeline.NewStepFromFunc("render templates", ctx.renderTemplates),
 	).Run()
-	return result.Err
+	return result.Err()
 }
 
-func (ctx *RenderContext) preFlightCheck() pipeline.ActionFunc {
-	return func(_ pipeline.Context) pipeline.Result {
-		err := firstOf(
-			checkIfArgumentNil(ctx.Engine, "Engine"),
-			checkIfArgumentNil(ctx.Repository, "Repository"),
-			checkIfArgumentNil(ctx.TemplateStore, "TemplateStore"),
-			checkIfArgumentNil(ctx.ValueStore, "ValueStore"),
-		)
-		return pipeline.Result{Err: err}
-	}
+func (ctx *RenderContext) preFlightCheck(_ context.Context) error {
+	err := firstOf(
+		checkIfArgumentNil(ctx.Engine, "Engine"),
+		checkIfArgumentNil(ctx.Repository, "Repository"),
+		checkIfArgumentNil(ctx.TemplateStore, "TemplateStore"),
+		checkIfArgumentNil(ctx.ValueStore, "ValueStore"),
+	)
+	return err
 }
 
-func (ctx *RenderContext) toAction(action func() error) pipeline.ActionFunc {
-	return func(_ pipeline.Context) pipeline.Result {
-		return pipeline.Result{Err: action()}
-	}
-}
-
-func (ctx *RenderContext) renderTemplates() error {
+func (ctx *RenderContext) renderTemplates(_ context.Context) error {
 	for _, template := range ctx.templates {
 		if unmanaged, err := ctx.ValueStore.FetchUnmanagedFlag(template, ctx.Repository); err != nil && !errors.Is(err, ErrKeyNotFound) {
 			return err
@@ -100,7 +93,7 @@ func (ctx *RenderContext) renderTemplate(template *Template) error {
 	return ctx.instrumentation.WrittenRenderResultToFile(template, targetPath, err)
 }
 
-func (ctx *RenderContext) loadTemplates() error {
+func (ctx *RenderContext) loadTemplates(_ context.Context) error {
 	templates, err := ctx.TemplateStore.FetchTemplates()
 	ctx.templates = templates
 	return ctx.instrumentation.FetchedTemplatesFromStore(err)

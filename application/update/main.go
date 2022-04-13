@@ -4,7 +4,7 @@ import (
 	"context"
 
 	pipeline "github.com/ccremer/go-command-pipeline"
-	instrumentation2 "github.com/ccremer/greposync/application/instrumentation"
+	"github.com/ccremer/greposync/application/instrumentation"
 	"github.com/ccremer/greposync/cfg"
 	"github.com/ccremer/greposync/domain"
 	"github.com/ccremer/greposync/infrastructure/logging"
@@ -23,11 +23,11 @@ const (
 type (
 	// Command is a facade service for the update command that holds all dependent services and settings.
 	Command struct {
-		cfg             *cfg.Configuration
-		repositories    []*domain.GitRepository
-		appService      *AppService
-		instrumentation instrumentation2.BatchInstrumentation
-		logFactory      logging.LoggerFactory
+		cfg          *cfg.Configuration
+		repositories []*domain.GitRepository
+		appService   *AppService
+		instr        instrumentation.BatchInstrumentation
+		logFactory   logging.LoggerFactory
 	}
 )
 
@@ -36,29 +36,30 @@ func NewCommand(
 	cfg *cfg.Configuration,
 	configurator *AppService,
 	factory logging.LoggerFactory,
-	instrumentation instrumentation2.BatchInstrumentation,
+	instrumentation instrumentation.BatchInstrumentation,
 ) *Command {
 	c := &Command{
-		cfg:             cfg,
-		appService:      configurator,
-		instrumentation: instrumentation,
-		logFactory:      factory,
+		cfg:        cfg,
+		appService: configurator,
+		instr:      instrumentation,
+		logFactory: factory,
 	}
 	return c
 }
 
-func (c *Command) runCommand(_ *cli.Context) error {
+func (c *Command) runCommand(cliCtx *cli.Context) error {
 	logger := c.logFactory.NewPipelineLogger("")
+	ctx := pipeline.MutableContext(cliCtx.Context)
 	p := pipeline.NewPipeline().AddBeforeHook(logger.Accept).WithSteps(
 		pipeline.NewStepFromFunc("configure infrastructure", c.configureInfrastructure),
 		pipeline.NewStepFromFunc("fetch managed repos config", c.fetchRepositories),
-		pipeline.NewWorkerPoolStep("update repositories", c.cfg.Project.Jobs, c.updateReposInParallel(), c.instrumentation.NewCollectErrorHandler(c.cfg.Project.SkipBroken)),
+		pipeline.NewWorkerPoolStep("update repositories", c.cfg.Project.Jobs, c.updateReposInParallel(), c.instr.NewCollectErrorHandler(c.cfg.Project.SkipBroken)),
 	)
 	p.WithFinalizer(func(ctx context.Context, result pipeline.Result) error {
-		c.instrumentation.BatchPipelineCompleted(c.GetRepositories())
+		c.instr.BatchPipelineCompleted(c.GetRepositories())
 		return result.Err()
 	})
-	return p.Run().Err()
+	return p.RunWithContext(ctx).Err()
 }
 
 func (c *Command) createPipeline(r *domain.GitRepository) *pipeline.Pipeline {
@@ -69,60 +70,60 @@ func (c *Command) createPipeline(r *domain.GitRepository) *pipeline.Pipeline {
 	showDiff := c.cfg.Log.ShowDiff
 	createPR := c.cfg.PullRequest.Create
 
-	repoCtx := &updatePipeline{
+	up := &updatePipeline{
 		repo:       r,
 		appService: c.appService,
 	}
 
 	logger := c.logFactory.NewPipelineLogger(r.URL.GetFullName())
-	p := pipeline.NewPipeline().AddBeforeHook(logger.Accept)
-	p.WithSteps(
+	pipe := pipeline.NewPipeline().AddBeforeHook(logger.Accept)
+	pipe.WithSteps(
 		pipeline.NewStepFromFunc("setup instrumentation", func(_ context.Context) error {
-			c.instrumentation.PipelineForRepositoryStarted(repoCtx.repo)
+			c.instr.PipelineForRepositoryStarted(up.repo)
 			return nil
 		}),
 
 		pipeline.NewPipeline().AddBeforeHook(logger.Accept).
 			WithNestedSteps("prepare workspace",
 
-				pipeline.ToStep("clone repository", repoCtx.clone, repoCtx.dirMissing()),
-				pipeline.ToStep("fetch", repoCtx.fetch, pipeline.Bool(resetRepo)),
-				pipeline.ToStep("reset", repoCtx.reset, pipeline.Bool(resetRepo)),
-				pipeline.ToStep("checkout branch", repoCtx.checkout, pipeline.Bool(resetRepo)),
-				pipeline.ToStep("pull", repoCtx.pull, pipeline.Bool(resetRepo)),
+				pipeline.ToStep("clone repository", up.clone, up.dirMissing()),
+				pipeline.ToStep("fetch", up.fetch, pipeline.Bool(resetRepo)),
+				pipeline.ToStep("reset", up.reset, pipeline.Bool(resetRepo)),
+				pipeline.ToStep("checkout branch", up.checkout, pipeline.Bool(resetRepo)),
+				pipeline.ToStep("pull", up.pull, pipeline.Bool(resetRepo)),
 			),
 
 		pipeline.NewPipeline().AddBeforeHook(logger.Accept).
 			WithNestedSteps("render",
-				pipeline.NewStepFromFunc("render templates", repoCtx.renderTemplates),
-				pipeline.NewStepFromFunc("cleanup unwanted files", repoCtx.cleanupUnwantedFiles),
+				pipeline.NewStepFromFunc("render templates", up.renderTemplates),
+				pipeline.NewStepFromFunc("cleanup unwanted files", up.cleanupUnwantedFiles),
 			),
 
-		pipeline.If(pipeline.And(pipeline.Bool(enabledCommits), repoCtx.isDirty()),
+		pipeline.If(pipeline.And(pipeline.Bool(enabledCommits), up.isDirty()),
 			pipeline.NewPipeline().
 				AddBeforeHook(logger.Accept).
 				WithNestedSteps("commit changes",
-					pipeline.NewStepFromFunc("add", repoCtx.add),
-					pipeline.NewStepFromFunc("commit", repoCtx.commit),
+					pipeline.NewStepFromFunc("add", up.add),
+					pipeline.NewStepFromFunc("commit", up.commit),
 				),
 		),
 
-		pipeline.ToStep("show diff", repoCtx.diff, pipeline.Bool(showDiff)),
-		pipeline.ToStep("push changes", repoCtx.push, pipeline.And(pipeline.Bool(enabledPush), repoCtx.hasCommits())),
-		pipeline.ToStep("find existing pull request", repoCtx.fetchPullRequest, pipeline.Bool(createPR)),
-		pipeline.ToStep("ensure pull request", repoCtx.ensurePullRequest, pipeline.And(repoCtx.hasCommits(), pipeline.Bool(createPR))),
+		pipeline.ToStep("show diff", up.diff, pipeline.Bool(showDiff)),
+		pipeline.ToStep("push changes", up.push, pipeline.And(pipeline.Bool(enabledPush), up.hasCommits())),
+		pipeline.ToStep("find existing pull request", up.fetchPullRequest, pipeline.Bool(createPR)),
+		pipeline.ToStep("ensure pull request", up.ensurePullRequest, pipeline.And(up.hasCommits(), pipeline.Bool(createPR))),
 	)
-	p.WithFinalizer(func(ctx context.Context, result pipeline.Result) error {
-		c.instrumentation.PipelineForRepositoryCompleted(r, result.Err())
+	pipe.WithFinalizer(func(ctx context.Context, result pipeline.Result) error {
+		c.instr.PipelineForRepositoryCompleted(r, result.Err())
 		return result.Err()
 	})
-	return p
+	return pipe
 }
 
 func (c *Command) updateReposInParallel() pipeline.Supplier {
 	return func(ctx context.Context, pipelines chan *pipeline.Pipeline) {
 		defer close(pipelines)
-		c.instrumentation.BatchPipelineStarted(c.repositories)
+		c.instr.BatchPipelineStarted(c.repositories)
 		for _, r := range c.GetRepositories() {
 			select {
 			case <-ctx.Done():
@@ -140,9 +141,10 @@ func (c *Command) configureInfrastructure(_ context.Context) error {
 	return nil
 }
 
-func (c *Command) fetchRepositories(_ context.Context) error {
+func (c *Command) fetchRepositories(ctx context.Context) error {
 	repos, err := c.appService.repoStore.FetchGitRepositories()
 	c.repositories = repos
+	pipeline.StoreInContext(ctx, instrumentation.RepositoriesContextKey{}, repos)
 	return err
 }
 

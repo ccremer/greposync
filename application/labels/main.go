@@ -113,17 +113,14 @@ func (c *Command) determineLabelsToDelete(uc *labelPipeline, r *domain.GitReposi
 	}
 }
 
-func (c *Command) fetchRepositories(_ context.Context) error {
+func (c *Command) fetchRepositories(ctx context.Context) error {
 	repos, err := c.appService.repoStore.FetchGitRepositories()
 	c.repos = repos
+	pipeline.StoreInContext(ctx, instrumentation.RepositoriesContextKey{}, repos)
 	return err
 }
 
 func (c *Command) configureInfrastructure(_ context.Context) error {
 	c.appService.ConfigureInfrastructure()
 	return nil
-}
-
-func (c *Command) GetRepositories() []*domain.GitRepository {
-	return c.repos
 }
