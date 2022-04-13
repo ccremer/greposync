@@ -652,16 +652,16 @@ The paths are relative to the Git root directory.</p>
 <div class="listingblock">
 <div class="title">CleanupUnwantedFiles</div>
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func (s *CleanupService) CleanupUnwantedFiles(ctx CleanupContext) error</code></pre>
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func (s *CleanupService) CleanupUnwantedFiles(pipe CleanupPipeline) error</code></pre>
 </div>
 </div>
 <hr>
 </div>
 <div class="sect2">
-<h3 id="_cleanupcontext"><a class="anchor" href="#_cleanupcontext"></a>CleanupContext</h3>
+<h3 id="_cleanuppipeline"><a class="anchor" href="#_cleanuppipeline"></a>CleanupPipeline</h3>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">type CleanupContext struct {
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">type CleanupPipeline struct {
     Repository    *GitRepository
     ValueStore    ValueStore
 }</code></pre>
