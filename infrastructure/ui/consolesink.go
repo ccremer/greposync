@@ -81,8 +81,9 @@ func (t *ConsoleSink) WithValues(keysAndValues ...interface{}) logr.LogSink {
 
 // WithName implements logr.LogSink.
 func (t *ConsoleSink) WithName(name string) logr.LogSink {
+	pSink := t.ptermSink.WithName(name).(plogr.PtermSink)
 	newSink := &ConsoleSink{
-		ptermSink: t.ptermSink.WithName(name).(*plogr.PtermSink),
+		ptermSink: &pSink,
 		console:   t.console,
 	}
 	return newSink
