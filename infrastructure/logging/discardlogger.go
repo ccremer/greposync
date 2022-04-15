@@ -13,7 +13,7 @@ func NewDiscardLoggerFactory() LoggerFactory {
 	return &DiscardLoggerFactory{}
 }
 
-func (d *DiscardLoggerFactory) SetLogLevel(_ LogLevel) {}
+func (d *DiscardLoggerFactory) SetLogLevel(_ int) {}
 
 func (d *DiscardLoggerFactory) NewGenericLogger(_ string) logr.Logger { return logr.Discard() }
 

@@ -37,13 +37,7 @@ func (i *RepositoryStoreInstrumentation) logGitArguments(repository *domain.GitR
 
 func (i *RepositoryStoreInstrumentation) logDebugInfo(repository *domain.GitRepository, line string) {
 	if line != "" {
-		i.log.WithName(repository.URL.GetFullName()).V(logging.LevelDebug).Info(line)
-	}
-}
-
-func (i *RepositoryStoreInstrumentation) logWarning(repository *domain.GitRepository, line string) {
-	if line != "" {
-		i.log.WithName(repository.URL.GetFullName()).V(logging.LevelWarn).Info(line)
+		i.log.WithName(repository.URL.GetFullName()).V(1).Info(line)
 	}
 }
 
@@ -52,5 +46,5 @@ func (i *RepositoryStoreInstrumentation) skipRepository(url *domain.GitURL) {
 }
 
 func (i *RepositoryStoreInstrumentation) loadRepositoryConfigFile(name string) {
-	i.log.V(logging.LevelDebug).Info("Loading config file", "name", name)
+	i.log.V(1).Info("Loading config file", "name", name)
 }

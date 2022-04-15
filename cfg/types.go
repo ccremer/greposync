@@ -35,8 +35,8 @@ type (
 
 	// LogConfig configures the logging options
 	LogConfig struct {
-		Level    string `json:"level" koanf:"level"`
-		ShowDiff bool   `json:"showDiff" koanf:"showDiff"`
+		Level    int  `json:"level" koanf:"level"`
+		ShowDiff bool `json:"showDiff" koanf:"showDiff"`
 		// Shows the full log in real-time rather than keeping it hidden until an error occurred.
 		ShowLog bool `json:"showLog" koanf:"showLog"`
 	}
@@ -111,9 +111,7 @@ func NewDefaultConfig() *Configuration {
 			MainConfigFileName:    "greposync.yml",
 			ConfigDefaultFileName: "config_defaults.yml",
 		},
-		Log: &LogConfig{
-			Level: "info",
-		},
+		Log: &LogConfig{},
 		Git: &GitConfig{
 			CommitMessage: "Update from greposync",
 		},

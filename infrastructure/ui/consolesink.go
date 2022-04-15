@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"os"
 
-	"github.com/ccremer/greposync/infrastructure/logging"
 	"github.com/ccremer/plogr"
 	"github.com/go-logr/logr"
 	"github.com/pterm/pterm"
@@ -27,16 +26,15 @@ func NewConsoleSink(console *ColoredConsole) *ConsoleSink {
 // Init implements logr.LogSink.
 // It will configure log levels that are defined in logging.LogLevel.
 func (t *ConsoleSink) Init(info logr.RuntimeInfo) {
-	sink := plogr.NewPtermSink()
+	sink := plogr.NewPtermSink().WithFallbackPrinter(pterm.Debug)
 	sink.Init(info)
+	for i := 0; i < len(sink.LevelEnabled); i++ {
+		sink.SetLevelEnabled(i, false)
+	}
 
-	sink.LevelPrinters[logging.LevelDebug] = plogr.DefaultLevelPrinters[1]
-	sink.LevelPrinters[logging.LevelInfo] = plogr.DefaultLevelPrinters[0]
-	sink.LevelPrinters[logging.LevelSuccess] = pterm.Success
-	sink.LevelPrinters[logging.LevelWarn] = pterm.Warning
 	sink.ErrorPrinter = *sink.ErrorPrinter.WithLineNumberOffset(3)
 
-	t.ptermSink = &sink
+	t.ptermSink = sink
 }
 
 // Enabled implements logr.LogSink.
@@ -87,10 +85,4 @@ func (t *ConsoleSink) WithName(name string) logr.LogSink {
 		console:   t.console,
 	}
 	return newSink
-}
-
-// WithLevelEnabled enables or disables the given log level, if existing.
-func (t *ConsoleSink) WithLevelEnabled(level logging.LogLevel, enabled bool) *ConsoleSink {
-	t.ptermSink.LevelEnabled[int(level)] = enabled
-	return t
 }
