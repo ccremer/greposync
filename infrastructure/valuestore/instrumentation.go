@@ -19,7 +19,7 @@ func (i *ValueStoreInstrumentation) attemptingLoadConfig(scope string, fileName 
 	if i == nil {
 		return
 	}
-	i.log.WithName(scope).V(logging.LevelDebug).Info("Loading config", "file", fileName)
+	i.log.WithName(scope).V(1).Info("Loading config", "file", fileName)
 }
 
 func (i *ValueStoreInstrumentation) loadedConfigIfNil(scope string, err error) error {
@@ -27,7 +27,7 @@ func (i *ValueStoreInstrumentation) loadedConfigIfNil(scope string, err error) e
 		return nil
 	}
 	if err != nil {
-		i.log.WithName(scope).V(logging.LevelWarn).Info("file not loaded", "error", err.Error())
+		i.log.WithName(scope).V(1).Info("file not loaded", "error", err.Error())
 	}
 	return nil
 }

@@ -44,7 +44,7 @@ func (i *CommonBatchInstrumentation) BatchPipelineCompleted(repos []*domain.GitR
 }
 
 func (i *CommonBatchInstrumentation) PipelineForRepositoryStarted(repo *domain.GitRepository) {
-	i.log.WithName(repo.URL.GetFullName()).V(logging.LevelDebug).Info("Starting pipeline")
+	i.log.WithName(repo.URL.GetFullName()).V(1).Info("Starting pipeline")
 }
 
 func (i *CommonBatchInstrumentation) PipelineForRepositoryCompleted(repo *domain.GitRepository, err error) {

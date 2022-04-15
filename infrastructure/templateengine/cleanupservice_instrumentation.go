@@ -26,11 +26,11 @@ func (r *CleanupServiceInstrumentation) WithRepository(repository *domain.GitRep
 
 func (r *CleanupServiceInstrumentation) FetchedFilesToDelete(fetchErr error, files []domain.Path) error {
 	if fetchErr == nil {
-		r.log.V(logging.LevelDebug).Info("Fetched files", "files", files)
+		r.log.V(1).Info("Fetched files", "files", files)
 	}
 	return fetchErr
 }
 
 func (r *CleanupServiceInstrumentation) DeletedFile(file domain.Path) {
-	r.log.V(logging.LevelDebug).Info("Deleted file", "file", file)
+	r.log.V(1).Info("Deleted file", "file", file)
 }

@@ -70,7 +70,7 @@ func (s *RepositoryStore) Diff(repository *domain.GitRepository, options domain.
 func (s *RepositoryStore) IsDirty(repository *domain.GitRepository) bool {
 	out, stderr, err := execGitCommand(repository.RootDir, []string{"status", "--short"})
 	if err != nil {
-		s.instrumentation.logWarning(repository, stderr)
+		s.instrumentation.logInfo(repository, stderr)
 		return true
 	}
 	if out == "" {

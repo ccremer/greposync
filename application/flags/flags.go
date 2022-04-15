@@ -1,8 +1,6 @@
 package flags
 
 import (
-	"fmt"
-
 	"github.com/ccremer/greposync/cfg"
 	"github.com/urfave/cli/v2"
 )
@@ -31,15 +29,15 @@ var (
 func InitGlobalFlags(config *cfg.Configuration) []cli.Flag {
 
 	globalFlags = []cli.Flag{
-		&cli.BoolFlag{
-			Name:    "verbose",
+		&cli.IntFlag{
+			Name:    logLevelFlagName,
 			Aliases: []string{"v"},
-			Usage:   fmt.Sprintf("Shorthand for --%s=debug", logLevelFlagName),
+			Usage:   "Log level that increases verbosity with greater numbers.",
+			Value:   config.Log.Level,
 		},
-		&cli.StringFlag{
-			Name:  logLevelFlagName,
-			Usage: "Log level. Allowed values are [debug, info, warn, error].",
-			Value: config.Log.Level,
+		&cli.BoolFlag{
+			Name:  LogShowLogFlagName,
+			Usage: "Shows the full log in real-time rather than keeping it hidden until an error occurred.",
 		},
 		&cli.PathFlag{
 			Name:  projectRootFlagName,
@@ -55,10 +53,6 @@ func InitGlobalFlags(config *cfg.Configuration) []cli.Flag {
 		&cli.BoolFlag{
 			Name:  ProjectSkipBrokenFlagName,
 			Usage: "Skip abort if a repository update encounters an error",
-		},
-		&cli.BoolFlag{
-			Name:  LogShowLogFlagName,
-			Usage: "Shows the full log in real-time rather than keeping it hidden until an error occurred.",
 		},
 		&cli.StringFlag{
 			Name:  ProjectIncludeFlagName,
@@ -79,12 +73,4 @@ func CombineWithGlobalFlags(flags ...cli.Flag) []cli.Flag {
 		globalFlags = append(globalFlags, flag)
 	}
 	return globalFlags
-}
-
-// ValidateGlobalFlags validates whether the global flags are given as expected.
-func ValidateGlobalFlags(ctx *cli.Context, config *cfg.Configuration) error {
-	if ctx.Bool("verbose") {
-		config.Log.Level = "debug"
-	}
-	return nil
 }

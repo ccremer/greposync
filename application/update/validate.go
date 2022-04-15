@@ -7,16 +7,11 @@ import (
 	"github.com/ccremer/greposync/application/clierror"
 	"github.com/ccremer/greposync/application/flags"
 	"github.com/ccremer/greposync/cfg"
-	"github.com/ccremer/greposync/infrastructure/logging"
 	"github.com/urfave/cli/v2"
 )
 
 func (c *Command) validateUpdateCommand(ctx *cli.Context) error {
 	if err := cfg.ParseConfig(c.cfg.Project.MainConfigFileName, c.cfg, ctx); err != nil {
-		return clierror.AsUsageError(err)
-	}
-
-	if err := flags.ValidateGlobalFlags(ctx, c.cfg); err != nil {
 		return clierror.AsUsageError(err)
 	}
 
@@ -48,8 +43,8 @@ func (c *Command) validateUpdateCommand(ctx *cli.Context) error {
 			return clierror.AsFlagUsageErrorf(dryRunFlagName, "unrecognized: %s", dryRunMode)
 		}
 	}
-	c.logFactory.SetLogLevel(logging.ParseLevelOrDefault(c.cfg.Log.Level, logging.LevelInfo))
+	c.logFactory.SetLogLevel(c.cfg.Log.Level)
 	j, _ := json.Marshal(c.cfg)
-	c.logFactory.NewGenericLogger("").V(logging.LevelDebug).Info("Using config", "config", string(j))
+	c.logFactory.NewGenericLogger("").V(1).Info("Using config", "config", string(j))
 	return nil
 }

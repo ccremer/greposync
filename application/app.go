@@ -23,6 +23,11 @@ type (
 	}
 )
 
+func init() {
+	// Remove -v short option
+	cli.VersionFlag.(*cli.BoolFlag).Aliases = nil
+}
+
 // NewApp initializes the CLI application.
 func NewApp(info VersionInfo, config *cfg.Configuration,
 	labelCommand *labels.Command,
