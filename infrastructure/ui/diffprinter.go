@@ -1,8 +1,6 @@
 package ui
 
 import (
-	"io"
-	"os"
 	"strings"
 
 	"github.com/pterm/pterm"
@@ -17,14 +15,12 @@ type DiffPrinter interface {
 
 // ConsoleDiffPrinter prints a colored diff to console.
 type ConsoleDiffPrinter struct {
-	writer io.Writer
 	header *pterm.HeaderPrinter
 }
 
 // NewConsoleDiffPrinter returns a new instance.
 func NewConsoleDiffPrinter() *ConsoleDiffPrinter {
 	return &ConsoleDiffPrinter{
-		writer: os.Stdout,
 		header: pterm.DefaultHeader.WithBackgroundStyle(pterm.NewStyle(pterm.BgMagenta)).WithMargin(15),
 	}
 }
@@ -32,23 +28,23 @@ func NewConsoleDiffPrinter() *ConsoleDiffPrinter {
 // PrintDiff implements DiffPrinter.
 // The prefix is used to print a header before actually printing the diff.
 func (c *ConsoleDiffPrinter) PrintDiff(prefix, diff string) {
-	if prefix != "" {
-		bytes := c.header.Sprintln(prefix)
-		_, _ = c.writer.Write([]byte(bytes))
-	}
 	lines := strings.Split(diff, "\n")
+	if diff == "" {
+		// no diff to print
+		return
+	}
+	if prefix != "" {
+		c.header.Println(prefix)
+	}
 	for _, line := range lines {
 		if strings.HasPrefix(line, "-") {
-			bytes := pterm.FgRed.Sprintln(line)
-			_, _ = c.writer.Write([]byte(bytes))
+			pterm.FgRed.Println(line)
 			continue
 		}
 		if strings.HasPrefix(line, "+") {
-			bytes := pterm.FgGreen.Sprintln(line)
-			_, _ = c.writer.Write([]byte(bytes))
+			pterm.FgGreen.Println(line)
 			continue
 		}
-		bytes := pterm.Sprintln(line)
-		_, _ = c.writer.Write([]byte(bytes))
+		pterm.Println(line)
 	}
 }
