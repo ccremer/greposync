@@ -1,7 +1,8 @@
-package logging
+package loggingtest
 
 import (
 	"github.com/ccremer/greposync/domain"
+	"github.com/ccremer/greposync/infrastructure/logging"
 	"github.com/go-logr/logr"
 )
 
@@ -9,7 +10,7 @@ import (
 type DiscardLoggerFactory struct{}
 
 // NewDiscardLoggerFactory returns a factory that creates DiscardLogger.
-func NewDiscardLoggerFactory() LoggerFactory {
+func NewDiscardLoggerFactory() logging.LoggerFactory {
 	return &DiscardLoggerFactory{}
 }
 
@@ -21,6 +22,6 @@ func (d *DiscardLoggerFactory) NewRepositoryLogger(_ *domain.GitRepository) logr
 	return logr.Discard()
 }
 
-func (d *DiscardLoggerFactory) NewPipelineLogger(name string) *PipelineLogger {
-	return &PipelineLogger{Logger: d.NewGenericLogger(name)}
+func (d *DiscardLoggerFactory) NewPipelineLogger(name string) *logging.PipelineLogger {
+	return &logging.PipelineLogger{Logger: d.NewGenericLogger(name)}
 }

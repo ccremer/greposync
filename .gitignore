@@ -30,3 +30,5 @@
 /config_defaults.yml
 /greposync.yml
 /managed_repos.yml
+/.tests
+/tests

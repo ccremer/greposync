@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/ccremer/greposync/domain"
-	"github.com/ccremer/greposync/infrastructure/logging"
+	"github.com/ccremer/greposync/infrastructure/logging/loggingtest"
 	"github.com/google/go-github/v39/github"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -148,7 +148,7 @@ func TestGhRemote_updateLabelCache(t *testing.T) {
 	}
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
-			r := NewRemote(NewGitHubInstrumentation(logging.NewDiscardLoggerFactory()))
+			r := NewRemote(NewGitHubInstrumentation(loggingtest.NewDiscardLoggerFactory()))
 			r.labelCache = tt.givenLabelCache
 			r.updateLabelCache(gitUrl, givenLabelToUpdate)
 
@@ -200,7 +200,7 @@ func TestGhRemote_removeLabelFromCache(t *testing.T) {
 	}
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
-			r := NewRemote(NewGitHubInstrumentation(logging.NewDiscardLoggerFactory()))
+			r := NewRemote(NewGitHubInstrumentation(loggingtest.NewDiscardLoggerFactory()))
 			r.labelCache = tt.givenLabelCache
 			r.removeLabelFromCache(gitUrl, givenLabelToRemove)
 
