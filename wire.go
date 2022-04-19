@@ -8,6 +8,7 @@ import (
 	"github.com/ccremer/greposync/application/initialize"
 	"github.com/ccremer/greposync/application/instrumentation"
 	"github.com/ccremer/greposync/application/labels"
+	"github.com/ccremer/greposync/application/test"
 	"github.com/ccremer/greposync/application/update"
 	"github.com/ccremer/greposync/cfg"
 	"github.com/ccremer/greposync/domain"
@@ -46,13 +47,15 @@ func initInjector() *injector {
 
 		// CLI
 		application.NewApp,
-		update.NewConfigurator,
 		wire.Value(application.VersionInfo{Version: version, Commit: commit, Date: date}),
 		cfg.NewDefaultConfig,
 		labels.NewCommand,
 		labels.NewConfigurator,
 		update.NewCommand,
+		update.NewConfigurator,
 		initialize.NewCommand,
+		test.NewCommand,
+		test.NewConfigurator,
 		wire.NewSet(ui.NewConsoleDiffPrinter, wire.Bind(new(ui.DiffPrinter), new(*ui.ConsoleDiffPrinter))),
 
 		// Template Engine
@@ -63,6 +66,7 @@ func initInjector() *injector {
 
 		// Stores
 		wire.NewSet(repositorystore.NewRepositoryStore, wire.Bind(new(domain.GitRepositoryStore), new(*repositorystore.RepositoryStore))),
+		repositorystore.NewTestRepositoryStore,
 		wire.NewSet(valuestore.NewKoanfStore, wire.Bind(new(domain.ValueStore), new(*valuestore.KoanfStore))),
 		wire.NewSet(githosting.NewPullRequestStore, wire.Bind(new(domain.PullRequestStore), new(*githosting.PullRequestStore))),
 		wire.NewSet(githosting.NewLabelStore, wire.Bind(new(domain.LabelStore), new(*githosting.LabelStore))),

@@ -11,6 +11,7 @@ import (
 	"github.com/ccremer/greposync/application/initialize"
 	"github.com/ccremer/greposync/application/instrumentation"
 	"github.com/ccremer/greposync/application/labels"
+	"github.com/ccremer/greposync/application/test"
 	"github.com/ccremer/greposync/application/update"
 	"github.com/ccremer/greposync/cfg"
 	"github.com/ccremer/greposync/domain"
@@ -54,7 +55,10 @@ func initInjector() *injector {
 	updateAppService := update.NewConfigurator(goTemplateEngine, repositoryStore, goTemplateStore, koanfStore, pullRequestStore, renderService, cleanupService, pullRequestService, consoleDiffPrinter, configuration, coloredConsole)
 	updateCommand := update.NewCommand(configuration, updateAppService, consoleLoggerFactory, commonBatchInstrumentation)
 	initializeCommand := initialize.NewCommand(configuration, consoleLoggerFactory)
-	app := application.NewApp(versionInfo, configuration, command, updateCommand, initializeCommand, consoleLoggerFactory)
+	testRepositoryStore := repositorystore.NewTestRepositoryStore(repositoryStoreInstrumentation)
+	testAppService := test.NewConfigurator(goTemplateEngine, testRepositoryStore, goTemplateStore, mapStore, renderService, consoleDiffPrinter, configuration, coloredConsole)
+	testCommand := test.NewCommand(configuration, testAppService, consoleLoggerFactory, commonBatchInstrumentation)
+	app := application.NewApp(versionInfo, configuration, command, updateCommand, initializeCommand, testCommand, consoleLoggerFactory)
 	mainInjector := NewInjector(app)
 	return mainInjector
 }
