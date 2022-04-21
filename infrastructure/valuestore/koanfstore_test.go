@@ -6,15 +6,17 @@ import (
 	"testing"
 
 	"github.com/ccremer/greposync/domain"
+	"github.com/knadh/koanf"
+	"github.com/knadh/koanf/providers/confmap"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-func TestMapStore_ImplementsInterface(t *testing.T) {
-	assert.Implements(t, (*domain.ValueStore)(nil), new(MapStore))
+func TestKoanfStore_ImplementsInterface(t *testing.T) {
+	assert.Implements(t, (*domain.ValueStore)(nil), new(KoanfStore))
 }
 
-func TestMapStore_loadAndMergeConfig(t *testing.T) {
+func TestKoanfStore_loadAndMergeConfig(t *testing.T) {
 	tests := map[string]struct {
 		expectedConf  map[string]interface{}
 		givenSyncFile string
@@ -37,20 +39,20 @@ func TestMapStore_loadAndMergeConfig(t *testing.T) {
 	}
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
-			s := NewMapStore(nil)
+			s := NewKoanfStore(nil)
+			s.syncConfigFileName = tt.givenSyncFile
 			u, err := url.Parse("https://github.com/ccremer/greposync")
 			require.NoError(t, err)
-			s.globalConfig = config{}
-			SyncConfigFileName = tt.givenSyncFile
+			s.globalKoanf = koanf.New("")
 			repo := &domain.GitRepository{URL: domain.FromURL(u), RootDir: domain.NewFilePath("testdata")}
 			result, err := s.loadAndMergeConfig(repo)
 			require.NoError(t, err)
-			assert.EqualValues(t, tt.expectedConf, result)
+			assert.EqualValues(t, tt.expectedConf, result.Raw())
 		})
 	}
 }
 
-func TestMapStore_loadDataForTemplate(t *testing.T) {
+func TestKoanfStore_LoadDataForTemplate(t *testing.T) {
 	tests := map[string]struct {
 		expectedConf          domain.Values
 		givenSyncFile         string
@@ -88,12 +90,41 @@ func TestMapStore_loadDataForTemplate(t *testing.T) {
 	}
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
-			s := NewMapStore(nil)
-			cfg, err := s.loadYaml(filepath.Join("testdata", tt.givenSyncFile))
+			s := NewKoanfStore(nil)
+			k := koanf.New("")
+			err := s.loadYaml(k, filepath.Join("testdata", tt.givenSyncFile))
 			require.NoError(t, err)
-			result, err := s.loadValuesForTemplate(cfg, tt.givenTemplateFileName)
+			result, err := s.loadValuesForTemplate(k, tt.givenTemplateFileName)
 			require.NoError(t, err)
 			assert.Equal(t, tt.expectedConf, result)
 		})
 	}
+}
+
+func TestKoanfStore_FetchValuesForTemplate(t *testing.T) {
+	newRepo := func(t *testing.T, path string) *domain.GitRepository {
+		u, err := url.Parse(path)
+		require.NoError(t, err)
+		return domain.NewGitRepository(domain.FromURL(u), domain.NewFilePath(path))
+	}
+	t.Run("GivenMultipleRepos_ThenSyncFilesAreIsolated", func(t *testing.T) {
+		s := NewKoanfStore(nil)
+		tpl := domain.NewTemplate(domain.NewFilePath("README.md"), 0777)
+		s.globalKoanf = koanf.New(".")
+		err := s.globalKoanf.Load(confmap.Provider(config{
+			"README.md": map[string]interface{}{
+				"global": "value",
+			},
+		}, ""), nil)
+		require.NoError(t, err)
+		repo1 := newRepo(t, "testdata/repo1")
+		repo2 := newRepo(t, "testdata/repo2")
+		vals1, err := s.FetchValuesForTemplate(tpl, repo1)
+		require.NoError(t, err)
+		vals2, err := s.FetchValuesForTemplate(tpl, repo2)
+		require.NoError(t, err)
+
+		assert.Equal(t, "parameter", vals1["extra"])
+		assert.Nil(t, vals2["extra"])
+	})
 }

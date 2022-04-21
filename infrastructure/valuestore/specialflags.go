@@ -6,12 +6,13 @@ import (
 	"strings"
 
 	"github.com/ccremer/greposync/domain"
+	"github.com/knadh/koanf"
 )
 
-func (s *MapStore) loadFilesToDelete(repoConfig config) ([]domain.Path, error) {
+func (s *KoanfStore) loadFilesToDelete(repoConfig *koanf.Koanf) ([]domain.Path, error) {
 	filePaths := make([]domain.Path, 0)
 	// Go through all top-level keys, which are the file names
-	for filePath, _ := range repoConfig {
+	for filePath, _ := range repoConfig.Raw() {
 		// If the filename is already handled by the template renderer, ignore it.
 		// Otherwise, add files that have deletion flag, but ignore directories
 		if !pathIsFile(filePath) {
@@ -36,7 +37,7 @@ func pathIsFile(filePath string) bool {
 	return !strings.HasSuffix(filePath, "/")
 }
 
-func (s *MapStore) loadBooleanFlag(repoConfig config, relativePath, flagName string) (bool, error) {
+func (s *KoanfStore) loadBooleanFlag(repoConfig *koanf.Koanf, relativePath, flagName string) (bool, error) {
 	values, err := s.loadValuesForTemplate(repoConfig, relativePath)
 	if err != nil {
 		return false, err
@@ -48,7 +49,7 @@ func (s *MapStore) loadBooleanFlag(repoConfig config, relativePath, flagName str
 	return false, domain.ErrKeyNotFound
 }
 
-func (s *MapStore) loadTargetPath(repoConfig config, relativePath string) (domain.Path, error) {
+func (s *KoanfStore) loadTargetPath(repoConfig *koanf.Koanf, relativePath string) (domain.Path, error) {
 	values, err := s.loadValuesForTemplate(repoConfig, relativePath)
 	if err != nil {
 		return "", err
