@@ -1,0 +1,6 @@
+:globals:
+  key: value
+
+README.md:
+  title: Hello World
+  extra: parameter

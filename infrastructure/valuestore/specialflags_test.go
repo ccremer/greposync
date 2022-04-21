@@ -5,6 +5,9 @@ import (
 	"testing"
 
 	"github.com/ccremer/greposync/domain"
+	"github.com/knadh/koanf"
+	"github.com/knadh/koanf/parsers/yaml"
+	"github.com/knadh/koanf/providers/file"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -46,7 +49,7 @@ var specialFlagsCases = map[string]struct {
 	},
 }
 
-func TestMapStore_FetchFilesToDelete(t *testing.T) {
+func TestFetchFilesToDelete(t *testing.T) {
 	tests := map[string]struct {
 		givenSyncFile string
 		expectedFiles []domain.Path
@@ -68,10 +71,10 @@ func TestMapStore_FetchFilesToDelete(t *testing.T) {
 	}
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
-			s := NewMapStore(nil)
-			cfg, err := s.loadYaml(path.Join("testdata", tt.givenSyncFile))
-			require.NoError(t, err)
-			result, err := s.loadFilesToDelete(cfg)
+			s := NewKoanfStore(nil)
+			k := koanf.New("")
+			require.NoError(t, k.Load(file.Provider(path.Join("testdata", tt.givenSyncFile)), yaml.Parser()))
+			result, err := s.loadFilesToDelete(k)
 			require.NoError(t, err)
 			require.Len(t, result, len(tt.expectedFiles))
 			for i := range tt.expectedFiles {
@@ -81,14 +84,14 @@ func TestMapStore_FetchFilesToDelete(t *testing.T) {
 	}
 }
 
-func TestMapStore_loadBooleanFlag(t *testing.T) {
+func TestLoadBooleanFlag(t *testing.T) {
 	for _, flagName := range []string{"delete", "unmanaged"} {
 		for name, tt := range specialFlagsCases {
 			t.Run(name+"_With_"+flagName, func(t *testing.T) {
-				s := NewMapStore(nil)
-				cfg, err := s.loadYaml(path.Join("testdata", "specialflags.yml"))
-				require.NoError(t, err)
-				result, err := s.loadBooleanFlag(cfg, tt.givenTemplateFileName, flagName)
+				s := NewKoanfStore(nil)
+				k := koanf.New("")
+				require.NoError(t, k.Load(file.Provider(path.Join("testdata", "specialflags.yml")), yaml.Parser()))
+				result, err := s.loadBooleanFlag(k, tt.givenTemplateFileName, flagName)
 				if tt.expectedErrString != "" {
 					require.Error(t, err)
 					assert.Contains(t, err.Error(), tt.expectedErrString)
@@ -101,13 +104,13 @@ func TestMapStore_loadBooleanFlag(t *testing.T) {
 	}
 }
 
-func TestMapStore_FetchTargetPath(t *testing.T) {
+func TestLoadTargetPath(t *testing.T) {
 	for name, tt := range specialFlagsCases {
 		t.Run(name, func(t *testing.T) {
-			s := NewMapStore(nil)
-			cfg, err := s.loadYaml(path.Join("testdata", "specialflags.yml"))
-			require.NoError(t, err)
-			result, err := s.loadTargetPath(cfg, tt.givenTemplateFileName)
+			s := NewKoanfStore(nil)
+			k := koanf.New("")
+			require.NoError(t, k.Load(file.Provider(path.Join("testdata", "specialflags.yml")), yaml.Parser()))
+			result, err := s.loadTargetPath(k, tt.givenTemplateFileName)
 			require.NoError(t, err)
 			assert.Equal(t, tt.expectedTargetPath, result)
 		})
