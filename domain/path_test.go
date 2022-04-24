@@ -121,3 +121,23 @@ func TestPath_Join(t *testing.T) {
 		})
 	}
 }
+
+func TestPath_IsInSlice(t *testing.T) {
+	givenPath := NewPath("path")
+	tests := map[string]struct {
+		givenSlice     []Path
+		expectedResult bool
+	}{
+		"GivenNil_ThenExpectFalse":                       {givenSlice: nil},
+		"GivenEmptySlice_ThenExpectFalse":                {givenSlice: []Path{}},
+		"GivenSamePath_ThenExpectTrue":                   {givenSlice: []Path{"path"}, expectedResult: true},
+		"GivenAnotherPath_ThenExpectFalse":               {givenSlice: []Path{"another"}},
+		"GivenMultiplePaths_WhenSamePath_ThenExpectTrue": {givenSlice: []Path{"another", "path"}, expectedResult: true},
+	}
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
+			result := givenPath.IsInSlice(tt.givenSlice)
+			assert.Equal(t, tt.expectedResult, result)
+		})
+	}
+}

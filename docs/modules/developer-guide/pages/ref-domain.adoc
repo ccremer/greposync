@@ -326,7 +326,7 @@ type ValueStore interface {
     FetchValuesForTemplate(template *Template, repository *GitRepository) (Values, error)
     FetchUnmanagedFlag(template *Template, repository *GitRepository) (bool, error)
     FetchTargetPath(template *Template, repository *GitRepository) (Path, error)
-    FetchFilesToDelete(repository *GitRepository) ([]Path, error)
+    FetchFilesToDelete(repository *GitRepository, templates []*Template) ([]Path, error)
 }
 ----
 
@@ -360,7 +360,7 @@ An empty string indicates that there is no alternative path configured.
 .FetchFilesToDelete
 [source, go]
 ----
-func FetchFilesToDelete(repository *GitRepository) ([]Path, error)
+func FetchFilesToDelete(repository *GitRepository, templates []*Template) ([]Path, error)
 ----
 FetchFilesToDelete returns a slice of Path that should be deleted in the Git repository.
 The paths are relative to the Git root directory.
@@ -399,10 +399,14 @@ func (s *CleanupService) CleanupUnwantedFiles(pipe CleanupPipeline) error
 [source, go]
 ----
 type CleanupPipeline struct {
-    Repository    *GitRepository
-    ValueStore    ValueStore
+    Repository       *GitRepository
+    ValueStore       ValueStore
+    TemplateStore    TemplateStore
 }
 ----
+
+
+
 
 
 
@@ -760,7 +764,7 @@ RenderService is a domain service that helps rendering templates.
 func (s *RenderService) RenderTemplates(ctx RenderContext) error
 ----
 
-RenderTemplates loads the Templates and renders them in the GitRepository.RootDir of the given RenderContext.Repository.
+RenderTemplates loads the TemplateStore and renders them in the GitRepository.RootDir of the given RenderContext.Repository.
 
 
 '''
@@ -1010,6 +1014,14 @@ func (p Path) String() string
 ----
 
 String returns a string representation of itself.
+
+.IsInSlice
+[source, go]
+----
+func (p Path) IsInSlice(paths []Path) bool
+----
+
+IsInSlice returns true if p is in the given slice, false otherwise.
 
 
 '''
@@ -1276,6 +1288,7 @@ func NewCleanupService(
 
 
 
+
 === NewGitRepository
 [source, go]
 ----
@@ -1326,6 +1339,7 @@ func NewFilePath(elems ...string) Path
 
 NewFilePath constructs a new Path joined by the given elements.
 Paths are joined with filepath.Join.
+
 
 
 

@@ -67,12 +67,13 @@ dir/subdir/file:
 
 `delete: true`::
 When this flag is set, the target file is being deleted.
-It is not rendered at all.
+If this flag is applied to directories or `:globals`, then every known and affected template file is deleted as well.
 
 [TIP]
 ====
 * Use this flag in `config_defaults.yml` to cleanup files that aren't needed in the managed repositories anymore.
-* Use this flag in `.sync.file` to tell greposync to not create certain files.
+* Use this flag in `.sync.file` on a single file name to tell greposync to not create single files.
+* Use this flag in `.sync.file` on a directory name or in `:globals` to tell greposync to not create multiple files.
 ====
 
 `unmanaged: true`::

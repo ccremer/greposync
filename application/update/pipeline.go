@@ -76,8 +76,9 @@ func (c *updatePipeline) renderTemplates(_ context.Context) error {
 
 func (c *updatePipeline) cleanupUnwantedFiles(_ context.Context) error {
 	err := c.appService.cleanupService.CleanupUnwantedFiles(domain.CleanupPipeline{
-		Repository: c.repo,
-		ValueStore: c.appService.valueStore,
+		Repository:    c.repo,
+		ValueStore:    c.appService.valueStore,
+		TemplateStore: c.appService.templateStore,
 	})
 	return err
 }

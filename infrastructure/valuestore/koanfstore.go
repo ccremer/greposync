@@ -32,9 +32,9 @@ func NewKoanfStore(instrumentation *ValueStoreInstrumentation) *KoanfStore {
 }
 
 // FetchValuesForTemplate implements domain.ValueStore.
-func (s *KoanfStore) FetchValuesForTemplate(template *domain.Template, config *domain.GitRepository) (domain.Values, error) {
+func (s *KoanfStore) FetchValuesForTemplate(template *domain.Template, repository *domain.GitRepository) (domain.Values, error) {
 	s.loadGlobals()
-	repoKoanf, err := s.prepareRepoKoanf(config)
+	repoKoanf, err := s.prepareRepoKoanf(repository)
 	if err != nil {
 		return domain.Values{}, err
 	}
@@ -42,9 +42,9 @@ func (s *KoanfStore) FetchValuesForTemplate(template *domain.Template, config *d
 }
 
 // FetchUnmanagedFlag implements domain.ValueStore.
-func (s *KoanfStore) FetchUnmanagedFlag(template *domain.Template, config *domain.GitRepository) (bool, error) {
+func (s *KoanfStore) FetchUnmanagedFlag(template *domain.Template, repository *domain.GitRepository) (bool, error) {
 	s.loadGlobals()
-	repoKoanf, err := s.prepareRepoKoanf(config)
+	repoKoanf, err := s.prepareRepoKoanf(repository)
 	if err != nil {
 		return false, err
 	}
@@ -52,9 +52,9 @@ func (s *KoanfStore) FetchUnmanagedFlag(template *domain.Template, config *domai
 }
 
 // FetchTargetPath implements domain.ValueStore.
-func (s *KoanfStore) FetchTargetPath(template *domain.Template, config *domain.GitRepository) (domain.Path, error) {
+func (s *KoanfStore) FetchTargetPath(template *domain.Template, repository *domain.GitRepository) (domain.Path, error) {
 	s.loadGlobals()
-	repoKoanf, err := s.prepareRepoKoanf(config)
+	repoKoanf, err := s.prepareRepoKoanf(repository)
 	if err != nil {
 		return "", err
 	}
@@ -62,13 +62,13 @@ func (s *KoanfStore) FetchTargetPath(template *domain.Template, config *domain.G
 }
 
 // FetchFilesToDelete implements domain.ValueStore.
-func (s *KoanfStore) FetchFilesToDelete(config *domain.GitRepository) ([]domain.Path, error) {
+func (s *KoanfStore) FetchFilesToDelete(repository *domain.GitRepository, templates []*domain.Template) ([]domain.Path, error) {
 	s.loadGlobals()
-	repoKoanf, err := s.prepareRepoKoanf(config)
+	repoKoanf, err := s.prepareRepoKoanf(repository)
 	if err != nil {
 		return []domain.Path{}, err
 	}
-	return s.loadFilesToDelete(repoKoanf)
+	return s.loadFilesToDelete(repoKoanf, templates)
 }
 
 func (s *KoanfStore) prepareRepoKoanf(repository *domain.GitRepository) (*koanf.Koanf, error) {
