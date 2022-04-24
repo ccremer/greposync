@@ -5,6 +5,7 @@
 * xref:tutorials/installation.adoc[Installation]
 * xref:tutorials/getting-started.adoc[Getting started]
 * xref:tutorials/create-pr.adoc[Create a PR]
+* xref:tutorials/setup-test-cases.adoc[Setup Test Cases]
 
 .How To
 * xref:how-tos/inherit-value.adoc[Inherit values in directories]
@@ -13,12 +14,14 @@
 * xref:how-tos/delete-files.adoc[Remove files in all repositories]
 * xref:how-tos/comment-files.adoc[Add comment headers]
 * xref:how-tos/sync-labels.adoc[Sync labels in all repositories]
+* xref:how-tos/test-template.adoc[Test rendering with test cases]
 * xref:how-tos/migrate-from-modulesync.adoc[Migrate from ModuleSync]
 
 .Technical reference
 * xref:references/template.adoc[Template]
 * xref:references/greposync.adoc[Main Configuration]
 * xref:references/sync-config.adoc[Sync Configuration]
+* xref:references/testing-mode.adoc[Testing Mode]
 
 .Explanation
 * xref:explanations/deep-merge.adoc[Configuration deep merge]

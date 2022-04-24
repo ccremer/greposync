@@ -1,0 +1,8 @@
+tests <1>
+└── case-1 <2>
+    ├── README.adoc <3>
+    └── .sync.yml <4>
+.tests <5>
+└── case-1 <6>
+    ├── README.adoc <7>
+    └── .sync.yml <8>

@@ -1,0 +1,46 @@
+= Testing Mode
+
+{page-component-name} supports a test mode that allows to verify the rendered artifacts using local, faked repositories.
+These faked repositories can be considered test cases, where a set of "golden" files represent the expected result.
+If the actual rendered file is different than its expected counterpart file, the test case is considered "failed".
+
+== File structure
+
+```
+include::example$test-ref/structure.txt[]
+```
+<1> The root directory name for test cases
+<2> Test case name (fake repository)
+<3> File with the expected content
+<4> {sync-file} file for the test case
+<5> The root directory name for the rendered test results (generated)
+<6> Directory name matching the test case
+<7> File with the rendered result
+<8> 1:1 copy of {sync-file} from test case
+
+Only the `tests` directory and their contents need to be prepared and are safe to include in any VCS.
+
+The `.tests` directory is generated when running tests and it matches the `tests` structure.
+This directory should be listed in `.gitignore`.
+
+CAUTION: The `.tests` directory is deleted completely before running the tests.
+
+[NOTE]
+====
+The expected file name must be the same as the template name including `.tpl` extension.
+Otherwise, the diff detects a file rename and the test fails, even if the file content is correct.
+For example, if your template directory contains `.gitignore.tpl`, the test directory must also contain `.gitignore.tpl`.
+====
+
+== Running tests
+
+Once the file structure is prepared, the tests can be run with `gsync test`.
+
+It will:
+
+. Clean directory `.tests` if it exists.
+. Analyse content in `tests` and copy the `{sync-file}` to `.tests` if exist.
+. Render the templates and write the results to `.tests` for each test case.
+. Run `git diff --no-index .tests/<case-name> tests/<case-name>`.
+  If the diff is empty, the test passes.
+  If the diff is non-empty, the diff is displayed and the test fails.
