@@ -51,8 +51,9 @@ var specialFlagsCases = map[string]struct {
 
 func TestFetchFilesToDelete(t *testing.T) {
 	tests := map[string]struct {
-		givenSyncFile string
-		expectedFiles []domain.Path
+		givenSyncFile     string
+		givenTemplateList []*domain.Template
+		expectedFiles     []domain.Path
 	}{
 		"GivenExistingFile_ThenExpectCorrectPropertyInheritance": {
 			givenSyncFile: "specialflags.yml",
@@ -68,17 +69,38 @@ func TestFetchFilesToDelete(t *testing.T) {
 				"subdir/fileTrue",
 			},
 		},
+		"GivenTemplateList_WhenTemplateDeletedWithGlobals_ThenExpectTemplateInList": {
+			givenSyncFile: "delete-globals.yml",
+			givenTemplateList: []*domain.Template{
+				{RelativePath: "a-file-not-in-sync.yml"},
+			},
+			expectedFiles: []domain.Path{
+				"topLevelFileTrue",
+				"subdir/fileTrue",
+				"a-file-not-in-sync.yml",
+			},
+		},
+		"GivenTemplateList_WhenTemplateExcludedViaHierarchy_ThenExpectNotInList": {
+			givenSyncFile: "delete-globals.yml",
+			givenTemplateList: []*domain.Template{
+				{RelativePath: "subdir/a-file-not-in-sync.yml"},
+			},
+			expectedFiles: []domain.Path{
+				"topLevelFileTrue",
+				"subdir/fileTrue",
+			},
+		},
 	}
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
 			s := NewKoanfStore(nil)
 			k := koanf.New("")
 			require.NoError(t, k.Load(file.Provider(path.Join("testdata", tt.givenSyncFile)), yaml.Parser()))
-			result, err := s.loadFilesToDelete(k)
+			result, err := s.loadFilesToDelete(k, tt.givenTemplateList)
 			require.NoError(t, err)
-			require.Len(t, result, len(tt.expectedFiles))
+			require.Len(t, result, len(tt.expectedFiles), "length of result list")
 			for i := range tt.expectedFiles {
-				assert.Contains(t, result, tt.expectedFiles[i])
+				assert.Contains(t, result, tt.expectedFiles[i], "expected file list")
 			}
 		})
 	}

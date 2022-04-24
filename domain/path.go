@@ -65,3 +65,13 @@ func (p Path) Delete() {
 func (p Path) String() string {
 	return string(p)
 }
+
+// IsInSlice returns true if p is in the given slice, false otherwise.
+func (p Path) IsInSlice(paths []Path) bool {
+	for i := 0; i < len(paths); i++ {
+		if paths[i] == p {
+			return true
+		}
+	}
+	return false
+}

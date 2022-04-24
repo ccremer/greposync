@@ -14,5 +14,5 @@ type ValueStore interface {
 	FetchTargetPath(template *Template, repository *GitRepository) (Path, error)
 	// FetchFilesToDelete returns a slice of Path that should be deleted in the Git repository.
 	// The paths are relative to the Git root directory.
-	FetchFilesToDelete(repository *GitRepository) ([]Path, error)
+	FetchFilesToDelete(repository *GitRepository, templates []*Template) ([]Path, error)
 }

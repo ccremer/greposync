@@ -31,7 +31,7 @@ func NewRenderService(instrumentation RenderServiceInstrumentation) *RenderServi
 	}
 }
 
-// RenderTemplates loads the Templates and renders them in the GitRepository.RootDir of the given RenderContext.Repository.
+// RenderTemplates loads the TemplateStore and renders them in the GitRepository.RootDir of the given RenderContext.Repository.
 func (s *RenderService) RenderTemplates(ctx RenderContext) error {
 	ctx.instrumentation = s.instrumentation.WithRepository(ctx.Repository)
 	result := pipeline.NewPipeline().WithSteps(
