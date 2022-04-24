@@ -300,7 +300,7 @@ Use <code>:globals</code> for that purpose.</p>
 <dt class="hdlist1"><code>delete: true</code></dt>
 <dd>
 <p>When this flag is set, the target file is being deleted.
-It is not rendered at all.</p>
+If this flag is applied to directories or <code>:globals</code>, then every known and affected template file is deleted as well.</p>
 </dd>
 </dl>
 </div>
@@ -317,7 +317,10 @@ It is not rendered at all.</p>
 <p>Use this flag in <code>config_defaults.yml</code> to cleanup files that aren&#8217;t needed in the managed repositories anymore.</p>
 </li>
 <li>
-<p>Use this flag in <code>.sync.file</code> to tell greposync to not create certain files.</p>
+<p>Use this flag in <code>.sync.file</code> on a single file name to tell greposync to not create single files.</p>
+</li>
+<li>
+<p>Use this flag in <code>.sync.file</code> on a directory name or in <code>:globals</code> to tell greposync to not create multiple files.</p>
 </li>
 </ul>
 </div>

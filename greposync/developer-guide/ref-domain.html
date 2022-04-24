@@ -582,7 +582,7 @@ It aborts on first error.</p>
     FetchValuesForTemplate(template *Template, repository *GitRepository) (Values, error)
     FetchUnmanagedFlag(template *Template, repository *GitRepository) (bool, error)
     FetchTargetPath(template *Template, repository *GitRepository) (Path, error)
-    FetchFilesToDelete(repository *GitRepository) ([]Path, error)
+    FetchFilesToDelete(repository *GitRepository, templates []*Template) ([]Path, error)
 }</code></pre>
 </div>
 </div>
@@ -624,7 +624,7 @@ An empty string indicates that there is no alternative path configured.</p>
 <div class="listingblock">
 <div class="title">FetchFilesToDelete</div>
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func FetchFilesToDelete(repository *GitRepository) ([]Path, error)</code></pre>
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func FetchFilesToDelete(repository *GitRepository, templates []*Template) ([]Path, error)</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -662,8 +662,9 @@ The paths are relative to the Git root directory.</p>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">type CleanupPipeline struct {
-    Repository    *GitRepository
-    ValueStore    ValueStore
+    Repository       *GitRepository
+    ValueStore       ValueStore
+    TemplateStore    TemplateStore
 }</code></pre>
 </div>
 </div>
@@ -1037,7 +1038,7 @@ There cannot be duplicates or labels with no name.</p>
 </div>
 </div>
 <div class="paragraph">
-<p>RenderTemplates loads the Templates and renders them in the GitRepository.RootDir of the given RenderContext.Repository.</p>
+<p>RenderTemplates loads the TemplateStore and renders them in the GitRepository.RootDir of the given RenderContext.Repository.</p>
 </div>
 <hr>
 </div>
@@ -1310,6 +1311,15 @@ If you need error handling, use os.RemoveAll directly.</p>
 </div>
 <div class="paragraph">
 <p>String returns a string representation of itself.</p>
+</div>
+<div class="listingblock">
+<div class="title">IsInSlice</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">func (p Path) IsInSlice(paths []Path) bool</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>IsInSlice returns true if p is in the given slice, false otherwise.</p>
 </div>
 <hr>
 </div>
