@@ -3,11 +3,13 @@ package application
 import (
 	"errors"
 	"os"
+	"sort"
 
 	"github.com/ccremer/greposync/application/clierror"
 	"github.com/ccremer/greposync/application/flags"
 	"github.com/ccremer/greposync/application/initialize"
 	"github.com/ccremer/greposync/application/labels"
+	"github.com/ccremer/greposync/application/test"
 	"github.com/ccremer/greposync/application/update"
 	"github.com/ccremer/greposync/cfg"
 	"github.com/ccremer/greposync/infrastructure/logging"
@@ -33,6 +35,7 @@ func NewApp(info VersionInfo, config *cfg.Configuration,
 	labelCommand *labels.Command,
 	updateCommand *update.Command,
 	initializeCommand *initialize.Command,
+	testCommand *test.Command,
 	factory logging.LoggerFactory,
 ) *App {
 	flags.InitGlobalFlags(config)
@@ -49,8 +52,12 @@ func NewApp(info VersionInfo, config *cfg.Configuration,
 			initializeCommand.GetCliCommand(),
 			labelCommand.GetCliCommand(),
 			updateCommand.GetCliCommand(),
+			testCommand.GetCliCommand(),
 		},
 		ExitErrHandler: clierror.NewErrorHandler(app.log),
+	}
+	for _, command := range a.Commands {
+		sort.Sort(cli.FlagsByName(command.Flags))
 	}
 	app.app = a
 	return app

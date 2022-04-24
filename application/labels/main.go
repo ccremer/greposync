@@ -49,7 +49,7 @@ func (c *Command) runCommand(_ *cli.Context) error {
 func (c *Command) updateRepos() pipeline.Supplier {
 	return func(ctx context.Context, pipelinesCH chan *pipeline.Pipeline) {
 		defer close(pipelinesCH)
-		c.instrumentation.BatchPipelineStarted(c.repos)
+		c.instrumentation.BatchPipelineStarted("Update started", c.repos)
 		for _, r := range c.repos {
 			select {
 			case <-ctx.Done():

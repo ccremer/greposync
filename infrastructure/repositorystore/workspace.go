@@ -41,7 +41,7 @@ func (s *RepositoryStore) Checkout(repository *domain.GitRepository) error {
 	}
 	args = append(args, repository.CommitBranch)
 
-	out, stderr, err := execGitCommand(repository.RootDir, s.instrumentation.logGitArguments(repository, args))
+	out, stderr, err := execGitCommand(repository.RootDir, s.instrumentation.logGitArguments(repository, 0, args))
 	if err != nil {
 		return mergeWithStdErr(err, stderr)
 	}
@@ -50,7 +50,7 @@ func (s *RepositoryStore) Checkout(repository *domain.GitRepository) error {
 }
 
 func (s *RepositoryStore) Fetch(repository *domain.GitRepository) error {
-	out, stderr, err := execGitCommand(repository.RootDir, s.instrumentation.logGitArguments(repository, []string{"fetch"}))
+	out, stderr, err := execGitCommand(repository.RootDir, s.instrumentation.logGitArguments(repository, 0, []string{"fetch"}))
 	if err != nil {
 		return mergeWithStdErr(err, stderr)
 	}
@@ -61,7 +61,7 @@ func (s *RepositoryStore) Fetch(repository *domain.GitRepository) error {
 }
 
 func (s *RepositoryStore) Reset(repository *domain.GitRepository) error {
-	out, stderr, err := execGitCommand(repository.RootDir, s.instrumentation.logGitArguments(repository, []string{"reset", "--hard"}))
+	out, stderr, err := execGitCommand(repository.RootDir, s.instrumentation.logGitArguments(repository, 0, []string{"reset", "--hard"}))
 	if err != nil {
 		return mergeWithStdErr(err, stderr)
 	}
@@ -75,7 +75,7 @@ func (s *RepositoryStore) Pull(repository *domain.GitRepository) error {
 		return err
 	}
 	if exists {
-		out, stderr, err := execGitCommand(repository.RootDir, s.instrumentation.logGitArguments(repository, []string{"pull", "origin", repository.CommitBranch}))
+		out, stderr, err := execGitCommand(repository.RootDir, s.instrumentation.logGitArguments(repository, 0, []string{"pull", "origin", repository.CommitBranch}))
 		if err != nil {
 			return mergeWithStdErr(err, stderr)
 		}
@@ -89,7 +89,7 @@ func (s *RepositoryStore) Push(repository *domain.GitRepository, options domain.
 	if options.Force {
 		args = append(args, "--force")
 	}
-	out, stderr, err := execGitCommand(repository.RootDir, s.instrumentation.logGitArguments(repository, args))
+	out, stderr, err := execGitCommand(repository.RootDir, s.instrumentation.logGitArguments(repository, 0, args))
 	if err != nil {
 		return mergeWithStdErr(err, stderr)
 	}

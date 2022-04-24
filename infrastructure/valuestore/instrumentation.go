@@ -27,7 +27,7 @@ func (i *ValueStoreInstrumentation) loadedConfigIfNil(scope string, err error) e
 		return nil
 	}
 	if err != nil {
-		i.log.WithName(scope).V(1).Info("file not loaded", "error", err.Error())
+		i.log.WithName(scope).V(1).Info("File not loaded", "error", err.Error())
 	}
 	return nil
 }

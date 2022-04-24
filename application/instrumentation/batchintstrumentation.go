@@ -6,8 +6,8 @@ import (
 )
 
 type BatchInstrumentation interface {
-	BatchPipelineStarted(repos []*domain.GitRepository)
-	BatchPipelineCompleted(repos []*domain.GitRepository)
+	BatchPipelineStarted(message string, repos []*domain.GitRepository)
+	BatchPipelineCompleted(message string, repos []*domain.GitRepository)
 	PipelineForRepositoryStarted(repo *domain.GitRepository)
 	PipelineForRepositoryCompleted(repo *domain.GitRepository, err error)
 	NewCollectErrorHandler(skipBroken bool) pipeline.ParallelResultHandler

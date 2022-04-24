@@ -69,8 +69,12 @@ func InitGlobalFlags(config *cfg.Configuration) []cli.Flag {
 // CombineWithGlobalFlags combines the given flags with the global flags.
 // The given flags are appended, so the global flags are first in the list.
 func CombineWithGlobalFlags(flags ...cli.Flag) []cli.Flag {
-	for _, flag := range flags {
-		globalFlags = append(globalFlags, flag)
+	result := make([]cli.Flag, len(globalFlags))
+	for i := 0; i < len(globalFlags); i++ {
+		result[i] = globalFlags[i]
 	}
-	return globalFlags
+	for _, flag := range flags {
+		result = append(result, flag)
+	}
+	return result
 }
