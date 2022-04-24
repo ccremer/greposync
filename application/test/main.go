@@ -2,6 +2,7 @@ package test
 
 import (
 	"context"
+	"os"
 
 	pipeline "github.com/ccremer/go-command-pipeline"
 	"github.com/ccremer/greposync/application/instrumentation"
@@ -15,22 +16,21 @@ func (c *Command) runCommand(cliCtx *cli.Context) error {
 	p := pipeline.NewPipeline().AddBeforeHook(logger.Accept).WithSteps(
 		pipeline.NewStepFromFunc("configure infrastructure", c.configureInfrastructure),
 		pipeline.NewStepFromFunc("fetch test repositories", c.fetchRepositories),
-		pipeline.NewWorkerPoolStep("update repositories", c.cfg.Project.Jobs, c.updateReposInParallel(), c.instr.NewCollectErrorHandler(c.cfg.Project.SkipBroken)),
+		pipeline.NewStepFromFunc("clean test directory", c.cleanTestDir),
+		pipeline.NewWorkerPoolStep("update repositories", c.cfg.Project.Jobs, c.updateReposInParallel(), c.instr.NewCollectErrorHandler(true)),
 	)
 	p.WithFinalizer(func(ctx context.Context, result pipeline.Result) error {
-		c.instr.BatchPipelineCompleted(c.repositories)
+		c.instr.BatchPipelineCompleted("Tests finished", c.repositories)
 		return result.Err()
 	})
 	return p.RunWithContext(ctx).Err()
 }
 
 func (c *Command) createRepositoryPipeline(r *domain.GitRepository) *pipeline.Pipeline {
-
-	showDiff := c.cfg.Log.ShowDiff
-
 	up := &updatePipeline{
-		repo:       r,
-		appService: c.appService,
+		repo:               r,
+		appService:         c.appService,
+		failPipelineIfDiff: c.exitOnFail,
 	}
 
 	logger := c.logFactory.NewPipelineLogger(r.URL.GetFullName())
@@ -40,12 +40,15 @@ func (c *Command) createRepositoryPipeline(r *domain.GitRepository) *pipeline.Pi
 			c.instr.PipelineForRepositoryStarted(up.repo)
 			return nil
 		}),
+		pipeline.NewStepFromFunc("create dir", up.createOutputDir),
+		pipeline.NewStepFromFunc("copy sync file", up.copySyncFile),
 		pipeline.NewPipeline().AddBeforeHook(logger.Accept).
 			WithNestedSteps("render",
 				pipeline.NewStepFromFunc("render templates", up.renderTemplates),
+				pipeline.NewStepFromFunc("cleanup unwanted files", up.cleanupUnwantedFiles),
 			),
 
-		pipeline.ToStep("show diff", up.diff, pipeline.Bool(showDiff)),
+		pipeline.NewStepFromFunc("show diff", up.diff),
 	)
 	pipe.WithFinalizer(func(ctx context.Context, result pipeline.Result) error {
 		c.instr.PipelineForRepositoryCompleted(r, result.Err())
@@ -57,7 +60,7 @@ func (c *Command) createRepositoryPipeline(r *domain.GitRepository) *pipeline.Pi
 func (c *Command) updateReposInParallel() pipeline.Supplier {
 	return func(ctx context.Context, pipelines chan *pipeline.Pipeline) {
 		defer close(pipelines)
-		c.instr.BatchPipelineStarted(c.repositories)
+		c.instr.BatchPipelineStarted("Tests started", c.repositories)
 		for _, r := range c.repositories {
 			select {
 			case <-ctx.Done():
@@ -80,4 +83,8 @@ func (c *Command) fetchRepositories(ctx context.Context) error {
 	c.repositories = repos
 	pipeline.StoreInContext(ctx, instrumentation.RepositoriesContextKey{}, repos)
 	return err
+}
+
+func (c *Command) cleanTestDir(_ context.Context) error {
+	return os.RemoveAll(c.appService.repoStore.TestOutputRootDir)
 }

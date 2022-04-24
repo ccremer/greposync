@@ -19,18 +19,20 @@ func TestTestRepositoryStore_FetchGitRepositories(t *testing.T) {
 		"GivenTestDir1_WhenParentContainsFiles_ThenExpectOnlyDirs": {
 			prepare: func(t *testing.T, s *TestRepositoryStore) {
 				s.ParentDir = "testdata/testcase1"
+				s.TestOutputRootDir = "testdata/.tests/testcase1"
 			},
 			expectedList: []*domain.GitRepository{
-				{RootDir: "testdata/testcase1/fakerepo1", URL: testURL(t, "fakerepo1")},
-				{RootDir: "testdata/testcase1/fakerepo2", URL: testURL(t, "fakerepo2")},
+				{RootDir: "testdata/.tests/testcase1/fakerepo1", URL: testURL(t, "file://testdata/.tests/testcase1/fakerepo1")},
+				{RootDir: "testdata/.tests/testcase1/fakerepo2", URL: testURL(t, "file://testdata/.tests/testcase1/fakerepo2")},
 			},
 		},
 		"GivenTestDir2_WhenParentContainsHiddenDirs_ThenSkipHiddenDir": {
 			prepare: func(t *testing.T, s *TestRepositoryStore) {
 				s.ParentDir = "testdata/testcase2"
+				s.TestOutputRootDir = "testdata/.tests/testcase2"
 			},
 			expectedList: []*domain.GitRepository{
-				{RootDir: "testdata/testcase2/fakerepo2", URL: testURL(t, "fakerepo2")},
+				{RootDir: "testdata/.tests/testcase2/fakerepo2", URL: testURL(t, "file://testdata/.tests/testcase2/fakerepo2")},
 			},
 		},
 	}
@@ -62,10 +64,10 @@ func TestTestRepositoryStore_Diff(t *testing.T) {
 				s.TestOutputRootDir = "testdata/diff1/actual"
 			},
 			givenRepository: &domain.GitRepository{
-				RootDir: domain.NewFilePath("testdata", "diff1", "fakerepo"),
+				RootDir: domain.NewFilePath("testdata", "diff1", "actual", "fakerepo"),
 				URL:     testURL(t, "fakerepo"),
 			},
-			expectedDiff: "--- a/testdata/diff1/fakerepo/file.txt\n+++ b/testdata/diff1/actual/fakerepo/file.txt\n@@ -1 +1 @@\n-Expected Line\n+Actual Line\n",
+			expectedDiff: "--- actual:testdata/diff1/actual/fakerepo/file.txt\n+++ expected:testdata/diff1/fakerepo/file.txt\n@@ -1 +1 @@\n-Actual Line\n+Expected Line\n",
 		},
 		"GivenTestDir2_WhenContentIsSame_ThenExpectNoDiffWithoutError": {
 			prepare: func(t *testing.T, s *TestRepositoryStore) {

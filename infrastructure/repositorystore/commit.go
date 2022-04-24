@@ -33,7 +33,7 @@ func (s *RepositoryStore) Commit(repository *domain.GitRepository, options domai
 	}
 
 	// Commit
-	out, stderr, err := execGitCommand(repository.RootDir, s.instrumentation.logGitArguments(repository, args))
+	out, stderr, err := execGitCommand(repository.RootDir, s.instrumentation.logGitArguments(repository, 0, args))
 	if err != nil {
 		s.instrumentation.logInfo(repository, out)
 		return mergeWithStdErr(err, stderr)
@@ -43,7 +43,7 @@ func (s *RepositoryStore) Commit(repository *domain.GitRepository, options domai
 }
 
 func (s *RepositoryStore) Add(repository *domain.GitRepository) error {
-	out, stderr, err := execGitCommand(repository.RootDir, s.instrumentation.logGitArguments(repository, []string{"add", "-A"}))
+	out, stderr, err := execGitCommand(repository.RootDir, s.instrumentation.logGitArguments(repository, 0, []string{"add", "-A"}))
 	if err != nil {
 		return mergeWithStdErr(err, stderr)
 	}

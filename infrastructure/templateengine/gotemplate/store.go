@@ -8,7 +8,8 @@ import (
 )
 
 type GoTemplateStore struct {
-	RootDir domain.Path
+	RootDir                   domain.Path
+	SkipRemovingFileExtension bool
 }
 
 func NewTemplateStore() *GoTemplateStore {
@@ -45,8 +46,12 @@ func (s *GoTemplateStore) evaluatePath(file string, info os.FileInfo, err error)
 	if pathErr != nil {
 		return nil, pathErr
 	}
-	return domain.NewTemplate(
+	tpl := domain.NewTemplate(
 		domain.NewPath(relativePath),
 		domain.Permissions(info.Mode()),
-	), nil
+	)
+	if s.SkipRemovingFileExtension {
+		tpl.ExtensionReplacement = ""
+	}
+	return tpl, nil
 }

@@ -56,7 +56,7 @@ func (c *Command) runCommand(cliCtx *cli.Context) error {
 		pipeline.NewWorkerPoolStep("update repositories", c.cfg.Project.Jobs, c.updateReposInParallel(), c.instr.NewCollectErrorHandler(c.cfg.Project.SkipBroken)),
 	)
 	p.WithFinalizer(func(ctx context.Context, result pipeline.Result) error {
-		c.instr.BatchPipelineCompleted(c.repositories)
+		c.instr.BatchPipelineCompleted("Update finished", c.repositories)
 		return result.Err()
 	})
 	return p.RunWithContext(ctx).Err()
@@ -123,7 +123,7 @@ func (c *Command) createPipeline(r *domain.GitRepository) *pipeline.Pipeline {
 func (c *Command) updateReposInParallel() pipeline.Supplier {
 	return func(ctx context.Context, pipelines chan *pipeline.Pipeline) {
 		defer close(pipelines)
-		c.instr.BatchPipelineStarted(c.repositories)
+		c.instr.BatchPipelineStarted("Update started", c.repositories)
 		for _, r := range c.repositories {
 			select {
 			case <-ctx.Done():

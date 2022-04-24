@@ -3,6 +3,7 @@ package clierror
 import (
 	"errors"
 	"fmt"
+	"os"
 
 	"github.com/go-logr/logr"
 	"github.com/urfave/cli/v2"
@@ -23,6 +24,10 @@ func NewErrorHandler(logger logr.Logger) cli.ExitErrHandlerFunc {
 			logger.Error(err, "user error")
 			cli.ShowCommandHelpAndExit(context, context.Command.Name, 2)
 			return
+		}
+		var cliErr cli.ExitCoder
+		if errors.As(err, &cliErr) {
+			os.Exit(cliErr.ExitCode())
 		}
 	}
 }

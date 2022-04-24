@@ -56,7 +56,7 @@ func initInjector() *injector {
 	updateCommand := update.NewCommand(configuration, updateAppService, consoleLoggerFactory, commonBatchInstrumentation)
 	initializeCommand := initialize.NewCommand(configuration, consoleLoggerFactory)
 	testRepositoryStore := repositorystore.NewTestRepositoryStore(repositoryStoreInstrumentation)
-	testAppService := test.NewConfigurator(goTemplateEngine, testRepositoryStore, goTemplateStore, mapStore, renderService, consoleDiffPrinter, configuration, coloredConsole)
+	testAppService := test.NewConfigurator(goTemplateEngine, testRepositoryStore, goTemplateStore, koanfStore, renderService, cleanupService, consoleDiffPrinter, configuration, coloredConsole)
 	testCommand := test.NewCommand(configuration, testAppService, consoleLoggerFactory, commonBatchInstrumentation)
 	app := application.NewApp(versionInfo, configuration, command, updateCommand, initializeCommand, testCommand, consoleLoggerFactory)
 	mainInjector := NewInjector(app)

@@ -32,7 +32,7 @@ func (t *ConsoleSink) Init(info logr.RuntimeInfo) {
 		sink.SetLevelEnabled(i, false)
 	}
 
-	sink.ErrorPrinter = *sink.ErrorPrinter.WithLineNumberOffset(3)
+	sink.ErrorPrinter = *sink.ErrorPrinter.WithShowLineNumber(false).WithLineNumberOffset(3)
 
 	t.ptermSink = sink
 }

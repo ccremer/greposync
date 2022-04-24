@@ -2,6 +2,7 @@ package instrumentation
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	pipeline "github.com/ccremer/go-command-pipeline"
@@ -11,6 +12,7 @@ import (
 	"github.com/ccremer/greposync/infrastructure/ui"
 	"github.com/go-logr/logr"
 	"github.com/hashicorp/go-multierror"
+	"github.com/urfave/cli/v2"
 )
 
 type CommonBatchInstrumentation struct {
@@ -27,13 +29,13 @@ func NewUpdateInstrumentation(console *ui.ColoredConsole, factory logging.Logger
 	}
 }
 
-func (i *CommonBatchInstrumentation) BatchPipelineStarted(repos []*domain.GitRepository) {
-	i.log.Info("Update started")
+func (i *CommonBatchInstrumentation) BatchPipelineStarted(message string, repos []*domain.GitRepository) {
+	i.log.Info(message)
 	i.console.StartBatchUpdate(repos)
 }
 
-func (i *CommonBatchInstrumentation) BatchPipelineCompleted(repos []*domain.GitRepository) {
-	i.log.Info("Update finished")
+func (i *CommonBatchInstrumentation) BatchPipelineCompleted(message string, repos []*domain.GitRepository) {
+	i.log.Info(message)
 
 	for index, result := range i.results {
 		if result.IsFailed() {
@@ -62,9 +64,17 @@ func (i *CommonBatchInstrumentation) NewCollectErrorHandler(skipBroken bool) pip
 }
 
 func (i *CommonBatchInstrumentation) ignoreErrors() pipeline.ParallelResultHandler {
-	// Do not propagate update errors from single repositories up the stack
+	// Do not propagate update errors from single repositories up the stack, unless one explicitly contains a wrapped exit code error.
 	return func(ctx context.Context, results map[uint64]pipeline.Result) error {
 		i.results = results
+		for _, result := range results {
+			if result.IsFailed() {
+				var clierr cli.ExitCoder
+				if errors.As(result.Err(), &clierr) {
+					return clierr
+				}
+			}
+		}
 		return nil
 	}
 }

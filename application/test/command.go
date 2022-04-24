@@ -15,6 +15,8 @@ type Command struct {
 	appService   *AppService
 	instr        instrumentation.BatchInstrumentation
 	logFactory   logging.LoggerFactory
+
+	exitOnFail bool
 }
 
 // NewCommand returns a new Command instance.
@@ -44,6 +46,12 @@ func (c *Command) createCliCommand() *cli.Command {
 		Usage:  "Test the rendered template against test cases",
 		Action: c.runCommand,
 		Before: c.validateTestCommand,
-		Flags:  flags.CombineWithGlobalFlags(),
+		Flags: flags.CombineWithGlobalFlags(
+			&cli.BoolFlag{
+				Name:        "exit-code",
+				Destination: &c.exitOnFail,
+				Usage:       "Exits app with exit code 3 if a test case failed.",
+			},
+		),
 	}
 }

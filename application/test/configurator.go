@@ -9,14 +9,15 @@ import (
 )
 
 type AppService struct {
-	engine        *gotemplate.GoTemplateEngine
-	repoStore     *repositorystore.TestRepositoryStore
-	templateStore *gotemplate.GoTemplateStore
-	valueStore    domain.ValueStore
-	renderService *domain.RenderService
-	diffPrinter   *ui.ConsoleDiffPrinter
-	cfg           *cfg.Configuration
-	console       *ui.ColoredConsole
+	engine         *gotemplate.GoTemplateEngine
+	repoStore      *repositorystore.TestRepositoryStore
+	templateStore  *gotemplate.GoTemplateStore
+	valueStore     domain.ValueStore
+	renderService  *domain.RenderService
+	cleanupService *domain.CleanupService
+	diffPrinter    *ui.ConsoleDiffPrinter
+	cfg            *cfg.Configuration
+	console        *ui.ColoredConsole
 }
 
 func NewConfigurator(
@@ -25,19 +26,21 @@ func NewConfigurator(
 	templateStore *gotemplate.GoTemplateStore,
 	valueStore domain.ValueStore,
 	renderService *domain.RenderService,
+	cleanupService *domain.CleanupService,
 	diffPrinter *ui.ConsoleDiffPrinter,
 	cfg *cfg.Configuration,
 	console *ui.ColoredConsole,
 ) *AppService {
 	return &AppService{
-		engine:        engine,
-		repoStore:     repoStore,
-		templateStore: templateStore,
-		valueStore:    valueStore,
-		renderService: renderService,
-		diffPrinter:   diffPrinter,
-		cfg:           cfg,
-		console:       console,
+		engine:         engine,
+		repoStore:      repoStore,
+		templateStore:  templateStore,
+		valueStore:     valueStore,
+		renderService:  renderService,
+		cleanupService: cleanupService,
+		diffPrinter:    diffPrinter,
+		cfg:            cfg,
+		console:        console,
 	}
 }
 
@@ -49,5 +52,7 @@ func (c *AppService) ConfigureInfrastructure() {
 	c.repoStore.ExcludeFilter = c.cfg.Project.Exclude
 	c.repoStore.IncludeFilter = c.cfg.Project.Include
 	c.templateStore.RootDir = "template"
-	c.console.Quiet = !c.cfg.Log.ShowLog
+	c.templateStore.SkipRemovingFileExtension = true
+	c.console.SetTitle("RUNNING TESTS...")
+	c.console.SetCommandName("Test")
 }

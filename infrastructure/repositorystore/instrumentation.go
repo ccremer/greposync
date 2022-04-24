@@ -30,8 +30,8 @@ func (i *RepositoryStoreInstrumentation) logInfo(repository *domain.GitRepositor
 	}
 }
 
-func (i *RepositoryStoreInstrumentation) logGitArguments(repository *domain.GitRepository, args []string) []string {
-	i.log.WithName(repository.URL.GetFullName()).Info(fmt.Sprintf("%s %s", GitBinary, strings.Join(args, " ")))
+func (i *RepositoryStoreInstrumentation) logGitArguments(repository *domain.GitRepository, level int, args []string) []string {
+	i.log.WithName(repository.URL.GetFullName()).V(level).Info(fmt.Sprintf("%s %s", GitBinary, strings.Join(args, " ")))
 	return args
 }
 

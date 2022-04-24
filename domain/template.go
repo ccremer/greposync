@@ -7,6 +7,8 @@ import (
 	"strings"
 )
 
+var DefaultExtensionReplacement = ".tpl"
+
 // Permissions is an alias for file permissions.
 type Permissions fs.FileMode
 
@@ -17,13 +19,16 @@ type Template struct {
 	// FilePermissions defines what file permissions this template file has.
 	// Rendered files should have the same permissions as template files.
 	FilePermissions Permissions
+	// ExtensionReplacement is a substring that is removed from the file path.
+	ExtensionReplacement string
 }
 
 // NewTemplate returns a new instance.
 func NewTemplate(relPath Path, perms Permissions) *Template {
 	return &Template{
-		RelativePath:    relPath,
-		FilePermissions: perms,
+		RelativePath:         relPath,
+		FilePermissions:      perms,
+		ExtensionReplacement: DefaultExtensionReplacement,
 	}
 }
 
@@ -33,11 +38,11 @@ func (t *Template) Render(values Values, engine TemplateEngine) (RenderResult, e
 	return content, err
 }
 
-// CleanPath returns a new Path with the first occurrence of ".tpl" in the base file name removed.
+// CleanPath returns a new Path with the first occurrence of Template.ExtensionReplacement in the base file name removed.
 func (t *Template) CleanPath() Path {
 	dirName := path.Dir(t.RelativePath.String())
 	baseName := path.Base(t.RelativePath.String())
-	newName := strings.Replace(baseName, ".tpl", "", 1)
+	newName := strings.Replace(baseName, t.ExtensionReplacement, "", 1)
 	return NewPath(dirName, newName)
 }
 

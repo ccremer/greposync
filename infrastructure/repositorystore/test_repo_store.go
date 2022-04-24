@@ -2,6 +2,7 @@ package repositorystore
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -33,6 +34,11 @@ var ErrNotSupported = fmt.Errorf("not supported")
 
 // FetchGitRepositories implements domain.GitRepositoryStore.
 func (s *TestRepositoryStore) FetchGitRepositories() ([]*domain.GitRepository, error) {
+	includeRegex, excludeRegex, err := compileRegex(s.IncludeFilter, s.ExcludeFilter)
+	if err != nil {
+		return nil, err
+	}
+
 	list := make([]*domain.GitRepository, 0)
 	dirs, err := os.ReadDir(filepath.Clean(s.ParentDir))
 	if err != nil {
@@ -43,11 +49,16 @@ func (s *TestRepositoryStore) FetchGitRepositories() ([]*domain.GitRepository, e
 		if !dirEntry.IsDir() || strings.HasPrefix(dirEntry.Name(), ".") {
 			continue
 		}
-		u, err := giturls.Parse(dirEntry.Name())
+		u, err := giturls.Parse(fmt.Sprintf("file://%s/%s", domain.NewFilePath(s.TestOutputRootDir), dirEntry.Name()))
 		if err != nil {
 			return list, err
 		}
-		repo := domain.NewGitRepository(domain.FromURL(u), domain.NewFilePath(s.ParentDir, dirEntry.Name()))
+		gitUrl := domain.FromURL(u)
+		if skipRepository(gitUrl.String(), includeRegex, excludeRegex) {
+			s.instrumentation.skipRepository(gitUrl)
+			continue
+		}
+		repo := domain.NewGitRepository(domain.FromURL(u), domain.NewFilePath(s.TestOutputRootDir, dirEntry.Name()))
 		list = append(list, repo)
 	}
 	return list, nil
@@ -57,14 +68,32 @@ func (s *TestRepositoryStore) FetchGitRepositories() ([]*domain.GitRepository, e
 // Since this implementation is meant for testing local fake repositories, the diff will be computed against the files stored in TestRepositoryStore.TestOutputRootDir.
 // The files in the repository's RootDir are the expected files, where "---" is the expected file content, and "+++" the actual content.
 func (s *TestRepositoryStore) Diff(repository *domain.GitRepository, _ domain.DiffOptions) (string, error) {
-	args := []string{"diff", "--no-index", repository.RootDir.String(), filepath.Join(s.TestOutputRootDir, repository.URL.Path)}
+	args := []string{
+		"diff", "--no-index", "--src-prefix=actual:", "--dst-prefix=expected:",
+		repository.RootDir.String(),
+		filepath.Join(s.ParentDir, repository.URL.Path)}
 	cwd, _ := os.Getwd()
-	fmt.Println(cwd)
-	stdout, stderr, err := execGitCommand(domain.NewFilePath(cwd), s.instrumentation.logGitArguments(repository, args))
+	stdout, stderr, err := execGitCommand(domain.NewFilePath(cwd), s.instrumentation.logGitArguments(repository, 1, args))
 	if err != nil && stdout == "" { // if there's a diff, the exit code is still 1 (--exit-code) implied
 		return "", mergeWithStdErr(err, stderr)
 	}
 	return stdout, nil
+}
+
+// CopySyncFile copies the sync file from StoreConfig.ParentDir to TestRepositoryStore.TestOutputRootDir.
+// It returns nil if the sync file doesn't exist.
+func (s *TestRepositoryStore) CopySyncFile(repository *domain.GitRepository) error {
+	src := domain.NewFilePath(s.ParentDir, repository.URL.Path, ".sync.yml")
+	if !src.FileExists() {
+		return nil
+	}
+	dst := filepath.Join(repository.RootDir.String(), ".sync.yml")
+	input, err := ioutil.ReadFile(src.String())
+	if err != nil {
+		return err
+	}
+	err = ioutil.WriteFile(dst, input, 0644)
+	return err
 }
 
 // Clone returns ErrNotSupported.

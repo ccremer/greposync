@@ -800,8 +800,9 @@ RenderContext represents a single rendering context for a GitRepository.
 [source, go]
 ----
 type Template struct {
-    RelativePath       Path
-    FilePermissions    Permissions
+    RelativePath            Path
+    FilePermissions         Permissions
+    ExtensionReplacement    string
 }
 ----
 
@@ -813,6 +814,9 @@ RelativePath is the Path reference to where the template file is contained withi
 FilePermissions::
 FilePermissions defines what file permissions this template file has.
 Rendered files should have the same permissions as template files.
+
+ExtensionReplacement::
+ExtensionReplacement is a substring that is removed from the file path.
 
 
 
@@ -832,7 +836,7 @@ Render takes the given Values and returns a RenderResult from the given Template
 func (t *Template) CleanPath() Path
 ----
 
-CleanPath returns a new Path with the first occurrence of ".tpl" in the base file name removed.
+CleanPath returns a new Path with the first occurrence of Template.ExtensionReplacement in the base file name removed.
 
 .AsValues
 [source, go]
@@ -1237,6 +1241,14 @@ ErrInvalidArgument is an error that indicates that a particular field is invalid
 var ErrKeyNotFound = errors.New("key not found")
 ----
 ErrKeyNotFound is an error that indicates that a particular key was not found.
+
+
+=== DefaultExtensionReplacement
+[source, go]
+----
+
+----
+
 
 
 == Functions
