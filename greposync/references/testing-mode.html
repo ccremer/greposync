@@ -3,8 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Sync Configuration :: greposync docs</title>
-    <link rel="canonical" href="https://ccremer.github.io/greposync/greposync/0.2/references/sync-config.html">
+    <title>Testing Mode :: greposync docs</title>
     <meta name="generator" content="Antora 3.0.1">
     <link rel="stylesheet" href="../../_/css/site.css">
     <script>var uiRootPath = '../../_'</script>
@@ -95,10 +94,10 @@
   <li class="nav-item" data-depth="1">
     <a class="nav-link" href="greposync.html">Main Configuration</a>
   </li>
-  <li class="nav-item is-current-page" data-depth="1">
+  <li class="nav-item" data-depth="1">
     <a class="nav-link" href="sync-config.html">Sync Configuration</a>
   </li>
-  <li class="nav-item" data-depth="1">
+  <li class="nav-item is-current-page" data-depth="1">
     <a class="nav-link" href="testing-mode.html">Testing Mode</a>
   </li>
 </ul>
@@ -166,116 +165,104 @@
   <ul>
     <li><a href="../index.html">greposync</a></li>
     <li>Technical reference</li>
-    <li><a href="sync-config.html">Sync Configuration</a></li>
+    <li><a href="testing-mode.html">Testing Mode</a></li>
   </ul>
 </nav>
 <div class="page-versions">
   <button class="version-menu-toggle" title="Show other versions of page">master</button>
   <div class="version-menu">
-    <a class="version is-current" href="sync-config.html">master</a>
-    <a class="version" href="../0.3/references/sync-config.html">0.3-rc2</a>
-    <a class="version" href="../0.2/references/sync-config.html">0.2</a>
-    <a class="version" href="../0.1/references/sync-config.html">0.1</a>
+    <a class="version is-current" href="testing-mode.html">master</a>
+    <a class="version is-missing" href="../0.3/index.html">0.3-rc2</a>
+    <a class="version is-missing" href="../0.2/index.html">0.2</a>
+    <a class="version is-missing" href="../0.1/index.html">0.1</a>
   </div>
 </div>
-  <div class="edit-this-page"><a href="https://github.com/ccremer/greposync/edit/master/docs/modules/ROOT/pages/references/sync-config.adoc">Edit this Page</a></div>
+  <div class="edit-this-page"><a href="https://github.com/ccremer/greposync/edit/master/docs/modules/ROOT/pages/references/testing-mode.adoc">Edit this Page</a></div>
   </div>
   <div class="content">
 <aside class="toc sidebar" data-title="Contents" data-levels="2">
   <div class="toc-menu"></div>
 </aside>
 <article class="doc">
-<h1 class="page">Sync Configuration</h1>
+<h1 class="page">Testing Mode</h1>
 <div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
-<p>There are 2 locations how template variables are configured.</p>
-</div>
-<div class="paragraph">
-<p><code>config_defaults.yml</code> is the config file that defines variables for all managed repositories.
-It&#8217;s expected to be in the current working directory when invoking <code>gsync</code>.</p>
-</div>
-<div class="paragraph">
-<p><code>.sync.yml</code> is the config file that is used to configure individual values per repository.
-Each entry extends and potentially overrides variables defined in <code>config_defaults.yml</code>.
-It&#8217;s expected to be in the root directory of a Git repository.</p>
+<p>greposync supports a test mode that allows to verify the rendered artifacts using local, faked repositories.
+These faked repositories can be considered test cases, where a set of "golden" files represent the expected result.
+If the actual rendered file is different than its expected counterpart file, the test case is considered "failed".</p>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_value_hierarchy"><a class="anchor" href="#_value_hierarchy"></a>Value hierarchy</h2>
+<h2 id="_file_structure"><a class="anchor" href="#_file_structure"></a>File structure</h2>
 <div class="sectionbody">
-<div class="paragraph">
-<p>The following hierarchy of merging and inheriting values is applied.
-The last element in the list is overwriting anything defined before.</p>
-</div>
-<div class="olist arabic">
-<ol class="arabic">
-<li>
-<p><code>:globals</code> in <code>config_defaults.yml</code></p>
-</li>
-<li>
-<p><code>directory/</code> in <code>config_defaults.yml</code></p>
-</li>
-<li>
-<p><code>directory/filename</code> in <code>config_defaults.yml</code></p>
-</li>
-<li>
-<p><code>:globals</code> in <code>.sync.yml</code></p>
-</li>
-<li>
-<p><code>directory/</code> in <code>.sync.yml</code></p>
-</li>
-<li>
-<p><code>directory/filename</code> in <code>.sync.yml</code></p>
-</li>
-</ol>
-</div>
-<div class="exampleblock">
-<div class="title">Example 1. Value hierarchy</div>
-<div class="content">
 <div class="listingblock">
-<div class="title">config_defaults.yml</div>
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">:globals:
-  key: 1
-
-dir/:
-  key: 2 <i class="conum" data-value="1"></i><b>(1)</b>
-
-dir/subdir/:
-  key: 3
-
-dir/subdir/file:
-  key: a</code></pre>
-</div>
-</div>
-<div class="listingblock">
-<div class="title">.sync.yml</div>
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">:globals:
-  key: 4
-
-dir/subdir/:
-  key: 5
-
-dir/subdir/file:
-  key: b <i class="conum" data-value="2"></i><b>(2)</b></code></pre>
+<pre class="highlightjs highlight"><code class="language-none hljs">tests <i class="conum" data-value="1"></i><b>(1)</b>
+└── case-1 <i class="conum" data-value="2"></i><b>(2)</b>
+    ├── README.adoc <i class="conum" data-value="3"></i><b>(3)</b>
+    └── .sync.yml <i class="conum" data-value="4"></i><b>(4)</b>
+.tests <i class="conum" data-value="5"></i><b>(5)</b>
+└── case-1 <i class="conum" data-value="6"></i><b>(6)</b>
+    ├── README.adoc <i class="conum" data-value="7"></i><b>(7)</b>
+    └── .sync.yml <i class="conum" data-value="8"></i><b>(8)</b></code></pre>
 </div>
 </div>
 <div class="colist arabic">
 <table>
 <tr>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>Any file within <code>dir</code> would get the value <code>key=2</code> as there is no override in <code>.sync.yml</code>.</td>
+<td>The root directory name for test cases</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>The <code>dir/subdir/file</code> would get the value <code>key=b</code> since it&#8217;s overriding the key in <code>config_defaults.yml</code>.</td>
+<td>Test case name (fake repository)</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>File with the expected content</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>.sync.yml file for the test case</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>The root directory name for the rendered test results (generated)</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>Directory name matching the test case</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="7"></i><b>7</b></td>
+<td>File with the rendered result</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="8"></i><b>8</b></td>
+<td>1:1 copy of .sync.yml from test case</td>
 </tr>
 </table>
 </div>
+<div class="paragraph">
+<p>Only the <code>tests</code> directory and their contents need to be prepared and are safe to include in any VCS.</p>
 </div>
+<div class="paragraph">
+<p>The <code>.tests</code> directory is generated when running tests and it matches the <code>tests</code> structure.
+This directory should be listed in <code>.gitignore</code>.</p>
+</div>
+<div class="admonitionblock caution">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-caution" title="Caution"></i>
+</td>
+<td class="content">
+The <code>.tests</code> directory is deleted completely before running the tests.
+</td>
+</tr>
+</table>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -284,16 +271,10 @@ dir/subdir/file:
 <i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-<div class="ulist">
-<ul>
-<li>
-<p>Specifying <code>/</code> as the top dir to apply values is not supported.
-Use <code>:globals</code> for that purpose.</p>
-</li>
-<li>
-<p>Appending the <code>/</code> suffix to a directory is necessary, otherwise they are interpreted as files.</p>
-</li>
-</ul>
+<div class="paragraph">
+<p>The expected file name must be the same as the template name including <code>.tpl</code> extension.
+Otherwise, the diff detects a file rename and the test fails, even if the file content is correct.
+For example, if your template directory contains <code>.gitignore.tpl</code>, the test directory must also contain <code>.gitignore.tpl</code>.</p>
 </div>
 </td>
 </tr>
@@ -302,107 +283,31 @@ Use <code>:globals</code> for that purpose.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_special_values"><a class="anchor" href="#_special_values"></a>Special values</h2>
+<h2 id="_running_tests"><a class="anchor" href="#_running_tests"></a>Running tests</h2>
 <div class="sectionbody">
-<div class="dlist">
-<dl>
-<dt class="hdlist1"><code>delete: true</code></dt>
-<dd>
-<p>When this flag is set, the target file is being deleted.
-If this flag is applied to directories or <code>:globals</code>, then every known and affected template file is deleted as well.</p>
-</dd>
-</dl>
-</div>
-<div class="admonitionblock tip">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-tip" title="Tip"></i>
-</td>
-<td class="content">
-<div class="ulist">
-<ul>
-<li>
-<p>Use this flag in <code>config_defaults.yml</code> to cleanup files that aren&#8217;t needed in the managed repositories anymore.</p>
-</li>
-<li>
-<p>Use this flag in <code>.sync.file</code> on a single file name to tell greposync to not create single files.</p>
-</li>
-<li>
-<p>Use this flag in <code>.sync.file</code> on a directory name or in <code>:globals</code> to tell greposync to not create multiple files.</p>
-</li>
-</ul>
-</div>
-</td>
-</tr>
-</table>
-</div>
-<div class="dlist">
-<dl>
-<dt class="hdlist1"><code>unmanaged: true</code></dt>
-<dd>
-<p>If this flag is set, the target file is not modified.</p>
-</dd>
-</dl>
-</div>
-<div class="admonitionblock tip">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-tip" title="Tip"></i>
-</td>
-<td class="content">
-Use this flag in <code>.sync.file</code> if a repository maintains its own version of the file outside of greposync.
-</td>
-</tr>
-</table>
-</div>
-<div class="dlist">
-<dl>
-<dt class="hdlist1"><code>targetPath: &lt;path&gt;</code></dt>
-<dd>
-<p>This property can override where the templated file is actually being written to.
-It is relative to the Git root directory.</p>
-</dd>
-</dl>
+<div class="paragraph">
+<p>Once the file structure is prepared, the tests can be run with <code>gsync test</code>.</p>
 </div>
 <div class="paragraph">
-<p>If the path contains the suffix <code>/</code>, the directory is changed but the file name is kept.
-Any parent directories are created as needed, with <code>0775</code> permission flags (before <code>umask</code>).</p>
+<p>It will:</p>
 </div>
-<div class="exampleblock">
-<div class="title">Example 2. Special values usage</div>
-<div class="content">
-<div class="listingblock">
-<div class="title"><code>.sync.file</code></div>
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">.editorconfig:
-  unmanaged: true <i class="conum" data-value="1"></i><b>(1)</b>
-
-Makefile:
-  delete: true <i class="conum" data-value="2"></i><b>(2)</b>
-
-subdir/.gitignore:
-  targetPath: newDir/ <i class="conum" data-value="3"></i><b>(3)</b></code></pre>
-</div>
-</div>
-<div class="colist arabic">
-<table>
-<tr>
-<td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>The repository keeps its own version of <code>.editorconfig</code>.</td>
-</tr>
-<tr>
-<td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>The repository does not need a <code>Makefile</code>.</td>
-</tr>
-<tr>
-<td><i class="conum" data-value="3"></i><b>3</b></td>
-<td>Parse the template in <code>subdir/.gitignore</code>, but write the output to <code>newDir/.gitignore</code> in the repository root.</td>
-</tr>
-</table>
-</div>
-</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Clean directory <code>.tests</code> if it exists.</p>
+</li>
+<li>
+<p>Analyse content in <code>tests</code> and copy the <code>.sync.yml</code> to <code>.tests</code> if exist.</p>
+</li>
+<li>
+<p>Render the templates and write the results to <code>.tests</code> for each test case.</p>
+</li>
+<li>
+<p>Run <code>git diff --no-index .tests/&lt;case-name&gt; tests/&lt;case-name&gt;</code>.
+If the diff is empty, the test passes.
+If the diff is non-empty, the diff is displayed and the test fails.</p>
+</li>
+</ol>
 </div>
 </div>
 </div>

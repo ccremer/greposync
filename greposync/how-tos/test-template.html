@@ -3,8 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Main Configuration :: greposync docs</title>
-    <link rel="canonical" href="https://ccremer.github.io/greposync/greposync/0.2/references/greposync.html">
+    <title>Test the rendering of the template with test cases :: greposync docs</title>
     <meta name="generator" content="Antora 3.0.1">
     <link rel="stylesheet" href="../../_/css/site.css">
     <script>var uiRootPath = '../../_'</script>
@@ -60,28 +59,28 @@
     <span class="nav-text">How To</span>
 <ul class="nav-list">
   <li class="nav-item" data-depth="1">
-    <a class="nav-link" href="../how-tos/inherit-value.html">Inherit values in directories</a>
+    <a class="nav-link" href="inherit-value.html">Inherit values in directories</a>
   </li>
   <li class="nav-item" data-depth="1">
-    <a class="nav-link" href="../how-tos/ignore-file.html">Ignore file in a repository</a>
+    <a class="nav-link" href="ignore-file.html">Ignore file in a repository</a>
   </li>
   <li class="nav-item" data-depth="1">
-    <a class="nav-link" href="../how-tos/delete-file.html">Remove file in a specific repository</a>
+    <a class="nav-link" href="delete-file.html">Remove file in a specific repository</a>
   </li>
   <li class="nav-item" data-depth="1">
-    <a class="nav-link" href="../how-tos/delete-files.html">Remove files in all repositories</a>
+    <a class="nav-link" href="delete-files.html">Remove files in all repositories</a>
   </li>
   <li class="nav-item" data-depth="1">
-    <a class="nav-link" href="../how-tos/comment-files.html">Add comment headers</a>
+    <a class="nav-link" href="comment-files.html">Add comment headers</a>
   </li>
   <li class="nav-item" data-depth="1">
-    <a class="nav-link" href="../how-tos/sync-labels.html">Sync labels in all repositories</a>
+    <a class="nav-link" href="sync-labels.html">Sync labels in all repositories</a>
+  </li>
+  <li class="nav-item is-current-page" data-depth="1">
+    <a class="nav-link" href="test-template.html">Test rendering with test cases</a>
   </li>
   <li class="nav-item" data-depth="1">
-    <a class="nav-link" href="../how-tos/test-template.html">Test rendering with test cases</a>
-  </li>
-  <li class="nav-item" data-depth="1">
-    <a class="nav-link" href="../how-tos/migrate-from-modulesync.html">Migrate from ModuleSync</a>
+    <a class="nav-link" href="migrate-from-modulesync.html">Migrate from ModuleSync</a>
   </li>
 </ul>
   </li>
@@ -90,16 +89,16 @@
     <span class="nav-text">Technical reference</span>
 <ul class="nav-list">
   <li class="nav-item" data-depth="1">
-    <a class="nav-link" href="template.html">Template</a>
-  </li>
-  <li class="nav-item is-current-page" data-depth="1">
-    <a class="nav-link" href="greposync.html">Main Configuration</a>
+    <a class="nav-link" href="../references/template.html">Template</a>
   </li>
   <li class="nav-item" data-depth="1">
-    <a class="nav-link" href="sync-config.html">Sync Configuration</a>
+    <a class="nav-link" href="../references/greposync.html">Main Configuration</a>
   </li>
   <li class="nav-item" data-depth="1">
-    <a class="nav-link" href="testing-mode.html">Testing Mode</a>
+    <a class="nav-link" href="../references/sync-config.html">Sync Configuration</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../references/testing-mode.html">Testing Mode</a>
   </li>
 </ul>
   </li>
@@ -165,69 +164,90 @@
 <nav class="breadcrumbs" aria-label="breadcrumbs">
   <ul>
     <li><a href="../index.html">greposync</a></li>
-    <li>Technical reference</li>
-    <li><a href="greposync.html">Main Configuration</a></li>
+    <li>How To</li>
+    <li><a href="test-template.html">Test rendering with test cases</a></li>
   </ul>
 </nav>
 <div class="page-versions">
   <button class="version-menu-toggle" title="Show other versions of page">master</button>
   <div class="version-menu">
-    <a class="version is-current" href="greposync.html">master</a>
-    <a class="version" href="../0.3/references/greposync.html">0.3-rc2</a>
-    <a class="version" href="../0.2/references/greposync.html">0.2</a>
-    <a class="version" href="../0.1/references/greposync.html">0.1</a>
+    <a class="version is-current" href="test-template.html">master</a>
+    <a class="version is-missing" href="../0.3/index.html">0.3-rc2</a>
+    <a class="version is-missing" href="../0.2/index.html">0.2</a>
+    <a class="version is-missing" href="../0.1/index.html">0.1</a>
   </div>
 </div>
-  <div class="edit-this-page"><a href="https://github.com/ccremer/greposync/edit/master/docs/modules/ROOT/pages/references/greposync.adoc">Edit this Page</a></div>
+  <div class="edit-this-page"><a href="https://github.com/ccremer/greposync/edit/master/docs/modules/ROOT/pages/how-tos/test-template.adoc">Edit this Page</a></div>
   </div>
   <div class="content">
 <aside class="toc sidebar" data-title="Contents" data-levels="2">
   <div class="toc-menu"></div>
 </aside>
 <article class="doc">
-<h1 class="page">Main Configuration</h1>
-<div id="preamble">
-<div class="sectionbody">
-<div class="paragraph">
-<p><code>greposync.yml</code> holds configuration variables that define how greposync behaves when invoked.</p>
-</div>
-<div class="listingblock">
-<div class="title">All supported settings with defaults</div>
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">git:
-  commitBranch: ""
-  commitMessage: Update from greposync
-  defaultBranch: ""
-  forcePush: false
-  name: ""
-  namespace: ""
-  skipCommit: false
-  skipPush: false
-  skipReset: false
-log:
-  level: 0
-  showDiff: false
-  showLog: false
-pr:
-  bodyTemplate: This Pull request updates this repository with changes from a greposync
-    template repository.
-  create: false
-  labels: null
-  subject: Update from greposync
-  targetBranch: ""
-project:
-  jobs: 1
-  rootDir: repos
-repositoryLabels: null
-template:
-  rootDir: template</code></pre>
-</div>
-</div>
+<h1 class="page">Test the rendering of the template with test cases</h1>
 <div class="dlist">
 <dl>
-<dt class="hdlist1"><code>git.commitBranch</code></dt>
+<dt class="hdlist1">❓ Question</dt>
 <dd>
-<p>The branch name to create and checkout when making commits.</p>
+<p>How can I ensure that a change in the template is rendered correctly in all repositories before rolling it out?</p>
+</dd>
+<dt class="hdlist1">📝 Use case</dt>
+<dd>
+<p>Consider the need for a new "feature flag" value in <code>config_defaults.yml</code>.
+Based on this value, an if-else block in a template is being rendered.
+However, we want to test whether this rendering is applied correctly.</p>
+</dd>
+</dl>
+</div>
+<hr>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">💡 Solution</dt>
+<dd>
+<p>Prepare 2 test cases:</p>
+<div class="listingblock">
+<div class="title">tests/feature-enabled/.sync.yml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">README.md:
+  feature-flag: true</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">tests/feature-disabled/.sync.yml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">README.md:
+  feature-flag: false</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Run the <code>test</code> subcommand to generate the test output:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">gsync test</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Copy the test output as a "golden file" back to test case:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">cp -r .tests/feature-enabled tests/feature-enabled
+cp -r .tests/feature-disabled tests/feature-disabled</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Edit the expected content based on this feature flag in the <code>tests</code> test files.</p>
+</div>
+<div class="paragraph">
+<p>Make sure to implement the template correctly for <code>README.md</code>.
+Then run the tests again:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">gsync test --exit-code</code></pre>
+</div>
+</div>
 <div class="admonitionblock tip">
 <table>
 <tr>
@@ -236,85 +256,37 @@ template:
 </td>
 <td class="content">
 <div class="paragraph">
-<p>The simplest workflow with <code>master</code> branch looks like this:</p>
-</div>
-<div class="olist arabic">
-<ol class="arabic">
-<li>
-<p>Clone repository with <code>master</code> branch</p>
-</li>
-<li>
-<p>Create and checkout <code>greposync</code> branch</p>
-</li>
-<li>
-<p>Update repository and make commits in <code>greposync</code> branch</p>
-</li>
-<li>
-<p>Push <code>greposync</code> branch</p>
-</li>
-<li>
-<p>Create pull request that merges <code>greposync</code> back into <code>master</code></p>
-</li>
-</ol>
-</div>
-</td>
-</tr>
-</table>
-</div>
-</dd>
-<dt class="hdlist1"><code>pr.targetBranch</code></dt>
-<dd>
-<p>The branch name which pull requests should be merged into.
-If empty, it defaults to <code>git.defaultBranch</code> (usually <code>master</code> or <code>main</code>).</p>
-</dd>
-<dt class="hdlist1"><code>pr.bodyTemplate</code></dt>
-<dd>
-<p>The pull request description text.
-Supports Go templates and the <a href="template.html" class="xref page">.Metadata.Repository</a> variables</p>
-</dd>
-<dt class="hdlist1"><code>pr.labels</code></dt>
-<dd>
-<p>This parameter takes a string array of labels to apply on pull requests.
-Label names that don&#8217;t exist are created with an empty description and a random color.
-Foreign labels in existing pull requests are not removed or renamed.</p>
-</dd>
-</dl>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_sync_labels_in_all_repositories"><a class="anchor" href="#_sync_labels_in_all_repositories"></a>Sync Labels In All Repositories</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>greposync can synchronize issue and pull request labels in all managed repositories.
-Configure the <code>repositoryLabels</code> key with config like this:</p>
+<p>You can also create test cases for single files by deleting all other files except the test file:</p>
 </div>
 <div class="listingblock">
+<div class="title">tests/readme/.sync.yml</div>
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">repositoryLabels:
-  greposync:
-    color: '#ededed'
-    delete: false
-    description: updates from template repository
-    name: greposync</code></pre>
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">:globals:
+  delete: true
+README.md:
+  delete: false
+  description: test case</code></pre>
 </div>
-</div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-<div class="paragraph">
-<p>The keys within <code>repositoryLabels.*</code> have no real value and are for description only.
-This structure was favored over an array in order to make this configuration deep-mergeable in the future.</p>
 </div>
 </td>
 </tr>
 </table>
 </div>
+</dd>
+<dt class="hdlist1">🔗 Reference</dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="../references/greposync.html" class="xref page">greposync.yml</a></p>
+</li>
+<li>
+<p><a href="../references/testing-mode.html" class="xref page">Testing Mode</a></p>
+</li>
+</ul>
 </div>
+</dd>
+</dl>
 </div>
 </article>
   </div>
