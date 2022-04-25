@@ -1,0 +1,72 @@
+= Test the rendering of the template with test cases
+
+❓ Question::
+How can I ensure that a change in the template is rendered correctly in all repositories before rolling it out?
+
+📝 Use case::
+Consider the need for a new "feature flag" value in `{defaults-file}`.
+Based on this value, an if-else block in a template is being rendered.
+However, we want to test whether this rendering is applied correctly.
+
+'''
+
+💡 Solution::
+Prepare 2 test cases:
++
+.tests/feature-enabled/{sync-file}
+[source,yaml]
+----
+README.md:
+  feature-flag: true
+----
++
+.tests/feature-disabled/{sync-file}
+[source,yaml]
+----
+README.md:
+  feature-flag: false
+----
++
+Run the `test` subcommand to generate the test output:
++
+[source,bash]
+----
+gsync test
+----
++
+Copy the test output as a "golden file" back to test case:
++
+[source,bash]
+----
+cp -r .tests/feature-enabled tests/feature-enabled
+cp -r .tests/feature-disabled tests/feature-disabled
+----
++
+Edit the expected content based on this feature flag in the `tests` test files.
++
+Make sure to implement the template correctly for `README.md`.
+Then run the tests again:
++
+[source,bash]
+----
+gsync test --exit-code
+----
++
+[TIP]
+====
+You can also create test cases for single files by deleting all other files except the test file:
+
+.tests/readme/{sync-file}
+[source,yaml]
+----
+:globals:
+  delete: true
+README.md:
+  delete: false
+  description: test case
+----
+====
+
+🔗 Reference::
+* xref:references/greposync.adoc[{page-component-name}.yml]
+* xref:references/testing-mode.adoc[Testing Mode]

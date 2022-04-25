@@ -1,0 +1,180 @@
+= Setup Test Cases
+
+🏁 Goals::
+. Create a test case
+. Run the test command
+
+[NOTE]
+====
+This tutorial continues where xref:tutorials/getting-started.adoc[Getting started] left.
+Be sure to complete that one first!
+====
+
+== Prerequisites
+
+You need the following tools installed in your `$PATH`.
+
+* `git`
+* `gsync`
+* `editor` (Your favorite text editor)
+
+== Create a Test Case
+
+A test case is at the core just a local simulated Git repository with pre-rendered template files.
+We will now create a test case that verifies that `description` for `README.md` is rendered correctly.
+
+For the purpose of this guide, we'll name our test case `case-1`, but it can be (almost) any name.
+
+. Create the directories
++
+[source,bash]
+----
+mkdir -p tests/case-1
+----
+
+. Create the config file with the following content:
++
+.tests/case-1/{sync-file}
+[source,yaml]
+----
+README.md:
+  description: Test case 1
+----
+
+. Create the README file with the following content:
++
+.tests/case-1/README.md
+[source,markdown]
+----
+<!--
+This file is managed by greposync.
+Do not modify manually.
+Adjust variables in `.sync.yml`.
+-->
+# my-repository
+
+Test case 1
+----
+
+== Run the Test
+
+Now that the test case is prepared, it's time to verify if our template works as expected.
+
+. Run gsync in test mode
++
+[source,bash]
+----
+gsync test
+----
++
+.The output should look like this
+[example]
+====
+[source,console]
+----
+  INFO    Tests started
+ SUCCESS   (.tests//case-1) Test finished for repository
+---------  RUNNING TESTS... [1/1] ████████████████████████████████████ 100%
+  INFO    Tests finished
+----
+====
+
+. Inspect what happens when running tests.
++
+You will now notice that there's a new directory in your current working directory: `.tests`.
+It matches the structure in `tests/case-1` almost identically.
+This is the output folder where {page-component-name} renders the test cases to build the diff.
+
+Congratulations!
+The test has verified that `README.md` is being correctly rendered.
+
+== Optional: Fail the Test
+
+Let's see what happens if we change the description.
+
+. Edit the contents to the following:
++
+.tests/case-1/{sync-file}
+[source,yaml]
+----
+README.md:
+  description: Failure
+----
+
+. Run the test again
++
+[source,bash]
+----
+gsync test
+----
+
+.The output should look like this
+[example]
+====
+[source,diff]
+----
+  INFO    Tests started
+
+               Diff: .tests//case-1
+
+diff --git actual:.tests/case-1/README.md expected:tests/case-1/README.md
+index efb424e..91b86cf 100644
+--- actual:.tests/case-1/README.md
++++ expected:tests/case-1/README.md
+@@ -5,4 +5,4 @@ Adjust variables in `.sync.yml`.
+ -->
+ # my-repository
+
+-Failure <1>
++Test case 1 <2>
+
+ SUCCESS   (.tests//case-1) Test finished for repository
+---------  RUNNING TESTS... [1/1] ████████████████████████████████████ 100% | 0s
+  INFO    Tests finished
+
+----
+<1> The actual rendered content
+<2> The expected content
+====
+
+[TIP]
+====
+Append `--exit-code` to exit the command with non-zero exit code, like this: `gsync test --exit-code`.
+====
+
+[TIP]
+====
+To build new test cases from "golden files", simply create a new empty test case directory, run the test and copy the content from `.tests` to `test`.
+For example:
+
+[source,bash]
+----
+mkdir tests/case-2
+gsync test
+cp -r .tests/case-2 tests/case-2
+----
+
+Now you can start creating `{sync-file}` for this test case and modify the expected content.
+====
+
+== Recommended: Exclude Test Output From Git
+
+The test output in `.tests` isn't meant to be included in VCS such as Git.
+Therefore it's recommended to exlude the test output in `.gitignore`:
+
+[source,bash]
+----
+echo -n "# greposync test output\n.tests/\n" >> .gitignore
+----
+
+[discrete]
+== Tutorial complete!
+
+🏆 Learnings::
+. You understand the test case directory structure.
+. You know how to run tests.
+
+📌 Where to go next::
+* xref:tutorials/create-pr.adoc[Tutorial: Create a pull request]
+* xref:references/sync-config.adoc[Reference: Sync configuration]
+* xref:references/testing-mode.adoc[Reference: Testing Mode]
