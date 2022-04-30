@@ -13,11 +13,11 @@ import (
 
 const (
 	dryRunFlagName    = "dry-run"
-	prCreateFlagName  = "pr-create"
-	prBodyFlagName    = "pr-bodyTemplate"
-	amendFlagName     = "git-amend"
-	forcePushFlagName = "git-forcePush"
-	showDiffFlagName  = "log-showDiff"
+	prCreateFlagName  = "pr.create"
+	prBodyFlagName    = "pr.bodyTemplate"
+	amendFlagName     = "git.amend"
+	forcePushFlagName = "git.forcePush"
+	showDiffFlagName  = "log.showDiff"
 )
 
 type (
@@ -28,6 +28,9 @@ type (
 		appService   *AppService
 		instr        instrumentation.BatchInstrumentation
 		logFactory   logging.LoggerFactory
+
+		dryRunFlag string
+		PrLabels   cli.StringSlice
 	}
 )
 
@@ -73,6 +76,7 @@ func (c *Command) createPipeline(r *domain.GitRepository) *pipeline.Pipeline {
 	up := &updatePipeline{
 		repo:       r,
 		appService: c.appService,
+		prLabels:   c.PrLabels.Value(),
 	}
 
 	logger := c.logFactory.NewPipelineLogger(r.URL.GetFullName())

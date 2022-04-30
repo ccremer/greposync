@@ -12,6 +12,7 @@ type updatePipeline struct {
 	log        logr.Logger
 	repo       *domain.GitRepository
 	appService *AppService
+	prLabels   []string
 }
 
 func (c *updatePipeline) clone(_ context.Context) error {
@@ -96,7 +97,7 @@ func (c *updatePipeline) ensurePullRequest(_ context.Context) error {
 			return err
 		}
 	}
-	if err := c.repo.PullRequest.AttachLabels(domain.FromStringSlice(c.appService.cfg.PullRequest.Labels)); err != nil {
+	if err := c.repo.PullRequest.AttachLabels(domain.FromStringSlice(c.prLabels)); err != nil {
 		return err
 	}
 	err := c.appService.prStore.EnsurePullRequest(c.repo)

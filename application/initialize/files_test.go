@@ -7,23 +7,10 @@ import (
 	"text/template"
 
 	"github.com/Masterminds/sprig/v3"
-	"github.com/ccremer/greposync/cfg"
 	"github.com/ccremer/greposync/domain"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"sigs.k8s.io/yaml"
 )
-
-func Test_ParseGreposyncYaml(t *testing.T) {
-	bytes, err := os.ReadFile("greposync.yml")
-	require.NoError(t, err)
-	config := &cfg.Configuration{}
-	err = yaml.Unmarshal(bytes, config)
-	assert.NoError(t, err)
-	assert.Equal(t, []string{"greposync"}, config.PullRequest.Labels)
-	assert.False(t, config.PullRequest.Create)
-	assert.Equal(t, "Update from greposync", config.PullRequest.Subject)
-}
 
 func Test_createDir(t *testing.T) {
 	tests := map[string]struct {

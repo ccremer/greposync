@@ -6,7 +6,6 @@ import (
 	"sort"
 
 	"github.com/ccremer/greposync/application/clierror"
-	"github.com/ccremer/greposync/application/flags"
 	"github.com/ccremer/greposync/application/initialize"
 	"github.com/ccremer/greposync/application/labels"
 	"github.com/ccremer/greposync/application/test"
@@ -38,7 +37,6 @@ func NewApp(info VersionInfo, config *cfg.Configuration,
 	testCommand *test.Command,
 	factory logging.LoggerFactory,
 ) *App {
-	flags.InitGlobalFlags(config)
 	app := &App{
 		log:    factory.NewGenericLogger(""),
 		config: config,

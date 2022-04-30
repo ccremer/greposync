@@ -1,7 +1,6 @@
 package update
 
 import (
-	"encoding/json"
 	"regexp"
 
 	"github.com/ccremer/greposync/application/clierror"
@@ -26,25 +25,23 @@ func (c *Command) validateUpdateCommand(ctx *cli.Context) error {
 		return clierror.AsFlagUsageErrorf(flags.ProjectJobsFlagName, "value is not between %d and %d", flags.JobsMinimumCount, flags.JobsMaximumCount)
 	}
 
-	if ctx.IsSet(dryRunFlagName) {
-		dryRunMode := ctx.String(dryRunFlagName)
-		switch dryRunMode {
-		case "offline":
-			c.cfg.Git.SkipReset = true
-			c.cfg.Git.SkipCommit = true
-			c.cfg.Git.SkipPush = true
-			c.cfg.PullRequest.Create = false
-		case "commit":
-			c.cfg.Git.SkipPush = true
-			c.cfg.PullRequest.Create = false
-		case "push":
-			c.cfg.PullRequest.Create = false
-		default:
-			return clierror.AsFlagUsageErrorf(dryRunFlagName, "unrecognized: %s", dryRunMode)
-		}
+	switch c.dryRunFlag {
+	case "":
+		break
+	case "offline":
+		c.cfg.Git.SkipReset = true
+		c.cfg.Git.SkipCommit = true
+		c.cfg.Git.SkipPush = true
+		c.cfg.PullRequest.Create = false
+	case "commit":
+		c.cfg.Git.SkipPush = true
+		c.cfg.PullRequest.Create = false
+	case "push":
+		c.cfg.PullRequest.Create = false
+	default:
+		return clierror.AsFlagUsageErrorf(flags.NewDryRunFlag(nil).Name, "unrecognized: %s", c.dryRunFlag)
 	}
 	c.logFactory.SetLogLevel(c.cfg.Log.Level)
-	j, _ := json.Marshal(c.cfg)
-	c.logFactory.NewGenericLogger("").V(1).Info("Using config", "config", string(j))
+	c.logFactory.NewGenericLogger("").V(1).Info("Using config", "config", flags.CollectFlagValues(ctx))
 	return nil
 }

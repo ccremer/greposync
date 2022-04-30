@@ -1,7 +1,6 @@
 package test
 
 import (
-	"encoding/json"
 	"regexp"
 
 	"github.com/ccremer/greposync/application/clierror"
@@ -27,7 +26,6 @@ func (c *Command) validateTestCommand(ctx *cli.Context) error {
 	}
 
 	c.logFactory.SetLogLevel(c.cfg.Log.Level)
-	j, _ := json.Marshal(c.cfg)
-	c.logFactory.NewGenericLogger("").V(1).Info("Using config", "config", string(j))
+	c.logFactory.NewGenericLogger("").V(1).Info("Using config", "config", flags.CollectFlagValues(ctx))
 	return nil
 }
