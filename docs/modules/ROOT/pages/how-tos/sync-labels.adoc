@@ -31,7 +31,7 @@ repositoryLabels:
 +
 [NOTE]
 ====
-The names in the `repositoryLabels` are irrelevant for {page-component-name} as they are transformed into an array.
+The subkeys in the `repositoryLabels` are irrelevant for {page-component-name} as they are transformed into an array.
 But they may later be useful when deep merging with overrides per repository (not implemented).
 ====
 +

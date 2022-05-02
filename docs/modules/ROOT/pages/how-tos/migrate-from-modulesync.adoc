@@ -90,10 +90,10 @@ pr_labels:
 [source,yaml,subs=attributes]
 ----
 git:
-  namespace: {namespace}
+  defaultNamespace: {namespace}
   commitMessage: Update from {namespace}/{control-repo}
   commitBranch: {page-component-name}-update
-pullRequest:
+pr:
   targetBranch: master
   subject: Update from {namespace}/{control-repo}
   labels:
