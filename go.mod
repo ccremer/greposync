@@ -17,7 +17,7 @@ require (
 	github.com/mattn/go-isatty v0.0.14
 	github.com/pterm/pterm v0.12.41
 	github.com/stretchr/testify v1.7.1
-	github.com/urfave/cli/v2 v2.4.5
+	github.com/urfave/cli/v2 v2.5.1
 	github.com/whilp/git-urls v1.0.0
 	golang.org/x/oauth2 v0.0.0-20220411215720-9780585627b5
 	golang.org/x/sys v0.0.0-20220429233432-b5fbb4746d32
