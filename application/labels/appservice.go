@@ -27,8 +27,3 @@ func NewConfigurator(
 		factory:    factory,
 	}
 }
-
-func (c *AppService) ConfigureInfrastructure() {
-	c.repoStore.ParentDir = "repos"
-	c.repoStore.DefaultNamespace = c.cfg.Git.Namespace
-}

@@ -41,6 +41,8 @@ func (c *Command) validateUpdateCommand(ctx *cli.Context) error {
 	default:
 		return clierror.AsFlagUsageErrorf(flags.NewDryRunFlag(nil).Name, "unrecognized: %s", c.dryRunFlag)
 	}
+	c.appService.console.Quiet = !c.cfg.Log.ShowLog
+	c.appService.engine.RootDir = c.appService.templateStore.RootDir
 	c.logFactory.SetLogLevel(c.cfg.Log.Level)
 	c.logFactory.NewGenericLogger("").V(1).Info("Using config", "config", flags.CollectFlagValues(ctx))
 	return nil

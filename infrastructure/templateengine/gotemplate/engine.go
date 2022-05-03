@@ -9,7 +9,7 @@ import (
 )
 
 type GoTemplateEngine struct {
-	RootDir domain.Path
+	RootDir string
 
 	cache map[domain.Path]*template.Template
 }
@@ -58,8 +58,8 @@ func (e *GoTemplateEngine) loadGoTemplate(template *domain.Template) (*template.
 	if tpl, exists := e.cache[template.RelativePath]; exists {
 		return tpl, nil
 	}
-	fullFilePath := filepath.Join(e.RootDir.String(), template.RelativePath.String())
-	helperPath := domain.NewFilePath(e.RootDir.String(), HelperFileName)
+	fullFilePath := filepath.Join(e.RootDir, template.RelativePath.String())
+	helperPath := domain.NewFilePath(e.RootDir, HelperFileName)
 	tpl, err := e.parseTemplateFile(fullFilePath, helperPath)
 	if err != nil {
 		return nil, err

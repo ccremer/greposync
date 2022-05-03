@@ -18,15 +18,15 @@ func (c *Command) createCliCommand() *cli.Command {
 
 		flags.NewJobsFlag(&c.cfg.Project.Jobs),
 		flags.NewSkipBrokenFlag(&c.cfg.Project.SkipBroken),
-		flags.NewIncludeFlag(&c.cfg.Project.Include),
-		flags.NewExcludeFlag(&c.cfg.Project.Exclude),
+		flags.NewIncludeFlag(&c.appService.repoStore.IncludeFilter),
+		flags.NewExcludeFlag(&c.appService.repoStore.ExcludeFilter),
 		flags.NewDryRunFlag(&c.dryRunFlag),
 
-		flags.NewGitRootDirFlag(&c.cfg.Project.RootDir),
+		flags.NewGitRootDirFlag(&c.appService.repoStore.ParentDir),
 		flags.NewGitAmendFlag(&c.cfg.Git.Amend),
 		flags.NewGitForcePushFlag(&c.cfg.Git.ForcePush),
-		flags.NewGitCommitBranchFlag(&c.cfg.Git.CommitBranch),
-		flags.NewGitDefaultNamespaceFlag(&c.cfg.Git.Namespace),
+		flags.NewGitCommitBranchFlag(&c.appService.repoStore.CommitBranch),
+		flags.NewGitDefaultNamespaceFlag(&c.appService.repoStore.DefaultNamespace),
 		flags.NewGitCommitMessageFlag(&c.cfg.Git.CommitMessage),
 
 		flags.NewPRCreateFlag(&c.cfg.PullRequest.Create),
@@ -35,7 +35,7 @@ func (c *Command) createCliCommand() *cli.Command {
 		flags.NewPRTargetBranchFlag(&c.cfg.PullRequest.TargetBranch),
 		flags.NewPRLabelsFlag(&c.PrLabels),
 
-		flags.NewTemplateRootDirFlag(&c.cfg.Template.RootDir),
+		flags.NewTemplateRootDirFlag(&c.appService.templateStore.RootDir),
 	}
 	return &cli.Command{
 		Name:   "update",

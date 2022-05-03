@@ -25,6 +25,13 @@ func (c *Command) validateTestCommand(ctx *cli.Context) error {
 		return clierror.AsFlagUsageErrorf(flags.ProjectJobsFlagName, "value is not between %d and %d", flags.JobsMinimumCount, flags.JobsMaximumCount)
 	}
 
+	c.appService.console.SetTitle("RUNNING TESTS...")
+	c.appService.console.SetCommandName("Test")
+	c.appService.templateStore.SkipRemovingFileExtension = true
+	c.appService.repoStore.ParentDir = "tests"
+	c.appService.repoStore.TestOutputRootDir = ".tests"
+	c.appService.repoStore.DefaultNamespace = "local"
+	c.appService.engine.RootDir = c.appService.templateStore.RootDir
 	c.logFactory.SetLogLevel(c.cfg.Log.Level)
 	c.logFactory.NewGenericLogger("").V(1).Info("Using config", "config", flags.CollectFlagValues(ctx))
 	return nil

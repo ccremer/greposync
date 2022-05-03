@@ -14,7 +14,6 @@ func (c *Command) runCommand(cliCtx *cli.Context) error {
 	logger := c.logFactory.NewPipelineLogger("")
 	ctx := pipeline.MutableContext(cliCtx.Context)
 	p := pipeline.NewPipeline().AddBeforeHook(logger.Accept).WithSteps(
-		pipeline.NewStepFromFunc("configure infrastructure", c.configureInfrastructure),
 		pipeline.NewStepFromFunc("fetch test repositories", c.fetchRepositories),
 		pipeline.NewStepFromFunc("clean test directory", c.cleanTestDir),
 		pipeline.NewWorkerPoolStep("update repositories", c.cfg.Project.Jobs, c.updateReposInParallel(), c.instr.NewCollectErrorHandler(true)),
@@ -71,11 +70,6 @@ func (c *Command) updateReposInParallel() pipeline.Supplier {
 			}
 		}
 	}
-}
-
-func (c *Command) configureInfrastructure(_ context.Context) error {
-	c.appService.ConfigureInfrastructure()
-	return nil
 }
 
 func (c *Command) fetchRepositories(ctx context.Context) error {
