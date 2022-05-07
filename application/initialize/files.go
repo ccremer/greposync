@@ -51,7 +51,7 @@ func writeFile(file string, content []byte) error {
 
 // createTemplateDir creates the template directory if it doesn't exist.
 func (c *Command) createTemplateDir(_ context.Context) error {
-	return createDir("template")
+	return createDir(c.TemplateDir)
 }
 
 func fileExists(path string) bool {
