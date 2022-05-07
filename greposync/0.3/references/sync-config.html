@@ -50,6 +50,9 @@
   <li class="nav-item" data-depth="1">
     <a class="nav-link" href="../tutorials/create-pr.html">Create a PR</a>
   </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../tutorials/setup-test-cases.html">Setup Test Cases</a>
+  </li>
 </ul>
   </li>
   <li class="nav-item" data-depth="0">
@@ -75,6 +78,9 @@
     <a class="nav-link" href="../how-tos/sync-labels.html">Sync labels in all repositories</a>
   </li>
   <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../how-tos/test-template.html">Test rendering with test cases</a>
+  </li>
+  <li class="nav-item" data-depth="1">
     <a class="nav-link" href="../how-tos/migrate-from-modulesync.html">Migrate from ModuleSync</a>
   </li>
 </ul>
@@ -89,8 +95,14 @@
   <li class="nav-item" data-depth="1">
     <a class="nav-link" href="greposync.html">Main Configuration</a>
   </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="cli.html">Command Line Interface (CLI)</a>
+  </li>
   <li class="nav-item is-current-page" data-depth="1">
     <a class="nav-link" href="sync-config.html">Sync Configuration</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="testing-mode.html">Testing Mode</a>
   </li>
 </ul>
   </li>
@@ -124,7 +136,7 @@
 <div class="nav-panel-explore" data-panel="explore">
   <div class="context">
     <span class="title">greposync</span>
-    <span class="version">0.3-rc2</span>
+    <span class="version">0.3-rc3</span>
   </div>
   <ul class="components">
     <li class="component is-current">
@@ -134,7 +146,7 @@
           <a href="../../index.html">master</a>
         </li>
         <li class="version is-current">
-          <a href="../index.html">0.3-rc2</a>
+          <a href="../index.html">0.3-rc3</a>
         </li>
         <li class="version is-latest">
           <a href="../../0.2/index.html">0.2</a>
@@ -161,10 +173,10 @@
   </ul>
 </nav>
 <div class="page-versions">
-  <button class="version-menu-toggle" title="Show other versions of page">0.3-rc2</button>
+  <button class="version-menu-toggle" title="Show other versions of page">0.3-rc3</button>
   <div class="version-menu">
     <a class="version" href="../../references/sync-config.html">master</a>
-    <a class="version is-current" href="sync-config.html">0.3-rc2</a>
+    <a class="version is-current" href="sync-config.html">0.3-rc3</a>
     <a class="version" href="../../0.2/references/sync-config.html">0.2</a>
     <a class="version" href="../../0.1/references/sync-config.html">0.1</a>
   </div>
@@ -300,7 +312,7 @@ Use <code>:globals</code> for that purpose.</p>
 <dt class="hdlist1"><code>delete: true</code></dt>
 <dd>
 <p>When this flag is set, the target file is being deleted.
-It is not rendered at all.</p>
+If this flag is applied to directories or <code>:globals</code>, then every known and affected template file is deleted as well.</p>
 </dd>
 </dl>
 </div>
@@ -317,7 +329,10 @@ It is not rendered at all.</p>
 <p>Use this flag in <code>config_defaults.yml</code> to cleanup files that aren&#8217;t needed in the managed repositories anymore.</p>
 </li>
 <li>
-<p>Use this flag in <code>.sync.file</code> to tell greposync to not create certain files.</p>
+<p>Use this flag in <code>.sync.file</code> on a single file name to tell greposync to not create single files.</p>
+</li>
+<li>
+<p>Use this flag in <code>.sync.file</code> on a directory name or in <code>:globals</code> to tell greposync to not create multiple files.</p>
 </li>
 </ul>
 </div>
