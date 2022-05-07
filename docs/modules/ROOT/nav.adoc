@@ -20,6 +20,7 @@
 .Technical reference
 * xref:references/template.adoc[Template]
 * xref:references/greposync.adoc[Main Configuration]
+* xref:references/cli.adoc[Command Line Interface (CLI)]
 * xref:references/sync-config.adoc[Sync Configuration]
 * xref:references/testing-mode.adoc[Testing Mode]
 

@@ -1,0 +1,29 @@
+NAME:
+   greposync update - Update the repositories in managed_repos.yml
+
+USAGE:
+   greposync update [command options] [arguments...]
+
+OPTIONS:
+   --dry-run value               Select a dry run mode. Allowed values: offline (do not run any Git commands except initial clone), commit (commit, but don't push), push (push, but don't touch PRs) [$G_DRYRUN]
+   --exclude value               Excludes repositories from updating that match the given filter (regex). Repositories matching both include and exclude filter are still excluded. [$G_EXCLUDE]
+   --git.amend                   Amend previous commit. Requires --git.forcePush. (default: false) [$G_GIT_AMEND]
+   --git.commitBranch value      The branch name to create, switch to and commit locally. (default: "greposync-update") [$G_GIT_COMMIT_BRANCH]
+   --git.commitMessage value     The commit message when committing an update. (default: "Update from greposync") [$G_GIT_COMMIT_MSG]
+   --git.defaultNamespace value  The repository owner without the repository name. This is often a user or organization name in GitHub.com or GitLab.com. (default: "github.com") [$G_GIT_DEFAULT_NS]
+   --git.forcePush               If push is enabled, push forcefully. (default: false) [$G_GIT_FORCEPUSH]
+   --git.root value              Local relative directory path where git clones repositories into. (default: "repos") [$G_GIT_ROOT_DIR]
+   --include value               Includes only repositories in the update that match the given filter (regex). The full URL (including scheme) is matched. [$G_INCLUDE]
+   --jobs value, -j value        Jobs is the number of parallel jobs to run. 1 basically means that jobs are run in sequence. (default: 1) [$G_JOBS]
+   --log.level value, -v value   Log level that increases verbosity with greater numbers. (default: 0) [$G_LOG_LEVEL]
+   --log.showDiff                Show the Git Diff for each repository after committing. In --dry-run=offline mode the diff is showed for unstaged changes. (default: false) [$G_SHOW_DIFF]
+   --log.showLog                 Shows the full log in real-time rather than keeping it hidden until an error occurred. (default: false) [$G_SHOW_LOG]
+   --pr.body value               Markdown-enabled body of the PullRequest. It will load from an existing file if this is a path. Content can be templated. (default: "This Pull request updates this repository with changes from a greposync template repository.") [$G_PR_BODY]
+   --pr.create                   Create a PullRequest on a supported git hoster after pushing to remote. (default: false) [$G_PR_CREATE]
+   --pr.labels value             Array of issue labels to apply when creating a pull request. Labels on existing pull requests are not updated. It is not validated whether the labels exist, the API may or may not create non-existing labels dynamically.  (accepts multiple inputs) [$G_PR_LABELS]
+   --pr.subject value            The Pull Request title. (default: "Update from greposync") [$G_PR_SUBJECT]
+   --pr.targetBranch value       Remote branch name of the pull request. If left empty, it will target the default branch (usually 'master' or 'main'). [$G_PR_TARGET_BRANCH]
+   --skipBroken                  Skip abort if a repository update encounters an error (default: false) [$G_SKIP_BROKEN]
+   --template.root value         The path relative to the current workdir where the template files are located. (default: "template") [$G_TEMPLATE_ROOT_DIR]
+   --help, -h                    show help (default: false)
+   

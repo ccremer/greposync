@@ -1,0 +1,18 @@
+NAME:
+   greposync labels - Synchronizes repository labels
+
+USAGE:
+   greposync labels [command options] [arguments...]
+
+OPTIONS:
+   --exclude value               Excludes repositories from updating that match the given filter (regex). Repositories matching both include and exclude filter are still excluded. [$G_EXCLUDE]
+   --git.commitBranch value      The branch name to create, switch to and commit locally. (default: "greposync-update") [$G_GIT_COMMIT_BRANCH]
+   --git.defaultNamespace value  The repository owner without the repository name. This is often a user or organization name in GitHub.com or GitLab.com. (default: "github.com") [$G_GIT_DEFAULT_NS]
+   --git.root value              Local relative directory path where git clones repositories into. (default: "repos") [$G_GIT_ROOT_DIR]
+   --include value               Includes only repositories in the update that match the given filter (regex). The full URL (including scheme) is matched. [$G_INCLUDE]
+   --jobs value, -j value        Jobs is the number of parallel jobs to run. 1 basically means that jobs are run in sequence. (default: 1) [$G_JOBS]
+   --log.level value, -v value   Log level that increases verbosity with greater numbers. (default: 0) [$G_LOG_LEVEL]
+   --log.showLog                 Shows the full log in real-time rather than keeping it hidden until an error occurred. (default: false) [$G_SHOW_LOG]
+   --skipBroken                  Skip abort if a repository update encounters an error (default: false) [$G_SKIP_BROKEN]
+   --help, -h                    show help (default: false)
+   
