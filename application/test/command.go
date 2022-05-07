@@ -41,6 +41,20 @@ func (c *Command) GetCliCommand() *cli.Command {
 }
 
 func (c *Command) createCliCommand() *cli.Command {
+	fls := []cli.Flag{
+		flags.NewLogLevelFlag(&c.cfg.Log.Level),
+		flags.NewShowLogFlag(&c.cfg.Log.ShowLog),
+		flags.NewGitRootDirFlag(&c.appService.repoStore.ParentDir),
+		flags.NewJobsFlag(&c.cfg.Project.Jobs),
+		flags.NewSkipBrokenFlag(&c.cfg.Project.SkipBroken),
+		flags.NewIncludeFlag(&c.appService.repoStore.IncludeFilter),
+		flags.NewExcludeFlag(&c.appService.repoStore.ExcludeFilter),
+		flags.NewTemplateRootDirFlag(&c.appService.templateStore.RootDir),
+		&cli.BoolFlag{Name: "exit-code", EnvVars: flags.Prefixed("EXIT_CODE"),
+			Usage:       "Exits app with exit code 3 if a test case failed.",
+			Destination: &c.exitOnFail,
+		},
+	}
 	return &cli.Command{
 		Name:  "test",
 		Usage: "Test the rendered template against test cases",
@@ -61,14 +75,8 @@ A 'git diff' will be computed and if it's non-empty, the test case is considered
 
 This command can be used to verify that the template is correct before rolling it out to production repositories.
 `,
+		Before: flags.And(flags.FromYAML(fls), c.validateTestCommand),
 		Action: c.runCommand,
-		Before: c.validateTestCommand,
-		Flags: flags.CombineWithGlobalFlags(
-			&cli.BoolFlag{
-				Name:        "exit-code",
-				Destination: &c.exitOnFail,
-				Usage:       "Exits app with exit code 3 if a test case failed.",
-			},
-		),
+		Flags:  fls,
 	}
 }

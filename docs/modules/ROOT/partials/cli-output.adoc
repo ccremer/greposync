@@ -1,0 +1,5 @@
+.{command-name} command help output
+[source,console]
+----
+include::example$help/{command-name}.txt[]
+----

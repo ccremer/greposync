@@ -11,37 +11,37 @@ func (c *Command) GetCliCommand() *cli.Command {
 }
 
 func (c *Command) createCliCommand() *cli.Command {
+	cFlags := []cli.Flag{
+		flags.NewLogLevelFlag(&c.cfg.Log.Level),
+		flags.NewShowLogFlag(&c.cfg.Log.ShowLog),
+		flags.NewShowDiffFlag(&c.cfg.Log.ShowDiff),
+
+		flags.NewJobsFlag(&c.cfg.Project.Jobs),
+		flags.NewSkipBrokenFlag(&c.cfg.Project.SkipBroken),
+		flags.NewIncludeFlag(&c.appService.repoStore.IncludeFilter),
+		flags.NewExcludeFlag(&c.appService.repoStore.ExcludeFilter),
+		flags.NewDryRunFlag(&c.dryRunFlag),
+
+		flags.NewGitRootDirFlag(&c.appService.repoStore.ParentDir),
+		flags.NewGitAmendFlag(&c.cfg.Git.Amend),
+		flags.NewGitForcePushFlag(&c.cfg.Git.ForcePush),
+		flags.NewGitCommitBranchFlag(&c.appService.repoStore.CommitBranch),
+		flags.NewGitDefaultNamespaceFlag(&c.appService.repoStore.DefaultNamespace),
+		flags.NewGitCommitMessageFlag(&c.cfg.Git.CommitMessage),
+
+		flags.NewPRCreateFlag(&c.cfg.PullRequest.Create),
+		flags.NewPRBodyFlag(&c.cfg.PullRequest.BodyTemplate),
+		flags.NewPRSubjectFlag(&c.cfg.PullRequest.Subject),
+		flags.NewPRTargetBranchFlag(&c.cfg.PullRequest.TargetBranch),
+		flags.NewPRLabelsFlag(&c.PrLabels),
+
+		flags.NewTemplateRootDirFlag(&c.appService.templateStore.RootDir),
+	}
 	return &cli.Command{
 		Name:   "update",
 		Usage:  "Update the repositories in managed_repos.yml",
+		Before: flags.And(flags.FromYAML(cFlags), c.validateUpdateCommand),
 		Action: c.runCommand,
-		Before: c.validateUpdateCommand,
-		Flags: flags.CombineWithGlobalFlags(
-			&cli.StringFlag{
-				Name:    dryRunFlagName,
-				Aliases: []string{"d"},
-				Usage:   "Select a dry run mode. Allowed values: offline (do not run any Git commands except initial clone), commit (commit, but don't push), push (push, but don't touch PRs)",
-			},
-			&cli.BoolFlag{
-				Name:  amendFlagName,
-				Usage: "Amend previous commit. Requires --git-forcePush",
-			},
-			&cli.BoolFlag{
-				Name:  forcePushFlagName,
-				Usage: "If push is enabled, push forcefully.",
-			},
-			&cli.BoolFlag{
-				Name:  prCreateFlagName,
-				Usage: "Create a PullRequest on a supported git hoster after pushing to remote.",
-			},
-			&cli.StringFlag{
-				Name:  prBodyFlagName,
-				Usage: "Markdown-enabled body of the PullRequest. It will load from an existing file if this is a path. Content can be templated. Defaults to commit message.",
-			},
-			&cli.BoolFlag{
-				Name:  showDiffFlagName,
-				Usage: "Show the Git Diff for each repository after committing. In --dry-run=offline mode the diff is showed for unstaged changes.",
-			},
-		),
+		Flags:  cFlags,
 	}
 }

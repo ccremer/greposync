@@ -1,0 +1,14 @@
+NAME:
+   greposync init - Initializes a template repository in the current working directory
+
+USAGE:
+   greposync init [command options] [arguments...]
+
+DESCRIPTION:
+   This command creates 'config_defaults.yml', 'managed_repositories.yml' and some template files with example content.
+   If any file already exists, it will be left untouched.
+
+OPTIONS:
+   --template.root value  The path relative to the current workdir where the template files are located. (default: "template") [$G_TEMPLATE_ROOT_DIR]
+   --help, -h             show help (default: false)
+   

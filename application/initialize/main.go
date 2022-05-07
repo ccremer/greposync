@@ -2,8 +2,10 @@ package initialize
 
 import (
 	pipeline "github.com/ccremer/go-command-pipeline"
+	"github.com/ccremer/greposync/application/flags"
 	"github.com/ccremer/greposync/cfg"
 	"github.com/ccremer/greposync/infrastructure/logging"
+	"github.com/ccremer/greposync/infrastructure/valuestore"
 	"github.com/urfave/cli/v2"
 )
 
@@ -15,6 +17,8 @@ type (
 		configFiles   map[string][]byte
 		templateFiles map[string][]byte
 		plog          *logging.PipelineLogger
+
+		TemplateDir string
 	}
 )
 
@@ -24,9 +28,9 @@ func NewCommand(cfg *cfg.Configuration, factory logging.LoggerFactory) *Command 
 		cfg:  cfg,
 		plog: factory.NewPipelineLogger("init"),
 		configFiles: map[string][]byte{
-			"greposync.yml":       grepoSyncYml,
-			"config_defaults.yml": configDefaultsYml,
-			"managed_repos.yml":   managedReposYml,
+			"greposync.yml":                 grepoSyncYml,
+			valuestore.GlobalConfigFileName: configDefaultsYml,
+			"managed_repos.yml":             managedReposYml,
 		},
 		templateFiles: map[string][]byte{
 			cfg.Template.RootDir + "/_helpers.tpl": helperTpl,
@@ -43,9 +47,14 @@ func (c *Command) GetCliCommand() *cli.Command {
 
 func (c *Command) createCommand() *cli.Command {
 	return &cli.Command{
-		Name:   "init",
-		Usage:  "Initializes a template repository in the current working directory",
+		Name:  "init",
+		Usage: "Initializes a template repository in the current working directory",
+		Description: `This command creates '` + valuestore.GlobalConfigFileName + `', 'managed_repositories.yml' and some template files with example content.
+If any file already exists, it will be left untouched.`,
 		Action: c.runCommand,
+		Flags: []cli.Flag{
+			flags.NewTemplateRootDirFlag(&c.TemplateDir),
+		},
 	}
 }
 

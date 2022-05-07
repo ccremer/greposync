@@ -1,0 +1,20 @@
+= Command Line Interface (CLI)
+
+.Main command help output
+[source,console]
+----
+$ gsync --help
+include::example$help/main.txt[]
+----
+
+:command-name: init
+include::partial$cli-output.adoc[]
+
+:command-name: update
+include::partial$cli-output.adoc[]
+
+:command-name: labels
+include::partial$cli-output.adoc[]
+
+:command-name: test
+include::partial$cli-output.adoc[]

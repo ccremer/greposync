@@ -1,0 +1,36 @@
+NAME:
+   greposync test - Test the rendered template against test cases
+
+USAGE:
+   greposync test [command options] [arguments...]
+
+DESCRIPTION:
+   Test cases are defined as local, simulated repositories in 'tests' directory, where each subdirectory itself is a separate test case.
+   The expected file structure should resemble this format: 
+   
+   tests
+   └── case-1 
+       ├── <file>
+       └── .sync.yml
+   
+   'case-1' is the test case name.
+   <file> represents any files that are to be rendered (for example README.md, Makefile etc.) with their contents being the desired output.
+   '.sync.yml' is the sync config for this simulated repository and it works exactly as the .sync.yml syntax in real repositories.
+   
+   When running this subcommand, these test cases are picked up and its template output rendered in a new directory '.tests'.
+   A 'git diff' will be computed and if it's non-empty, the test case is considered failed.
+   
+   This command can be used to verify that the template is correct before rolling it out to production repositories.
+
+OPTIONS:
+   --exclude value              Excludes repositories from updating that match the given filter (regex). Repositories matching both include and exclude filter are still excluded. [$G_EXCLUDE]
+   --exit-code                  Exits app with exit code 3 if a test case failed. (default: false) [$G_EXIT_CODE]
+   --git.root value             Local relative directory path where git clones repositories into. (default: "repos") [$G_GIT_ROOT_DIR]
+   --include value              Includes only repositories in the update that match the given filter (regex). The full URL (including scheme) is matched. [$G_INCLUDE]
+   --jobs value, -j value       Jobs is the number of parallel jobs to run. 1 basically means that jobs are run in sequence. (default: 1) [$G_JOBS]
+   --log.level value, -v value  Log level that increases verbosity with greater numbers. (default: 0) [$G_LOG_LEVEL]
+   --log.showLog                Shows the full log in real-time rather than keeping it hidden until an error occurred. (default: false) [$G_SHOW_LOG]
+   --skipBroken                 Skip abort if a repository update encounters an error (default: false) [$G_SKIP_BROKEN]
+   --template.root value        The path relative to the current workdir where the template files are located. (default: "template") [$G_TEMPLATE_ROOT_DIR]
+   --help, -h                   show help (default: false)
+   

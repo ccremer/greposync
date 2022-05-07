@@ -11,15 +11,6 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-const (
-	dryRunFlagName    = "dry-run"
-	prCreateFlagName  = "pr-create"
-	prBodyFlagName    = "pr-bodyTemplate"
-	amendFlagName     = "git-amend"
-	forcePushFlagName = "git-forcePush"
-	showDiffFlagName  = "log-showDiff"
-)
-
 type (
 	// Command is a facade service for the update command that holds all dependent services and settings.
 	Command struct {
@@ -28,6 +19,9 @@ type (
 		appService   *AppService
 		instr        instrumentation.BatchInstrumentation
 		logFactory   logging.LoggerFactory
+
+		dryRunFlag string
+		PrLabels   cli.StringSlice
 	}
 )
 
@@ -51,7 +45,6 @@ func (c *Command) runCommand(cliCtx *cli.Context) error {
 	logger := c.logFactory.NewPipelineLogger("")
 	ctx := pipeline.MutableContext(cliCtx.Context)
 	p := pipeline.NewPipeline().AddBeforeHook(logger.Accept).WithSteps(
-		pipeline.NewStepFromFunc("configure infrastructure", c.configureInfrastructure),
 		pipeline.NewStepFromFunc("fetch managed repos config", c.fetchRepositories),
 		pipeline.NewWorkerPoolStep("update repositories", c.cfg.Project.Jobs, c.updateReposInParallel(), c.instr.NewCollectErrorHandler(c.cfg.Project.SkipBroken)),
 	)
@@ -73,6 +66,7 @@ func (c *Command) createPipeline(r *domain.GitRepository) *pipeline.Pipeline {
 	up := &updatePipeline{
 		repo:       r,
 		appService: c.appService,
+		prLabels:   c.PrLabels.Value(),
 	}
 
 	logger := c.logFactory.NewPipelineLogger(r.URL.GetFullName())
@@ -134,11 +128,6 @@ func (c *Command) updateReposInParallel() pipeline.Supplier {
 			}
 		}
 	}
-}
-
-func (c *Command) configureInfrastructure(_ context.Context) error {
-	c.appService.ConfigureInfrastructure()
-	return nil
 }
 
 func (c *Command) fetchRepositories(ctx context.Context) error {

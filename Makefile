@@ -28,6 +28,11 @@ generate:
 	$(GOASCIIDOC_CMD) domain
 	cp application/initialize/_helpers.tpl docs/modules/ROOT/examples/comment/helpers.tpl
 	cp domain/testdata/golden/metadata.txt docs/modules/ROOT/examples/code/metadata.tpl
+	go run . --help > docs/modules/ROOT/examples/help/main.txt
+	go run . init --help > docs/modules/ROOT/examples/help/init.txt
+	go run . update --help > docs/modules/ROOT/examples/help/update.txt
+	go run . test --help > docs/modules/ROOT/examples/help/test.txt
+	go run . labels --help > docs/modules/ROOT/examples/help/labels.txt
 
 .PHONY: fmt
 fmt: ## Run 'go fmt' against code

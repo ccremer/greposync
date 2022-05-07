@@ -1,13 +1,9 @@
 package main
 
-import (
-	"time"
-)
-
 var (
 	version = "unknown"
 	commit  = "-dirty-"
-	date    = time.Now().Format("2006-01-02")
+	date    = ""
 )
 
 func main() {

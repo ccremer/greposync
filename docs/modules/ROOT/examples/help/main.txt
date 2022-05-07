@@ -1,0 +1,28 @@
+NAME:
+   greposync - Managed Git repositories in bulk
+
+USAGE:
+   greposync [global options] command [command options] [arguments...]
+
+VERSION:
+   unknown, commit -dirty-, date 
+
+DESCRIPTION:
+   At the heart of greposync is a template.
+   The template exists of files that are being rendered with various input variables and ultimately committed to a Git repository.
+   greposync enables you to keep multiple Git repositories aligned with all the skeleton files that you need.
+   
+   While services like GitHub offer the functionality of template repository, once you generated a new repository from the template it's not being updated anymore.
+   Over time you'll do changes to your CI/CD workflows or Makefiles and you want the changes in all your popular repositories. 
+   greposync does just that.
+
+COMMANDS:
+   init     Initializes a template repository in the current working directory
+   labels   Synchronizes repository labels
+   update   Update the repositories in managed_repos.yml
+   test     Test the rendered template against test cases
+   help, h  Shows a list of commands or help for one command
+
+GLOBAL OPTIONS:
+   --help, -h  show help (default: false)
+   --version   print the version (default: false)

@@ -1,7 +1,6 @@
 package labels
 
 import (
-	"encoding/json"
 	"regexp"
 
 	"github.com/ccremer/greposync/application/clierror"
@@ -31,7 +30,6 @@ func (c *Command) validateCommand(ctx *cli.Context) error {
 		return clierror.AsUsageErrorf("invalid label configuration in '%s': %w", "repositoryLabels", err)
 	}
 	c.appService.factory.SetLogLevel(c.cfg.Log.Level)
-	j, _ := json.Marshal(c.cfg)
-	c.appService.factory.NewGenericLogger("").V(1).Info("Using config", "config", string(j))
+	c.appService.factory.NewGenericLogger("").V(1).Info("Using config", "config", flags.CollectFlagValues(ctx))
 	return nil
 }

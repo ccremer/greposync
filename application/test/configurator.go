@@ -43,16 +43,3 @@ func NewConfigurator(
 		console:        console,
 	}
 }
-
-func (c *AppService) ConfigureInfrastructure() {
-	c.engine.RootDir = "template"
-	c.repoStore.ParentDir = "tests"
-	c.repoStore.TestOutputRootDir = ".tests"
-	c.repoStore.DefaultNamespace = "local"
-	c.repoStore.ExcludeFilter = c.cfg.Project.Exclude
-	c.repoStore.IncludeFilter = c.cfg.Project.Include
-	c.templateStore.RootDir = "template"
-	c.templateStore.SkipRemovingFileExtension = true
-	c.console.SetTitle("RUNNING TESTS...")
-	c.console.SetCommandName("Test")
-}
