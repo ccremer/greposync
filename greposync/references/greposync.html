@@ -96,6 +96,9 @@
     <a class="nav-link" href="greposync.html">Main Configuration</a>
   </li>
   <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="cli.html">Command Line Interface (CLI)</a>
+  </li>
+  <li class="nav-item" data-depth="1">
     <a class="nav-link" href="sync-config.html">Sync Configuration</a>
   </li>
   <li class="nav-item" data-depth="1">
@@ -195,32 +198,23 @@
 <div class="title">All supported settings with defaults</div>
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">git:
-  commitBranch: ""
+  commitBranch: greposync-update
   commitMessage: Update from greposync
-  defaultBranch: ""
+  defaultNamespace: github.com
   forcePush: false
-  name: ""
-  namespace: ""
-  skipCommit: false
-  skipPush: false
-  skipReset: false
+  root: repos
 log:
-  level: 0
   showDiff: false
   showLog: false
 pr:
-  bodyTemplate: This Pull request updates this repository with changes from a greposync
-    template repository.
+  body: This Pull request updates this repository with changes from a greposync template
+    repository.
   create: false
-  labels: null
+  labels: []
   subject: Update from greposync
   targetBranch: ""
-project:
-  jobs: 1
-  rootDir: repos
-repositoryLabels: null
 template:
-  rootDir: template</code></pre>
+  root: template</code></pre>
 </div>
 </div>
 <div class="dlist">
