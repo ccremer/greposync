@@ -42,8 +42,15 @@ func NewApp(info VersionInfo, config *cfg.Configuration,
 		config: config,
 	}
 	a := &cli.App{
-		Name:                 "greposync",
-		Usage:                "git-repo-sync: Shameless reimplementation of ModuleSync in Go",
+		Name:  "greposync",
+		Usage: "Managed Git repositories in bulk",
+		Description: `At the heart of greposync is a template.
+The template exists of files that are being rendered with various input variables and ultimately committed to a Git repository.
+greposync enables you to keep multiple Git repositories aligned with all the skeleton files that you need.
+
+While services like GitHub offer the functionality of template repository, once you generated a new repository from the template it's not being updated anymore.
+Over time you'll do changes to your CI/CD workflows or Makefiles and you want the changes in all your popular repositories. 
+greposync does just that.`,
 		Version:              info.String(),
 		EnableBashCompletion: true,
 		Commands: []*cli.Command{
