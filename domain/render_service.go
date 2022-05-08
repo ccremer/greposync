@@ -3,6 +3,8 @@ package domain
 import (
 	"context"
 	"errors"
+	"os"
+	"path/filepath"
 
 	pipeline "github.com/ccremer/go-command-pipeline"
 	"golang.org/x/sys/unix"
@@ -89,7 +91,13 @@ func (ctx *RenderContext) renderTemplate(template *Template) error {
 		targetPath = alternativePath
 	}
 
-	err = result.WriteToFile(ctx.Repository.RootDir.Join(targetPath), template.FilePermissions)
+	actualFile := ctx.Repository.RootDir.Join(targetPath)
+	err = os.MkdirAll(filepath.Dir(actualFile.String()), 0775)
+	if err != nil {
+		return err
+	}
+
+	err = result.WriteToFile(actualFile, template.FilePermissions)
 	return ctx.instrumentation.WrittenRenderResultToFile(template, targetPath, err)
 }
 
