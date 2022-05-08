@@ -32,6 +32,7 @@ type StoreConfig struct {
 	ParentDir        string
 	DefaultNamespace string
 	CommitBranch     string
+	BaseURL          string
 
 	IncludeFilter string
 	ExcludeFilter string
@@ -64,7 +65,6 @@ func (s *RepositoryStore) FetchGitRepositories() ([]*domain.GitRepository, error
 	if err := s.k.Unmarshal("repositories", &m); err != nil {
 		return nil, err
 	}
-	gitBase := "git@github.com:"
 
 	includeRegex, excludeRegex, err := compileRegex(s.IncludeFilter, s.ExcludeFilter)
 	if err != nil {
@@ -72,7 +72,7 @@ func (s *RepositoryStore) FetchGitRepositories() ([]*domain.GitRepository, error
 	}
 
 	for _, repo := range m {
-		u, err := parseUrl(repo, gitBase, s.DefaultNamespace)
+		u, err := parseUrl(repo, s.BaseURL, s.DefaultNamespace)
 		if err != nil {
 			return list, err
 		}

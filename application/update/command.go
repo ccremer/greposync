@@ -28,6 +28,7 @@ func (c *Command) createCliCommand() *cli.Command {
 		flags.NewGitCommitBranchFlag(&c.appService.repoStore.CommitBranch),
 		flags.NewGitDefaultNamespaceFlag(&c.appService.repoStore.DefaultNamespace),
 		flags.NewGitCommitMessageFlag(&c.cfg.Git.CommitMessage),
+		flags.NewGitBaseURLFlag(&c.appService.repoStore.BaseURL),
 
 		flags.NewPRCreateFlag(&c.cfg.PullRequest.Create),
 		flags.NewPRBodyFlag(&c.cfg.PullRequest.BodyTemplate),

@@ -43,6 +43,7 @@ func createExampleConfig() {
 		flags.NewGitCommitBranchFlag(nil),
 		flags.NewGitDefaultNamespaceFlag(nil),
 		flags.NewGitForcePushFlag(nil),
+		flags.NewGitBaseURLFlag(nil),
 
 		flags.NewShowDiffFlag(nil),
 		flags.NewShowLogFlag(nil),

@@ -126,6 +126,13 @@ func NewGitCommitMessageFlag(dst *string) *altsrc.StringFlag {
 	})
 }
 
+func NewGitBaseURLFlag(dst *string) *altsrc.StringFlag {
+	return altsrc.NewStringFlag(&cli.StringFlag{Name: "git.base", EnvVars: Prefixed("GIT_BASE"),
+		Usage: "Git base URL.",
+		Value: "git@github.com:", Destination: dst,
+	})
+}
+
 //// PR Flags
 
 func NewPRCreateFlag(dst *bool) *altsrc.BoolFlag {

@@ -8,6 +8,7 @@ OPTIONS:
    --dry-run value               Select a dry run mode. Allowed values: offline (do not run any Git commands except initial clone), commit (commit, but don't push), push (push, but don't touch PRs) [$G_DRYRUN]
    --exclude value               Excludes repositories from updating that match the given filter (regex). Repositories matching both include and exclude filter are still excluded. [$G_EXCLUDE]
    --git.amend                   Amend previous commit. Requires --git.forcePush. (default: false) [$G_GIT_AMEND]
+   --git.base value              Git base URL. (default: "git@github.com:") [$G_GIT_BASE]
    --git.commitBranch value      The branch name to create, switch to and commit locally. (default: "greposync-update") [$G_GIT_COMMIT_BRANCH]
    --git.commitMessage value     The commit message when committing an update. (default: "Update from greposync") [$G_GIT_COMMIT_MSG]
    --git.defaultNamespace value  The repository owner without the repository name. This is often a user or organization name in GitHub.com or GitLab.com. (default: "github.com") [$G_GIT_DEFAULT_NS]
