@@ -1059,10 +1059,11 @@ There cannot be duplicates or labels with no name.</p>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">type RenderContext struct {
-    Repository       *GitRepository
-    ValueStore       ValueStore
-    TemplateStore    TemplateStore
-    Engine           TemplateEngine
+    Repository              *GitRepository
+    ValueStore              ValueStore
+    TemplateStore           TemplateStore
+    Engine                  TemplateEngine
+    SkipExtensionRemoval    bool
 }</code></pre>
 </div>
 </div>
@@ -1079,9 +1080,8 @@ There cannot be duplicates or labels with no name.</p>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go">type Template struct {
-    RelativePath            Path
-    FilePermissions         Permissions
-    ExtensionReplacement    string
+    RelativePath       Path
+    FilePermissions    Permissions
 }</code></pre>
 </div>
 </div>
@@ -1098,10 +1098,6 @@ There cannot be duplicates or labels with no name.</p>
 <dd>
 <p>FilePermissions defines what file permissions this template file has.
 Rendered files should have the same permissions as template files.</p>
-</dd>
-<dt class="hdlist1">ExtensionReplacement</dt>
-<dd>
-<p>ExtensionReplacement is a substring that is removed from the file path.</p>
 </dd>
 </dl>
 </div>
@@ -1610,7 +1606,7 @@ Returns an empty string slice if Values is nil or empty.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_defaultextensionreplacement"><a class="anchor" href="#_defaultextensionreplacement"></a>DefaultExtensionReplacement</h3>
+<h3 id="_fileextensionreplacement"><a class="anchor" href="#_fileextensionreplacement"></a>FileExtensionReplacement</h3>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-go hljs" data-lang="go"></code></pre>
