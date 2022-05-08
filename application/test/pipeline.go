@@ -44,15 +44,6 @@ func (c *updatePipeline) createOutputDir(_ context.Context) error {
 	return os.MkdirAll(c.repo.RootDir.String(), 0775)
 }
 
-func (c *updatePipeline) cleanupUnwantedFiles(_ context.Context) error {
-	err := c.appService.cleanupService.CleanupUnwantedFiles(domain.CleanupPipeline{
-		Repository:    c.repo,
-		ValueStore:    c.appService.valueStore,
-		TemplateStore: c.appService.templateStore,
-	})
-	return err
-}
-
 func (c *updatePipeline) copySyncFile(_ context.Context) error {
 	return c.appService.repoStore.CopySyncFile(c.repo)
 }
