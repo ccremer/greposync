@@ -17,10 +17,11 @@ type RenderService struct {
 
 // RenderContext represents a single rendering context for a GitRepository.
 type RenderContext struct {
-	Repository    *GitRepository
-	ValueStore    ValueStore
-	TemplateStore TemplateStore
-	Engine        TemplateEngine
+	Repository           *GitRepository
+	ValueStore           ValueStore
+	TemplateStore        TemplateStore
+	Engine               TemplateEngine
+	SkipExtensionRemoval bool
 
 	instrumentation RenderServiceInstrumentation
 	templates       []*Template
@@ -87,6 +88,9 @@ func (ctx *RenderContext) renderTemplate(template *Template) error {
 	}
 
 	targetPath := template.CleanPath()
+	if ctx.SkipExtensionRemoval {
+		targetPath = template.RelativePath
+	}
 	if alternativePath != "" {
 		targetPath = alternativePath
 	}

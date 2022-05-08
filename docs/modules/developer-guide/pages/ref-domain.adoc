@@ -773,14 +773,17 @@ RenderTemplates loads the TemplateStore and renders them in the GitRepository.Ro
 [source, go]
 ----
 type RenderContext struct {
-    Repository       *GitRepository
-    ValueStore       ValueStore
-    TemplateStore    TemplateStore
-    Engine           TemplateEngine
+    Repository              *GitRepository
+    ValueStore              ValueStore
+    TemplateStore           TemplateStore
+    Engine                  TemplateEngine
+    SkipExtensionRemoval    bool
 }
 ----
 
 RenderContext represents a single rendering context for a GitRepository.
+
+
 
 
 
@@ -804,9 +807,8 @@ RenderContext represents a single rendering context for a GitRepository.
 [source, go]
 ----
 type Template struct {
-    RelativePath            Path
-    FilePermissions         Permissions
-    ExtensionReplacement    string
+    RelativePath       Path
+    FilePermissions    Permissions
 }
 ----
 
@@ -818,9 +820,6 @@ RelativePath is the Path reference to where the template file is contained withi
 FilePermissions::
 FilePermissions defines what file permissions this template file has.
 Rendered files should have the same permissions as template files.
-
-ExtensionReplacement::
-ExtensionReplacement is a substring that is removed from the file path.
 
 
 
@@ -1255,7 +1254,7 @@ var ErrKeyNotFound = errors.New("key not found")
 ErrKeyNotFound is an error that indicates that a particular key was not found.
 
 
-=== DefaultExtensionReplacement
+=== FileExtensionReplacement
 [source, go]
 ----
 
