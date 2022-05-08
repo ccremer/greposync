@@ -26,6 +26,7 @@ type RenderContext struct {
 	instrumentation RenderServiceInstrumentation
 	templates       []*Template
 	values          Values
+	deletedFiles    []Path
 }
 
 func NewRenderService(instrumentation RenderServiceInstrumentation) *RenderService {
@@ -40,6 +41,7 @@ func (s *RenderService) RenderTemplates(ctx RenderContext) error {
 	result := pipeline.NewPipeline().WithSteps(
 		pipeline.NewStepFromFunc("preflight check", ctx.preFlightCheck),
 		pipeline.NewStepFromFunc("load templates", ctx.loadTemplates),
+		pipeline.NewStepFromFunc("load deleted file names", ctx.loadDeletedFiles),
 		pipeline.NewStepFromFunc("render templates", ctx.renderTemplates),
 	).Run()
 	return result.Err()
@@ -57,6 +59,10 @@ func (ctx *RenderContext) preFlightCheck(_ context.Context) error {
 
 func (ctx *RenderContext) renderTemplates(_ context.Context) error {
 	for _, template := range ctx.templates {
+		if template.CleanPath().IsInSlice(ctx.deletedFiles) {
+			// do not render files that are going to be deleted anyway
+			continue
+		}
 		if unmanaged, err := ctx.ValueStore.FetchUnmanagedFlag(template, ctx.Repository); err != nil && !errors.Is(err, ErrKeyNotFound) {
 			return err
 		} else if unmanaged {
@@ -125,4 +131,10 @@ func (ctx *RenderContext) enrichWithMetadata(values Values, template *Template) 
 			TemplateValueKey:   template.AsValues(),
 		},
 	}
+}
+
+func (ctx *RenderContext) loadDeletedFiles(_ context.Context) error {
+	files, err := ctx.ValueStore.FetchFilesToDelete(ctx.Repository, ctx.templates)
+	ctx.deletedFiles = files
+	return err
 }

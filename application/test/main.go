@@ -41,11 +41,7 @@ func (c *Command) createRepositoryPipeline(r *domain.GitRepository) *pipeline.Pi
 		}),
 		pipeline.NewStepFromFunc("create dir", up.createOutputDir),
 		pipeline.NewStepFromFunc("copy sync file", up.copySyncFile),
-		pipeline.NewPipeline().AddBeforeHook(logger.Accept).
-			WithNestedSteps("render",
-				pipeline.NewStepFromFunc("render templates", up.renderTemplates),
-				pipeline.NewStepFromFunc("cleanup unwanted files", up.cleanupUnwantedFiles),
-			),
+		pipeline.NewStepFromFunc("render templates", up.renderTemplates),
 
 		pipeline.NewStepFromFunc("show diff", up.diff),
 	)
