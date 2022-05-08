@@ -19,10 +19,11 @@ type updatePipeline struct {
 
 func (c *updatePipeline) renderTemplates(_ context.Context) error {
 	err := c.appService.renderService.RenderTemplates(domain.RenderContext{
-		Repository:    c.repo,
-		ValueStore:    c.appService.valueStore,
-		TemplateStore: c.appService.templateStore,
-		Engine:        c.appService.engine,
+		Repository:           c.repo,
+		ValueStore:           c.appService.valueStore,
+		TemplateStore:        c.appService.templateStore,
+		Engine:               c.appService.engine,
+		SkipExtensionRemoval: true,
 	})
 	return err
 }

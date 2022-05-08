@@ -52,7 +52,7 @@ func TestKoanfStore_loadAndMergeConfig(t *testing.T) {
 	}
 }
 
-func TestKoanfStore_LoadDataForTemplate(t *testing.T) {
+func TestKoanfStore_loadValuesForTemplate(t *testing.T) {
 	tests := map[string]struct {
 		expectedConf          domain.Values
 		givenSyncFile         string

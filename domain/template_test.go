@@ -35,11 +35,6 @@ func TestTemplate_CleanPath(t *testing.T) {
 			givenPath:    NewPath("readme.md.tpl.tpl"),
 			expectedPath: NewPath("readme.md.tpl"),
 		},
-		"GivenFile_WhenExtensionReplacementGiven_ThenRemoveOne": {
-			givenExtensionReplacement: ".other",
-			givenPath:                 NewPath("readme.md.other.tpl"),
-			expectedPath:              NewPath("readme.md.tpl"),
-		},
 		"GivenFileInDir_WhenExtension_ThenRemoveFromFileName": {
 			givenPath:    NewPath("dir", "readme.tpl.md"),
 			expectedPath: NewPath("dir", "readme.md"),
@@ -48,9 +43,6 @@ func TestTemplate_CleanPath(t *testing.T) {
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
 			template := NewTemplate(tt.givenPath, Permissions(0))
-			if tt.givenExtensionReplacement != "" {
-				template.ExtensionReplacement = tt.givenExtensionReplacement
-			}
 			result := template.CleanPath()
 			assert.Equal(t, tt.expectedPath, result)
 		})

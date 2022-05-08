@@ -27,7 +27,6 @@ func (c *Command) validateTestCommand(ctx *cli.Context) error {
 
 	c.appService.console.SetTitle("RUNNING TESTS...")
 	c.appService.console.SetCommandName("Test")
-	c.appService.templateStore.SkipRemovingFileExtension = true
 	c.appService.repoStore.ParentDir = "tests"
 	c.appService.repoStore.TestOutputRootDir = ".tests"
 	c.appService.repoStore.DefaultNamespace = "local"
