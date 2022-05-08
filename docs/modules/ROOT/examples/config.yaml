@@ -1,4 +1,5 @@
 git:
+  base: 'git@github.com:'
   commitBranch: greposync-update
   commitMessage: Update from greposync
   defaultNamespace: github.com
