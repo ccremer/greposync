@@ -17,7 +17,7 @@ require (
 	github.com/mattn/go-isatty v0.0.14
 	github.com/pterm/pterm v0.12.41
 	github.com/stretchr/testify v1.7.1
-	github.com/urfave/cli/v2 v2.5.1
+	github.com/urfave/cli/v2 v2.7.1
 	github.com/whilp/git-urls v1.0.0
 	golang.org/x/oauth2 v0.0.0-20220411215720-9780585627b5
 	golang.org/x/sys v0.0.0-20220429233432-b5fbb4746d32
@@ -29,6 +29,7 @@ require (
 	github.com/Masterminds/semver/v3 v3.1.1 // indirect
 	github.com/alexflint/go-arg v1.3.0 // indirect
 	github.com/alexflint/go-scalar v1.0.0 // indirect
+	github.com/antzucaro/matchr v0.0.0-20210222213004-b04723ef80f0 // indirect
 	github.com/atomicgo/cursor v0.0.1 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.1 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
