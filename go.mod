@@ -19,8 +19,8 @@ require (
 	github.com/stretchr/testify v1.7.1
 	github.com/urfave/cli/v2 v2.7.1
 	github.com/whilp/git-urls v1.0.0
-	golang.org/x/oauth2 v0.0.0-20220411215720-9780585627b5
-	golang.org/x/sys v0.0.0-20220429233432-b5fbb4746d32
+	golang.org/x/oauth2 v0.0.0-20220524215830-622c5d57e401
+	golang.org/x/sys v0.0.0-20220520151302-bc2c85ada10a
 	sigs.k8s.io/yaml v1.3.0
 )
 
