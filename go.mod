@@ -10,7 +10,7 @@ require (
 	github.com/go-logr/logr v1.2.3
 	github.com/google/go-github/v39 v39.2.0
 	github.com/google/wire v0.5.0
-	github.com/gookit/color v1.5.0
+	github.com/gookit/color v1.5.1
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/knadh/koanf v1.4.2
 	github.com/mariotoffia/goasciidoc v0.4.6
