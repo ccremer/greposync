@@ -19,8 +19,8 @@ require (
 	github.com/stretchr/testify v1.7.2
 	github.com/urfave/cli/v2 v2.7.1
 	github.com/whilp/git-urls v1.0.0
-	golang.org/x/oauth2 v0.0.0-20220524215830-622c5d57e401
-	golang.org/x/sys v0.0.0-20220520151302-bc2c85ada10a
+	golang.org/x/oauth2 v0.0.0-20220630143837-2104d58473e0
+	golang.org/x/sys v0.0.0-20220627191245-f75cf1eec38b
 	sigs.k8s.io/yaml v1.3.0
 )
 
@@ -36,7 +36,7 @@ require (
 	github.com/cpuguy83/go-md2man/v2 v2.0.1 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
-	github.com/golang/protobuf v1.4.2 // indirect
+	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/google/subcommands v1.0.1 // indirect
 	github.com/google/uuid v1.1.1 // indirect
@@ -56,13 +56,13 @@ require (
 	github.com/xo/terminfo v0.0.0-20210125001918-ca9a967f8778 // indirect
 	golang.org/x/crypto v0.0.0-20210817164053-32db794688a5 // indirect
 	golang.org/x/mod v0.4.2 // indirect
-	golang.org/x/net v0.0.0-20220127200216-cd36cc0744dd // indirect
+	golang.org/x/net v0.0.0-20220624214902-1bab6f366d9e // indirect
 	golang.org/x/term v0.0.0-20210927222741-03fcf44c2211 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/tools v0.1.5 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
-	google.golang.org/protobuf v1.25.0 // indirect
+	google.golang.org/protobuf v1.28.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
