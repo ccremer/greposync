@@ -5,7 +5,7 @@ go 1.18
 require (
 	github.com/BurntSushi/toml v1.1.0
 	github.com/Masterminds/sprig/v3 v3.2.2
-	github.com/ccremer/go-command-pipeline v0.17.0
+	github.com/ccremer/go-command-pipeline v0.18.0
 	github.com/ccremer/plogr v0.6.0
 	github.com/go-logr/logr v1.2.3
 	github.com/google/go-github/v39 v39.2.0
@@ -16,7 +16,7 @@ require (
 	github.com/mariotoffia/goasciidoc v0.4.6
 	github.com/mattn/go-isatty v0.0.14
 	github.com/pterm/pterm v0.12.42
-	github.com/stretchr/testify v1.7.2
+	github.com/stretchr/testify v1.7.3
 	github.com/urfave/cli/v2 v2.7.1
 	github.com/whilp/git-urls v1.0.0
 	golang.org/x/oauth2 v0.0.0-20220630143837-2104d58473e0
