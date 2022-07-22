@@ -15,7 +15,7 @@ require (
 	github.com/knadh/koanf v1.4.2
 	github.com/mariotoffia/goasciidoc v0.4.6
 	github.com/mattn/go-isatty v0.0.14
-	github.com/pterm/pterm v0.12.42
+	github.com/pterm/pterm v0.12.44
 	github.com/stretchr/testify v1.7.3
 	github.com/urfave/cli/v2 v2.7.1
 	github.com/whilp/git-urls v1.0.0
