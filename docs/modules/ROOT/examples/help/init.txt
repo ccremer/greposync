@@ -10,5 +10,4 @@ DESCRIPTION:
 
 OPTIONS:
    --template.root value  The path relative to the current workdir where the template files are located. (default: "template") [$G_TEMPLATE_ROOT_DIR]
-   --help, -h             show help (default: false)
    

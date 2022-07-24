@@ -14,5 +14,4 @@ OPTIONS:
    --log.level value, -v value   Log level that increases verbosity with greater numbers. (default: 0) [$G_LOG_LEVEL]
    --log.showLog                 Shows the full log in real-time rather than keeping it hidden until an error occurred. (default: false) [$G_SHOW_LOG]
    --skipBroken                  Skip abort if a repository update encounters an error (default: false) [$G_SKIP_BROKEN]
-   --help, -h                    show help (default: false)
    

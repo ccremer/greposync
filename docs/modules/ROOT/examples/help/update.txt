@@ -26,5 +26,4 @@ OPTIONS:
    --pr.targetBranch value       Remote branch name of the pull request. If left empty, it will target the default branch (usually 'master' or 'main'). [$G_PR_TARGET_BRANCH]
    --skipBroken                  Skip abort if a repository update encounters an error (default: false) [$G_SKIP_BROKEN]
    --template.root value         The path relative to the current workdir where the template files are located. (default: "template") [$G_TEMPLATE_ROOT_DIR]
-   --help, -h                    show help (default: false)
    
