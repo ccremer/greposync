@@ -26,3 +26,4 @@ COMMANDS:
 GLOBAL OPTIONS:
    --help, -h  show help (default: false)
    --version   print the version (default: false)
+   
