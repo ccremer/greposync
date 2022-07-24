@@ -16,7 +16,7 @@ require (
 	github.com/mariotoffia/goasciidoc v0.4.6
 	github.com/mattn/go-isatty v0.0.14
 	github.com/pterm/pterm v0.12.42
-	github.com/stretchr/testify v1.7.3
+	github.com/stretchr/testify v1.8.0
 	github.com/urfave/cli/v2 v2.11.1
 	github.com/whilp/git-urls v1.0.0
 	golang.org/x/oauth2 v0.0.0-20220630143837-2104d58473e0
