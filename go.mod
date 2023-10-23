@@ -13,7 +13,7 @@ require (
 	github.com/gookit/color v1.5.0
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/knadh/koanf v1.4.2
-	github.com/mariotoffia/goasciidoc v0.4.6
+	github.com/mariotoffia/goasciidoc v0.4.7
 	github.com/mattn/go-isatty v0.0.16
 	github.com/pterm/pterm v0.12.42
 	github.com/stretchr/testify v1.8.0
