@@ -14,13 +14,13 @@ require (
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/knadh/koanf v1.4.2
 	github.com/mariotoffia/goasciidoc v0.4.6
-	github.com/mattn/go-isatty v0.0.16
+	github.com/mattn/go-isatty v0.0.20
 	github.com/pterm/pterm v0.12.42
 	github.com/stretchr/testify v1.8.0
 	github.com/urfave/cli/v2 v2.11.1
 	github.com/whilp/git-urls v1.0.0
 	golang.org/x/oauth2 v0.1.0
-	golang.org/x/sys v0.1.0
+	golang.org/x/sys v0.6.0
 	sigs.k8s.io/yaml v1.3.0
 )
 
