@@ -3,7 +3,7 @@ module github.com/ccremer/greposync
 go 1.18
 
 require (
-	github.com/BurntSushi/toml v1.2.0
+	github.com/BurntSushi/toml v1.3.2
 	github.com/Masterminds/sprig/v3 v3.2.2
 	github.com/ccremer/go-command-pipeline v0.18.0
 	github.com/ccremer/plogr v0.6.0
@@ -17,7 +17,7 @@ require (
 	github.com/mattn/go-isatty v0.0.16
 	github.com/pterm/pterm v0.12.42
 	github.com/stretchr/testify v1.8.0
-	github.com/urfave/cli/v2 v2.11.1
+	github.com/urfave/cli/v2 v2.27.1
 	github.com/whilp/git-urls v1.0.0
 	golang.org/x/oauth2 v0.1.0
 	golang.org/x/sys v0.1.0
