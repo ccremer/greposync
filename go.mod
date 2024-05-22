@@ -7,7 +7,7 @@ require (
 	github.com/Masterminds/sprig/v3 v3.2.2
 	github.com/ccremer/go-command-pipeline v0.18.0
 	github.com/ccremer/plogr v0.6.0
-	github.com/go-logr/logr v1.2.3
+	github.com/go-logr/logr v1.4.2
 	github.com/google/go-github/v39 v39.2.0
 	github.com/google/wire v0.5.0
 	github.com/gookit/color v1.5.0
