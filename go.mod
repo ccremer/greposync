@@ -3,7 +3,7 @@ module github.com/ccremer/greposync
 go 1.18
 
 require (
-	github.com/BurntSushi/toml v1.2.0
+	github.com/BurntSushi/toml v1.4.0
 	github.com/Masterminds/sprig/v3 v3.2.2
 	github.com/ccremer/go-command-pipeline v0.18.0
 	github.com/ccremer/plogr v0.6.0
