@@ -6,17 +6,17 @@ require (
 	github.com/BurntSushi/toml v1.2.0
 	github.com/Masterminds/sprig/v3 v3.2.2
 	github.com/ccremer/go-command-pipeline v0.18.0
-	github.com/ccremer/plogr v0.6.0
+	github.com/ccremer/plogr v0.7.0
 	github.com/go-logr/logr v1.2.3
 	github.com/google/go-github/v39 v39.2.0
 	github.com/google/wire v0.5.0
-	github.com/gookit/color v1.5.0
+	github.com/gookit/color v1.5.2
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/knadh/koanf v1.4.2
 	github.com/mariotoffia/goasciidoc v0.4.6
 	github.com/mattn/go-isatty v0.0.16
-	github.com/pterm/pterm v0.12.42
-	github.com/stretchr/testify v1.8.0
+	github.com/pterm/pterm v0.12.51
+	github.com/stretchr/testify v1.8.1
 	github.com/urfave/cli/v2 v2.11.1
 	github.com/whilp/git-urls v1.0.0
 	golang.org/x/oauth2 v0.1.0
@@ -43,7 +43,7 @@ require (
 	github.com/huandu/xstrings v1.3.1 // indirect
 	github.com/imdario/mergo v0.3.12 // indirect
 	github.com/lithammer/fuzzysearch v1.1.5 // indirect
-	github.com/mattn/go-runewidth v0.0.13 // indirect
+	github.com/mattn/go-runewidth v0.0.14 // indirect
 	github.com/mitchellh/copystructure v1.2.0 // indirect
 	github.com/mitchellh/mapstructure v1.4.1 // indirect
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
