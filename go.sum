@@ -39,8 +39,8 @@ github.com/aws/aws-sdk-go-v2/service/sso v1.4.2/go.mod h1:NBvT9R1MEF+Ud6ApJKM0G+
 github.com/aws/aws-sdk-go-v2/service/sts v1.7.2/go.mod h1:8EzeIqfWt2wWT4rJVu3f21TfrhJ8AEMzVybRNSb/b4g=
 github.com/aws/smithy-go v1.8.0/go.mod h1:SObp3lf9smib00L/v3U2eAKG8FyQ7iLrJnQiAmR5n+E=
 github.com/bgentry/speakeasy v0.1.0/go.mod h1:+zsyZBPWlz7T6j88CTgSN5bM796AkVf0kBD4zp0CCIs=
-github.com/ccremer/go-command-pipeline v0.18.0 h1:QJWlz+/KtBRIpv46T3zrW58w5DDaLZTnULka/7pJtQM=
-github.com/ccremer/go-command-pipeline v0.18.0/go.mod h1:fhQHl6aNWFKU1qKNTd26Zn5PHlcPqTylygOu845uejA=
+github.com/ccremer/go-command-pipeline v0.20.0 h1:2bjmhyvQsbD9ZARGtiW+hxdN2vANlVXCHU+0PoZqeME=
+github.com/ccremer/go-command-pipeline v0.20.0/go.mod h1:uTtRkKisQugA2PNMf1V+lN2Jcv1fH5hnrAJHTRHpfJo=
 github.com/ccremer/plogr v0.6.0 h1:0/2dVxIcbrDkbFjpZcWBUyGYtIHhslgTmBECjMptLzs=
 github.com/ccremer/plogr v0.6.0/go.mod h1:0rx2lckCXaVhC8bKV2BIc3Kt2sKEmXpvdsNOQ7hk0g8=
 github.com/client9/misspell v0.3.4/go.mod h1:qj6jICC3Q7zFZvVWo7KLAzC3yx5G7kyvSDkc90ppPyw=
