@@ -1,6 +1,6 @@
 module github.com/ccremer/greposync
 
-go 1.18
+go 1.21
 
 require (
 	github.com/BurntSushi/toml v1.2.0
@@ -13,7 +13,7 @@ require (
 	github.com/gookit/color v1.5.0
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/knadh/koanf v1.4.2
-	github.com/mariotoffia/goasciidoc v0.4.6
+	github.com/mariotoffia/goasciidoc v0.4.7
 	github.com/mattn/go-isatty v0.0.16
 	github.com/pterm/pterm v0.12.42
 	github.com/stretchr/testify v1.8.0
@@ -29,8 +29,8 @@ require (
 	atomicgo.dev/keyboard v0.2.8 // indirect
 	github.com/Masterminds/goutils v1.1.1 // indirect
 	github.com/Masterminds/semver/v3 v3.1.1 // indirect
-	github.com/alexflint/go-arg v1.3.0 // indirect
-	github.com/alexflint/go-scalar v1.0.0 // indirect
+	github.com/alexflint/go-arg v1.4.3 // indirect
+	github.com/alexflint/go-scalar v1.2.0 // indirect
 	github.com/containerd/console v1.0.3 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
@@ -55,7 +55,7 @@ require (
 	github.com/xo/terminfo v0.0.0-20210125001918-ca9a967f8778 // indirect
 	github.com/xrash/smetrics v0.0.0-20201216005158-039620a65673 // indirect
 	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519 // indirect
-	golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4 // indirect
+	golang.org/x/mod v0.12.0 // indirect
 	golang.org/x/net v0.1.0 // indirect
 	golang.org/x/term v0.1.0 // indirect
 	golang.org/x/text v0.4.0 // indirect
